@@ -2,7 +2,7 @@
 
 A fully interactive, nested, and dynamic Kanban board built with the BALL Stack (Bootstrap, Alpine.js, Laravel, Livewire).
 
-![Kanban Board](https://via.placeholder.com/600x400.png?text=Kanban+Board+Screenshot)
+![Kanban Board](https://snipboard.io/OcSbQx.jpg)
 
 ## Features
 
@@ -23,12 +23,12 @@ A fully interactive, nested, and dynamic Kanban board built with the BALL Stack 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/ball-stack-kanban.git
+   git clone https://github.com/rafitojuan/project-board-livewire.git
    ```
 
 2. Navigate to the project directory:
    ```
-   cd ball-stack-kanban
+   cd project-board-livewire
    ```
 
 3. Install PHP dependencies:
@@ -67,7 +67,7 @@ Visit `http://localhost:8000` in your browser to see the application in action.
 
 ## Usage
 
-[Provide basic instructions on how to use the Kanban board, create tasks, move items, etc.]
+Pake aja jir
 
 ## Contributing
 
