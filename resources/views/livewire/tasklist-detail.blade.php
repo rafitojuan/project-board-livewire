@@ -49,7 +49,7 @@
             <div class="card rounded-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title">Task</h5>
+                        <h5 class="card-title">Kegiatan</h5>
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#addColumnModal">Add Column</button>
                     </div>
@@ -162,7 +162,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Add Task
+                        Add Kegiatan
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -214,7 +214,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Task
+                        Update Kegiatan
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -300,7 +300,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Tasklist Column
+                        Update Kegiatan Column
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -334,14 +334,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalToggleLabel">
-                        Subtask
+                        Jobdesk
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="text-end mb-3">
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#addSubtaskModal">+ Add Subtask</button>
+                            data-bs-target="#addSubtaskModal">+ Add Jobdesk</button>
                     </div>
                     <div>
                         <livewire:subtasks-table id="{{ $task['id'] }}" />
@@ -362,7 +362,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Add subtask
+                        Add Jobdesk
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

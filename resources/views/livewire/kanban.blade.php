@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-muted">Tidak ada task saat ini.</p>
+                                <p class="text-muted">Tidak ada project saat ini.</p>
                             @endforelse
                         </div>
 
@@ -105,7 +105,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Tasklist
+                        Update Project
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -165,7 +165,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Add Tasklist
+                        Add Project
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -241,7 +241,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Tasklist Column
+                        Update Project Column
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

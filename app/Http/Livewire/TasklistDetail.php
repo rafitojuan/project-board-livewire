@@ -269,8 +269,6 @@ class TasklistDetail extends Component
 
     public function render()
     {
-        return view('livewire.tasklist-detail', [
-            'totalBiaya' => Subtask::sum('biaya'),
-        ]);
+        return view('livewire.tasklist-detail');
     }
 }

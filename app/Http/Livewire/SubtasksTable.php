@@ -98,17 +98,20 @@ class SubtasksTable extends DataTableComponent
                 ->sortable()->searchable(),
             BooleanColumn::make("Completed", "completed")
                 ->sortable()->searchable(),
-            Column::make('Name')->view('components.action-buttons'),
+            Column::make('Action', 'id')->view('components.action-buttons'),
         ];
     }
 
 
-    public function edit($id)
+    public function edit($row)
     {
-        $this->emit('editSubtask', $id);
+        $subtask = Subtask::findOrFail($row);
+        $data = $subtask->name;
+        
+        
     }
 
-    public function delete($row): void
+    public function delete($row)
     {
         Subtask::where('id', $row)->delete();
         $this->alert('success', 'Subtask berhasil dihapus!');
