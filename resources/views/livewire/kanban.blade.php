@@ -56,7 +56,9 @@
                                                     class="text-dark">{{ Str::limit($tasklist->name, 60) . (strlen($tasklist->name) > 60 ? '...' : '') }}</a>
                                             </h5>
                                             <p class="text-muted">
-                                                {{ $tasklist->created_at ? $tasklist->created_at->format('d M, Y') : 'N/A' }}
+                                                {{ \Carbon\Carbon::parse($tasklist->started_at)->format('d F Y') }}
+                                                <span class="fw-bold mx-3">-</span>
+                                                {{ $tasklist->end_at ? \Carbon\Carbon::parse($tasklist->end_at)->format('d F Y') : 'N/A' }}
                                             </p>
                                         </div>
 
@@ -124,10 +126,17 @@
                             <textarea name="location" id="location" class="form-control" placeholder="Masukkan lokasi" wire:model='location'
                                 rows="3"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" wire:model='newTasklistStartDate'
-                                value="" id="">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" wire:model='newTasklistStartDate'
+                                    value="" id="start_date">
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
+                                    value="" id="end_date">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="value">Value</label>
@@ -164,23 +173,45 @@
                     <form wire:submit='addTasklist'>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Masukkan nama"
-                                wire:model='newTasklistName' required>
+                            <input type="text" class="form-control @error('newTasklistName') is-invalid @enderror"
+                                id="name" placeholder="Masukkan nama" wire:model='newTasklistName' required>
+                            @error('newTasklistName')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="company" class="form-label">Company</label>
-                            <input type="text" class="form-control" id="company" placeholder="Masukkan company"
-                                wire:model='newTasklistCompany' required>
+                            <input type="text"
+                                class="form-control @error('newTasklistCompany') is-invalid @enderror" id="company"
+                                placeholder="Masukkan company" wire:model='newTasklistCompany' required>
+                            @error('newTasklistCompany')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="location" class="form-label">Location</label>
-                            <textarea name="location" id="location" class="form-control" placeholder="Masukkan lokasi" wire:model='location'
-                                rows="3"></textarea>
+                            <textarea name="location" id="location" class="form-control @error('location') is-invalid @enderror"
+                                onkeyup="auto_grow(this)" placeholder="Masukkan lokasi" wire:model='location' rows="3"></textarea>
+                            @error('location')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" wire:model='newTasklistStartDate'
-                                value="{{ now()->format('Y-m-d\TH:i') }}" id="">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date"
+                                    class="form-control @error('newTasklistStartDate') is-invalid @enderror"
+                                    wire:model='newTasklistStartDate' value="{{ now()->format('Y-m-d\TH:i') }}"
+                                    id="start_date">
+                                @error('newTasklistStartDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
+                                    value="{{ now()->format('Y-m-d\TH:i') }}" id="end_date">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="value">Value</label>

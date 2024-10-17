@@ -24,7 +24,9 @@ return new class extends Migration
             $table->integer('order');
             $table->string('company')->nullable();
             $table->string('location')->nullable();
-            $table->decimal('value', 10, 2)->nullable();
+            $table->decimal('value', 15, 2)->nullable();
+            $table->date('started_at')->default(now()->format('Y-m-d'));
+            $table->date('end_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -44,6 +46,8 @@ return new class extends Migration
             $table->foreignId('tasklist_column_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->integer('order');
+            $table->date('started_at')->default(now()->format('Y-m-d'));
+            $table->date('end_at')->nullable();
             $table->timestamps();
         });
 

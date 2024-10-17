@@ -56,7 +56,10 @@
                                                     class="text-dark"><?php echo e(Str::limit($tasklist->name, 60) . (strlen($tasklist->name) > 60 ? '...' : '')); ?></a>
                                             </h5>
                                             <p class="text-muted">
-                                                <?php echo e($tasklist->created_at ? $tasklist->created_at->format('d M, Y') : 'N/A'); ?>
+                                                <?php echo e(\Carbon\Carbon::parse($tasklist->started_at)->format('d F Y')); ?>
+
+                                                <span class="fw-bold mx-3">-</span>
+                                                <?php echo e($tasklist->end_at ? \Carbon\Carbon::parse($tasklist->end_at)->format('d F Y') : 'N/A'); ?>
 
                                             </p>
                                         </div>
@@ -126,10 +129,17 @@
                             <textarea name="location" id="location" class="form-control" placeholder="Masukkan lokasi" wire:model='location'
                                 rows="3"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" wire:model='newTasklistStartDate'
-                                value="" id="">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" wire:model='newTasklistStartDate'
+                                    value="" id="start_date">
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
+                                    value="" id="end_date">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="value">Value</label>
@@ -166,23 +176,101 @@
                     <form wire:submit='addTasklist'>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Masukkan nama"
-                                wire:model='newTasklistName' required>
+                            <input type="text" class="form-control <?php $__errorArgs = ['newTasklistName'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                id="name" placeholder="Masukkan nama" wire:model='newTasklistName' required>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistName'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="company" class="form-label">Company</label>
-                            <input type="text" class="form-control" id="company" placeholder="Masukkan company"
-                                wire:model='newTasklistCompany' required>
+                            <input type="text"
+                                class="form-control <?php $__errorArgs = ['newTasklistCompany'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="company"
+                                placeholder="Masukkan company" wire:model='newTasklistCompany' required>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistCompany'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="location" class="form-label">Location</label>
-                            <textarea name="location" id="location" class="form-control" placeholder="Masukkan lokasi" wire:model='location'
-                                rows="3"></textarea>
+                            <textarea name="location" id="location" class="form-control <?php $__errorArgs = ['location'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                onkeyup="auto_grow(this)" placeholder="Masukkan lokasi" wire:model='location' rows="3"></textarea>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['location'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" wire:model='newTasklistStartDate'
-                                value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>" id="">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date"
+                                    class="form-control <?php $__errorArgs = ['newTasklistStartDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='newTasklistStartDate' value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>"
+                                    id="start_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistStartDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
+                                    value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>" id="end_date">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="value">Value</label>

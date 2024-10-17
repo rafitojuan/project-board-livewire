@@ -14,7 +14,9 @@
                     </nav>
                     <h4 class="card-title fs-4 ms-2"><?php echo e($tasklist->name); ?></h4>
                     <p class="card-text ms-2 mt-3 mb-3">
-                        <?php echo e(\Carbon\Carbon::parse($tasklist->created_at)->format('d F Y')); ?>
+                        <?php echo e(\Carbon\Carbon::parse($tasklist->started_at)->format('d F Y')); ?> <span
+                            class="fw-bold mx-2">-</span>
+                        <?php echo e($tasklist->end_at ? \Carbon\Carbon::parse($tasklist->end_at)->format('d F Y') : 'N/A'); ?>
 
                     </p>
                 </div>
@@ -109,14 +111,16 @@
                                                         </div>
                                                         <div>
                                                             <h5 class="font-size-15" style="cursor: pointer"
-                                                                data-bs-toggle="modal" data-bs-target="#subTaskModal">
+                                                                data-bs-toggle="modal" data-bs-target="#subTaskModal"
+                                                                wire:click="openSubTaskModal(<?php echo e($task); ?>)">
                                                                 <?php echo e(Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '')); ?>
 
                                                             </h5>
-                                                            <p class="text-muted">
-                                                                <?php echo e($task->created_at ? $task->created_at->format('d M, Y') : 'N/A'); ?>
+                                                            <small class="text-muted mb-2">
+                                                                <?php echo e(\Carbon\Carbon::parse($task->started_at)->format('d M Y')); ?><span
+                                                                    class="mx-1">-</span><?php echo e($task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A'); ?>
 
-                                                            </p>
+                                                            </small>
                                                         </div>
 
                                                         <div class="avatar-group float-start task-assigne">
@@ -124,7 +128,7 @@
                                                         </div>
                                                         <div class="text-end">
                                                             <h5 class="font-size-15 mb-1">Rp
-                                                                <?php echo e(number_format($tasklist->value / 2, 2)); ?>
+
 
                                                             </h5>
                                                             <p class="mb-0 text-muted">Project Value</p>
@@ -190,9 +194,11 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control <?php $__errorArgs = ['taskStartDate'];
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date"
+                                    class="form-control <?php $__errorArgs = ['taskStartDate'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -200,17 +206,40 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                wire:model='taskStartDate' value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>" id="">
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskStartDate'];
+                                    wire:model='taskStartDate' value="<?php echo e(now()->format('Y-m-d')); ?>" id="start_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskStartDate'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                <small class="text-danger"><?php echo e($message); ?></small>
-                            <?php unset($message);
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control <?php $__errorArgs = ['taskEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='taskEndDate' id="end_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                            </div>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -259,9 +288,11 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control <?php $__errorArgs = ['taskStartDate'];
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date"
+                                    class="form-control <?php $__errorArgs = ['taskStartDate'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -269,17 +300,40 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                wire:model='taskStartDate' value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>" id="">
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskStartDate'];
+                                    wire:model='taskStartDate' id="start_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskStartDate'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                <small class="text-danger"><?php echo e($message); ?></small>
-                            <?php unset($message);
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control <?php $__errorArgs = ['taskEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='taskEndDate' id="end_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                            </div>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -388,10 +442,11 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
         </div>
     </div>
 
+
     
-    <div class="modal fade" id="subTaskModal" wire:ignore.self aria-hidden="true"
+    <div class="modal fade" id="subTaskModal" data-bs-backdrop="static" wire:ignore.self aria-hidden="true"
         aria-labelledby="exampleModalToggleLabel" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalToggleLabel">
@@ -400,13 +455,53 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="text-end mb-3">
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#addSubtaskModal">+ Add Subtask</button>
+                    </div>
                     <div>
-                        <label for="name" class="form-label">Name: </label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" wire:click="addSubtaskInput">
-                                <i class="mdi mdi-plus"></i>
-                            </span>
-                            <input type="text" class="form-control <?php $__errorArgs = ['subtaskName.0'];
+                        <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('subtasks-table', ['id' => ''.e($task['id']).'']);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-3583511551-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" wire:ignore.self id="addSubtaskModal" tabindex="-1" data-bs-backdrop="static"
+        data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">
+                        Add subtask
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form wire:submit='addSubtask'>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control <?php $__errorArgs = ['subtaskName'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -414,8 +509,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                id="name" placeholder="Masukkan nama" wire:model='subtaskName.0' required>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskName.0'];
+                                id="name" placeholder="Masukkan nama" wire:model='subtaskName' required>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskName'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -426,14 +521,10 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-
-                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $subtaskName; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text" wire:click="removeSubtaskInput(<?php echo e($index); ?>)">
-                                    <i class="mdi mdi-minus"></i>
-                                </span>
-                                <input type="text"
-                                    class="form-control <?php $__errorArgs = ['subtaskName.' . $index];
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Pelaksana <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control <?php $__errorArgs = ['subtaskName'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -441,51 +532,111 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                    id="name" placeholder="Masukkan nama"
-                                    wire:model='subtaskName.<?php echo e($index); ?>' required>
-                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskName.' . $index];
+                                id="name" placeholder="Masukkan pelaksana" wire:model='subtaskJob' required>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskJob'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                    <small class="text-danger"><?php echo e($message); ?></small>
-                                <?php unset($message);
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="name" class="form-label">Tanggal Mulai</label>
+                                    <input type="date"
+                                        class="form-control <?php $__errorArgs = ['subTaskStarted'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                        id="name" placeholder="Masukkan tanngal mulai"
+                                        wire:model='subTaskStarted'>
+                                    <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subTaskStarted'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <small class="text-danger"><?php echo e($message); ?></small>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                                </div>
+                                <div class="col">
+                                    <label for="name" class="form-label">Tanggal Akhir</label>
+                                    <input type="date"
+                                        class="form-control <?php $__errorArgs = ['subTaskEnd'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="name"
+                                        placeholder="Masukkan tanngal akhir" wire:model='subTaskEnd'>
+                                    <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subTaskEnd'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <small class="text-danger"><?php echo e($message); ?></small>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                                </div>
                             </div>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
-                    </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number"
+                                    class="form-control <?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="name"
+                                    placeholder="Masukkan nominal" wire:model='subtaskValue'
+                                    x-on:keydown="if(event.target.value.length >= 10) event.preventDefault()">
+                            </div>
+                            <small class="text-danger" x-show="subtaskValue >= 9999999999">Maximum value
+                                reached</small>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">
-                        Open second modal
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                        data-bs-target="#subTaskModal">
+                        Back
                     </button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
+                </form>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2"
-        tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalToggleLabel2">
-                        Modal 2
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Hide this modal and show the first with the button below.
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">
-                        Back to first
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
 </div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/tasklist-detail.blade.php ENDPATH**/ ?>

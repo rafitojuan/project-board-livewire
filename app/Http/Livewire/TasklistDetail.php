@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Subtask;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
@@ -29,13 +30,25 @@ class TasklistDetail extends Component
     public $editingTaskColumn;
     public $taskName;
     public $taskStartDate;
+    public $taskEndDate;
     public $tasklistColumnName;
-    public $subtaskName = [];
+    public $subtaskName;
+    public $subtaskJob;
+    public $subtaskValue;
+    public $subtaskValue2;
+    public $subTaskStarted;
+    public $subTaskEnd;
 
     protected $rules = [
         'newColumnName' => 'required|min:3',
         'taskName' => 'required|min:3',
-        'taskStartDate' => 'required',
+        'taskStartDate' => 'required|date',
+        'taskEndDate' => 'date',
+        'subtaskName' => 'required|min:3',
+        'subtaskJob' => 'required|min:3',
+        'subtaskValue' => 'min:3|numeric',
+        'subTaskStarted' => 'required|date',
+        'subTaskEnd' => 'date',
     ];
 
     protected $listeners = [
@@ -82,17 +95,20 @@ class TasklistDetail extends Component
     {
         $this->validate([
             'taskName' => 'required|min:3',
-            'taskStartDate' => 'required',
+            'taskStartDate' => 'required|date',
+            'taskEndDate' => 'date',
         ]);
 
         Task::create([
             'tasklist_column_id' => $this->editingTasklistColumnId,
             'name' => $this->taskName,
+            'started_at' => $this->taskStartDate,
+            'end_at' => $this->taskEndDate,
             'order' => Task::where('tasklist_column_id', $this->editingTasklistColumnId)->max('order') + 1,
             'status_id' => 1,
         ]);
 
-        $this->reset('taskName', 'taskStartDate');
+        $this->reset('taskName', 'taskStartDate', 'taskEndDate');
         $this->dispatch('close-taskModal', ['modalName' => 'closeTaskModal']);
         $this->loadTasklistColumns();
         $this->alert('success', 'Task added successfully!');
@@ -103,7 +119,8 @@ class TasklistDetail extends Component
         $this->taskId = $task['id'];
         $this->editingTasklistColumnId = $task['tasklist_column_id'];
         $this->taskName = $task['name'];
-        $this->taskStartDate = Carbon::parse($task['created_at'])->format('Y-m-d');
+        $this->taskStartDate = $task['started_at'];
+        $this->taskEndDate = $task['end_at'];
     }
 
     public function updateTask()
@@ -111,14 +128,16 @@ class TasklistDetail extends Component
         $this->validate([
             'taskName' => 'required|min:3',
             'taskStartDate' => 'required',
+            'taskEndDate' => 'date',
         ]);
 
         Task::where('id', $this->taskId)->update([
             'name' => $this->taskName,
-            'created_at' => $this->taskStartDate,
+            'started_at' => $this->taskStartDate,
+            'end_at' => $this->taskEndDate,
         ]);
 
-        $this->reset('taskName', 'taskStartDate');
+        $this->reset('taskName', 'taskStartDate', 'taskEndDate');
         $this->dispatch('close-taskModal', ['modalName' => 'updateTaskModal']);
         $this->loadTasklistColumns();
         $this->alert('success', 'Task updated successfully!');
@@ -207,6 +226,7 @@ class TasklistDetail extends Component
         ]);
     }
 
+
     public function deleteColumn()
     {
         TasklistColumn::where('id', $this->editingTasklistColumnId)->delete();
@@ -215,19 +235,42 @@ class TasklistDetail extends Component
         $this->alert('success', 'Kolom berhasil dihapus!');
     }
 
-    public function addSubtaskInput()
+
+    public function openSubTaskModal($task)
     {
-        $this->subtaskName[] = '';
+        $this->taskId = $task['id'];
     }
 
-    public function removeSubtaskInput($index)
+    public function addSubtask()
     {
-        unset($this->subtaskName[$index]);
-        $this->subtaskName = array_values($this->subtaskName);
+        $this->validate([
+            'subtaskName' => 'required|min:3',
+            'subtaskJob' => 'required|min:3',
+            'subtaskValue' => 'numeric',
+            'subTaskStarted' => 'required|date',
+            'subTaskEnd' => 'date',
+        ]);
+
+        Subtask::create([
+            'name' => $this->subtaskName,
+            'pelaksana' => $this->subtaskJob,
+            'biaya' => $this->subtaskValue,
+            'started_at' => $this->subTaskStarted,
+            'end_at' => $this->subTaskEnd,
+            'task_id' => $this->taskId,
+            'keterangan' => 'order'
+        ]);
+
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd');
+        $this->alert('success', 'Subtask berhasil ditambahkan!');
+        $this->dispatch('refreshDatatable');
     }
+
 
     public function render()
     {
-        return view('livewire.tasklist-detail');
+        return view('livewire.tasklist-detail', [
+            'totalBiaya' => Subtask::sum('biaya'),
+        ]);
     }
 }

@@ -14,6 +14,11 @@ class Subtask extends Model
         'name',
         'value',
         'completed',
+        'pelaksana',
+        'biaya',
+        'started_at',
+        'end_at',
+        'keterangan',
     ];
 
     public function task()

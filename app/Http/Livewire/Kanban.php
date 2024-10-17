@@ -25,6 +25,7 @@ class Kanban extends Component
     public $newTasklistCompany;
     public $location = '';
     public $newTasklistStartDate;
+    public $newTasklistEndDate;
     public $newTasklistValue;
     public $editingColumn;
     public $newTaskName;
@@ -38,7 +39,8 @@ class Kanban extends Component
         'location' => 'nullable|string',
         'newTasklistValue' => 'nullable|numeric',
         'newTaskName' => 'required|min:3',
-        'newTasklistStartDate' => 'required',
+        'newTasklistStartDate' => 'required|date',
+        'newTasklistEndDate' => 'date',
     ];
 
     protected $listeners = [
@@ -91,7 +93,8 @@ class Kanban extends Component
         $this->newTasklistCompany = $tasklist['company'];
         $this->location = $tasklist['location'];
         $this->newTasklistValue = $tasklist['value'];
-        $this->newTasklistStartDate = $tasklist['created_at'];
+        $this->newTasklistStartDate = $tasklist['started_at'];
+        $this->newTasklistEndDate = $tasklist['end_at'];
     }
 
     public function openAddTaskModal($tasklistColumnId)
@@ -161,7 +164,8 @@ class Kanban extends Component
             'value' => $this->newTasklistValue,
             'order' => $newOrder,
             'status_id' => 1,
-            'created_at' => $this->newTasklistStartDate ? Carbon::parse($this->newTasklistStartDate)->format('Y-m-d H:i:s') : now()->format('Y-m-d H:i:s'),
+            'started_at' => $this->newTasklistStartDate,
+            'end_at' => $this->newTasklistEndDate ?? null,
         ]);
 
         $defaultColumns = ['Upcoming', 'In Progress', 'Completed'];
@@ -194,7 +198,8 @@ class Kanban extends Component
             'company' => $this->newTasklistCompany,
             'location' => $this->location,
             'value' => $this->newTasklistValue,
-            'created_at' => $this->newTasklistStartDate ? Carbon::parse($this->newTasklistStartDate) : now(),
+            'started_at' => $this->newTasklistStartDate,
+            'end_at' => $this->newTasklistEndDate ?? null,
         ];
 
         Tasklist::where('id', $this->tasklistId)->update($data);

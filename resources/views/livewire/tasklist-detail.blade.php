@@ -14,7 +14,9 @@
                     </nav>
                     <h4 class="card-title fs-4 ms-2">{{ $tasklist->name }}</h4>
                     <p class="card-text ms-2 mt-3 mb-3">
-                        {{ \Carbon\Carbon::parse($tasklist->created_at)->format('d F Y') }}
+                        {{ \Carbon\Carbon::parse($tasklist->started_at)->format('d F Y') }} <span
+                            class="fw-bold mx-2">-</span>
+                        {{ $tasklist->end_at ? \Carbon\Carbon::parse($tasklist->end_at)->format('d F Y') : 'N/A' }}
                     </p>
                 </div>
                 <div class="card-body">
@@ -107,12 +109,14 @@
                                                         </div>
                                                         <div>
                                                             <h5 class="font-size-15" style="cursor: pointer"
-                                                                data-bs-toggle="modal" data-bs-target="#subTaskModal">
+                                                                data-bs-toggle="modal" data-bs-target="#subTaskModal"
+                                                                wire:click="openSubTaskModal({{ $task }})">
                                                                 {{ Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '') }}
                                                             </h5>
-                                                            <p class="text-muted">
-                                                                {{ $task->created_at ? $task->created_at->format('d M, Y') : 'N/A' }}
-                                                            </p>
+                                                            <small class="text-muted mb-2">
+                                                                {{ \Carbon\Carbon::parse($task->started_at)->format('d M Y') }}<span
+                                                                    class="mx-1">-</span>{{ $task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A' }}
+                                                            </small>
                                                         </div>
 
                                                         <div class="avatar-group float-start task-assigne">
@@ -120,7 +124,8 @@
                                                         </div>
                                                         <div class="text-end">
                                                             <h5 class="font-size-15 mb-1">Rp
-                                                                {{ number_format($tasklist->value / 2, 2) }}
+
+
                                                             </h5>
                                                             <p class="mb-0 text-muted">Project Value</p>
                                                         </div>
@@ -171,13 +176,24 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control @error('taskStartDate') is-invalid @enderror"
-                                wire:model='taskStartDate' value="{{ now()->format('Y-m-d\TH:i') }}" id="">
-                            @error('taskStartDate')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date"
+                                    class="form-control @error('taskStartDate') is-invalid @enderror"
+                                    wire:model='taskStartDate' value="{{ now()->format('Y-m-d') }}" id="start_date">
+                                @error('taskStartDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control @error('taskEndDate') is-invalid @enderror"
+                                    wire:model='taskEndDate' id="end_date">
+                                @error('taskEndDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -212,13 +228,24 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Start Date</label>
-                            <input type="date" class="form-control @error('taskStartDate') is-invalid @enderror"
-                                wire:model='taskStartDate' value="{{ now()->format('Y-m-d\TH:i') }}" id="">
-                            @error('taskStartDate')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date"
+                                    class="form-control @error('taskStartDate') is-invalid @enderror"
+                                    wire:model='taskStartDate' id="start_date">
+                                @error('taskStartDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control @error('taskEndDate') is-invalid @enderror"
+                                    wire:model='taskEndDate' id="end_date">
+                                @error('taskEndDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -299,10 +326,11 @@
         </div>
     </div>
 
+
     {{-- Subtask Modal --}}
-    <div class="modal fade" id="subTaskModal" wire:ignore.self aria-hidden="true"
+    <div class="modal fade" id="subTaskModal" data-bs-backdrop="static" wire:ignore.self aria-hidden="true"
         aria-labelledby="exampleModalToggleLabel" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalToggleLabel">
@@ -311,63 +339,102 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="text-end mb-3">
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#addSubtaskModal">+ Add Subtask</button>
+                    </div>
                     <div>
-                        <label for="name" class="form-label">Name: </label>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" wire:click="addSubtaskInput">
-                                <i class="mdi mdi-plus"></i>
-                            </span>
-                            <input type="text" class="form-control @error('subtaskName.0') is-invalid @enderror"
-                                id="name" placeholder="Masukkan nama" wire:model='subtaskName.0' required>
-                            @error('subtaskName.0')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        @foreach ($subtaskName as $index => $name)
-                            <div class="input-group mb-3">
-                                <span class="input-group-text" wire:click="removeSubtaskInput({{ $index }})">
-                                    <i class="mdi mdi-minus"></i>
-                                </span>
-                                <input type="text"
-                                    class="form-control @error('subtaskName.' . $index) is-invalid @enderror"
-                                    id="name" placeholder="Masukkan nama"
-                                    wire:model='subtaskName.{{ $index }}' required>
-                                @error('subtaskName.' . $index)
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        @endforeach
+                        <livewire:subtasks-table id="{{ $task['id'] }}" />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">
-                        Open second modal
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2"
-        tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal fade" wire:ignore.self id="addSubtaskModal" tabindex="-1" data-bs-backdrop="static"
+        data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalToggleLabel2">
-                        Modal 2
+                    <h5 class="modal-title" id="modalTitleId">
+                        Add subtask
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Hide this modal and show the first with the button below.
+                    <form wire:submit='addSubtask'>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('subtaskName') is-invalid @enderror"
+                                id="name" placeholder="Masukkan nama" wire:model='subtaskName' required>
+                            @error('subtaskName')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Pelaksana <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('subtaskName') is-invalid @enderror"
+                                id="name" placeholder="Masukkan pelaksana" wire:model='subtaskJob' required>
+                            @error('subtaskJob')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="name" class="form-label">Tanggal Mulai</label>
+                                    <input type="date"
+                                        class="form-control @error('subTaskStarted') is-invalid @enderror"
+                                        id="name" placeholder="Masukkan tanngal mulai"
+                                        wire:model='subTaskStarted'>
+                                    @error('subTaskStarted')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                                <div class="col">
+                                    <label for="name" class="form-label">Tanggal Akhir</label>
+                                    <input type="date"
+                                        class="form-control @error('subTaskEnd') is-invalid @enderror" id="name"
+                                        placeholder="Masukkan tanngal akhir" wire:model='subTaskEnd'>
+                                    @error('subTaskEnd')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number"
+                                    class="form-control @error('subtaskValue') is-invalid @enderror" id="name"
+                                    placeholder="Masukkan nominal" wire:model='subtaskValue'
+                                    x-on:keydown="if(event.target.value.length >= 10) event.preventDefault()">
+                            </div>
+                            <small class="text-danger" x-show="subtaskValue >= 9999999999">Maximum value
+                                reached</small>
+                            @error('subtaskValue')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">
-                        Back to first
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                        data-bs-target="#subTaskModal">
+                        Back
                     </button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
+                </form>
             </div>
         </div>
     </div>
+    {{-- End --}}
 
 </div>
