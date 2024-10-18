@@ -69,9 +69,13 @@
                                             <li class="py-1"><?php echo e($tasklist->location); ?></li>
                                         </ul>
 
-                                        <div class="avatar-group float-start task-assigne">
-                                            <!-- Avatar -->
-                                        </div>
+                                        <!--[if BLOCK]><![endif]--><?php if($tasklist->url): ?>
+                                            <a href="<?php echo e($tasklist->url); ?>" target="_blank"
+                                                class="float-start d-flex align-items-center text-decoration-none">
+                                                <i class="bi bi-link-45deg fs-4 me-1"></i>
+                                                <span>lampiran</span>
+                                            </a>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                         <div class="text-end">
                                             <h5 class="font-size-15 mb-1">Rp <?php echo e(number_format($tasklist->value, 2)); ?>
 
@@ -81,7 +85,7 @@
                                     </div>
                                 </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                <p class="text-muted">Tidak ada task saat ini.</p>
+                                <p class="text-muted">Tidak ada project saat ini.</p>
                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
 
@@ -102,15 +106,16 @@
 
 
     <!-- Update Tasklist Modal -->
-    <div class="modal fade updateModal" tabindex="-1" id="updateModal" role="dialog"
-        aria-labelledby="myLargeModalLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade updateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        id="updateModal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Tasklist
+                        Update Project
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click='closeEditTasklistModal'
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form wire:submit='updateTasklist'>
@@ -149,9 +154,15 @@
                                     placeholder="Masukkan nilai" wire:model='newTasklistValue' required>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
+                            <input type="url" class="form-control" id="url"
+                                placeholder="https://example.com"" wire:model='newTasklistUrl'>
+                        </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" wire:click='closeEditTasklistModal'
+                        data-bs-dismiss="modal">
                         Close
                     </button>
                     <button type="submit" class="btn btn-primary">Update</button>
@@ -161,6 +172,7 @@
         </div>
     </div>
 
+
     <!-- Add Tasklist Modal -->
     <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true" wire:ignore.self>
@@ -168,7 +180,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Add Tasklist
+                        Add Project
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -280,6 +292,11 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                     placeholder="Masukkan nilai" wire:model='newTasklistValue' required>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
+                            <input type="url" class="form-control" id="url"
+                                placeholder="https://example.com"" wire:model='newTasklistUrl'>
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -300,7 +317,7 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Tasklist Column
+                        Update Project Column
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

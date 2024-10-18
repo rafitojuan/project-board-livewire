@@ -34,11 +34,16 @@
         $('.addTaskModal').modal('show');
     })
 
+    window.addEventListener('open-subtaskModal', event => {
+        $('#subTaskModal').modal('show');
+    })
+
     window.addEventListener('close-taskModal', event => {
         $('.addTaskModal').modal('hide');
         $('.updateTaskModal').modal('hide');
         $('.updateTasklistColumnModal').modal('hide');
         $('.addColumnModal').modal('hide');
+        $('#editSubtaskModal').modal('hide');
     })
 
     $('#change-password').on('submit', function(event) {

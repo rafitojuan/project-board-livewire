@@ -19,6 +19,7 @@ class Subtask extends Model
         'started_at',
         'end_at',
         'keterangan',
+        'url',
     ];
 
     public function task()

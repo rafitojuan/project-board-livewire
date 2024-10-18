@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    protected $fillable = ['tasklist_column_id', 'name', 'order', 'status_id', 'started_at', 'end_at'];
+    protected $fillable = ['tasklist_column_id', 'name', 'order', 'status_id', 'started_at', 'end_at', 'url'];
 
     public function tasklistColumn()
     {

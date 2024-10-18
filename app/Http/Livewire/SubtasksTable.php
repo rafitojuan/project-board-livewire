@@ -16,8 +16,17 @@ class SubtasksTable extends DataTableComponent
 {
     use LivewireAlert, WithPagination;
 
+    public $subtaskName;
     public $subtaskId;
+    public $subtaskJob;
+    public $subtaskValue;
+    public $subTaskStarted;
+    public $subTaskEnd;
+    public $subtaskCompleted;
+    public $subTaskKeterangan;
+    public $subtaskUrl;
     public $id;
+    public string $kode;
     protected $index = 0;
 
     protected $listeners = [
@@ -27,7 +36,7 @@ class SubtasksTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        return Subtask::query()->where('task_id', $this->id);
+        return Subtask::query()->where('task_id', $this->kode);
     }
 
     public function configure(): void
@@ -83,10 +92,10 @@ class SubtasksTable extends DataTableComponent
         $this->index = $this->getPage() > 1 ? ($this->getPage() - 1) * $this->perPage() : 0;
         return [
             Column::make('No', 'id')->format(fn($row) => ++$this->index)->sortable()->searchable(),
-            Column::make("Name", "name")
-                ->sortable()->searchable(),
-            Column::make("Pelaksana", "pelaksana")
-                ->sortable()->searchable(),
+            Column::make("Pekerjaan", "name")->view('components.name-field'),
+            column::make("pelaksana")->hideIf(true),
+            column::make("keterangan")->hideIf(true),
+            column::make("url")->hideIf(true),
             DateColumn::make("Tanggal Mulai", "started_at")
                 ->sortable()->searchable()->outputFormat('d F y')->emptyValue('N/A'),
             DateColumn::make("Tanggal Akhir", "end_at")
@@ -96,7 +105,7 @@ class SubtasksTable extends DataTableComponent
                     return 'Rp' . number_format($value, 0, ',', '.');
                 })
                 ->sortable()->searchable(),
-            BooleanColumn::make("Completed", "completed")
+            BooleanColumn::make("Status", "completed")
                 ->sortable()->searchable(),
             Column::make('Action', 'id')->view('components.action-buttons'),
         ];
@@ -106,10 +115,29 @@ class SubtasksTable extends DataTableComponent
     public function edit($row)
     {
         $subtask = Subtask::findOrFail($row);
-        $data = $subtask->name;
-        
-        
+        $this->subtaskName = $subtask->name;
+        $this->subtaskId = $subtask->id;
+        $this->subtaskJob = $subtask->pelaksana;
+        $this->subtaskValue = $subtask->biaya;
+        $this->subTaskStarted = $subtask->started_at;
+        $this->subTaskEnd = $subtask->end_at;
+        $this->subtaskCompleted = $subtask->completed;
+        $this->subTaskKeterangan = $subtask->keterangan;
+        $this->subtaskUrl = $subtask->url;
+
+        $this->dispatch('editSubtask', [
+            'subtaskName' => $this->subtaskName,
+            'subtaskId' => $this->subtaskId,
+            'subtaskJob' => $this->subtaskJob,
+            'subtaskValue' => $this->subtaskValue,
+            'subTaskStarted' => $this->subTaskStarted,
+            'subTaskEnd' => $this->subTaskEnd,
+            'subtaskCompleted' => $this->subtaskCompleted,
+            'subTaskKeterangan' => $this->subTaskKeterangan,
+            'subtaskUrl' => $this->subtaskUrl
+        ]);
     }
+
 
     public function delete($row)
     {

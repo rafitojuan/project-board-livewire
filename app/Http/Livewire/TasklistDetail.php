@@ -6,7 +6,6 @@ use App\Models\Subtask;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
-use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Attributes\Title;
@@ -35,9 +34,14 @@ class TasklistDetail extends Component
     public $subtaskName;
     public $subtaskJob;
     public $subtaskValue;
-    public $subtaskValue2;
     public $subTaskStarted;
     public $subTaskEnd;
+    public $subtaskId;
+    public $subtaskCompleted;
+    public $subTaskKeterangan;
+    public $taskUrl;
+    public $subtaskUrl;
+    public $kode;
 
     protected $rules = [
         'newColumnName' => 'required|min:3',
@@ -49,13 +53,18 @@ class TasklistDetail extends Component
         'subtaskValue' => 'min:3|numeric',
         'subTaskStarted' => 'required|date',
         'subTaskEnd' => 'date',
+        'subtaskCompleted' => 'boolean',
+        'subTaskKeterangan' => 'nullable|string',
+        'taskUrl' => 'nullable|url',
+        'subtaskUrl' => 'nullable|url',
     ];
 
     protected $listeners = [
         'refreshTasklistColumns' => '$refresh',
         'deleteColumnConfirmed' => 'deleteColumnConfirmed',
         'hapusTask' => 'hapusTask',
-        'deleteTasklistColumnConfirmed' => 'deleteColumn'
+        'deleteTasklistColumnConfirmed' => 'deleteColumn',
+        'editSubtask' => 'editSubtask',
     ];
 
     public function mount($encryptedId)
@@ -97,6 +106,7 @@ class TasklistDetail extends Component
             'taskName' => 'required|min:3',
             'taskStartDate' => 'required|date',
             'taskEndDate' => 'date',
+            'taskUrl' => 'nullable|url',
         ]);
 
         Task::create([
@@ -106,9 +116,10 @@ class TasklistDetail extends Component
             'end_at' => $this->taskEndDate,
             'order' => Task::where('tasklist_column_id', $this->editingTasklistColumnId)->max('order') + 1,
             'status_id' => 1,
+            'url' => $this->taskUrl,
         ]);
 
-        $this->reset('taskName', 'taskStartDate', 'taskEndDate');
+        $this->reset('taskName', 'taskStartDate', 'taskEndDate', 'taskUrl');
         $this->dispatch('close-taskModal', ['modalName' => 'closeTaskModal']);
         $this->loadTasklistColumns();
         $this->alert('success', 'Task added successfully!');
@@ -121,6 +132,12 @@ class TasklistDetail extends Component
         $this->taskName = $task['name'];
         $this->taskStartDate = $task['started_at'];
         $this->taskEndDate = $task['end_at'];
+        $this->taskUrl = $task['url'];
+    }
+
+    public function closeTaskModal()
+    {
+        $this->reset('taskName', 'taskStartDate', 'taskEndDate', 'taskUrl');
     }
 
     public function updateTask()
@@ -129,15 +146,17 @@ class TasklistDetail extends Component
             'taskName' => 'required|min:3',
             'taskStartDate' => 'required',
             'taskEndDate' => 'date',
+            'taskUrl' => 'nullable|url',
         ]);
 
         Task::where('id', $this->taskId)->update([
             'name' => $this->taskName,
             'started_at' => $this->taskStartDate,
             'end_at' => $this->taskEndDate,
+            'url' => $this->taskUrl,
         ]);
 
-        $this->reset('taskName', 'taskStartDate', 'taskEndDate');
+        $this->reset('taskName', 'taskStartDate', 'taskEndDate', 'taskUrl');
         $this->dispatch('close-taskModal', ['modalName' => 'updateTaskModal']);
         $this->loadTasklistColumns();
         $this->alert('success', 'Task updated successfully!');
@@ -226,7 +245,6 @@ class TasklistDetail extends Component
         ]);
     }
 
-
     public function deleteColumn()
     {
         TasklistColumn::where('id', $this->editingTasklistColumnId)->delete();
@@ -235,10 +253,16 @@ class TasklistDetail extends Component
         $this->alert('success', 'Kolom berhasil dihapus!');
     }
 
-
     public function openSubTaskModal($task)
     {
-        $this->taskId = $task['id'];
+        $this->kode = $task['id'];
+        // dd($this->kode);
+    }
+
+    public function closeSubtaskModal($kode)
+    {
+        // $this->reset($kode);
+        $this->kode = null;
     }
 
     public function addSubtask()
@@ -249,6 +273,7 @@ class TasklistDetail extends Component
             'subtaskValue' => 'numeric',
             'subTaskStarted' => 'required|date',
             'subTaskEnd' => 'date',
+            'subtaskUrl' => 'nullable|url',
         ]);
 
         Subtask::create([
@@ -258,14 +283,61 @@ class TasklistDetail extends Component
             'started_at' => $this->subTaskStarted,
             'end_at' => $this->subTaskEnd,
             'task_id' => $this->taskId,
-            'keterangan' => 'order'
+            'keterangan' => 'order',
+            'url' => $this->subtaskUrl,
         ]);
 
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl');
         $this->alert('success', 'Subtask berhasil ditambahkan!');
         $this->dispatch('refreshDatatable');
     }
 
+    public function editSubtask($data)
+    {
+        $this->subtaskName = $data['subtaskName'];
+        $this->subtaskId = $data['subtaskId'];
+        $this->subtaskJob = $data['subtaskJob'];
+        $this->subtaskValue = $data['subtaskValue'];
+        $this->subTaskStarted = $data['subTaskStarted'];
+        $this->subTaskEnd = $data['subTaskEnd'];
+        $this->subtaskCompleted = $data['subtaskCompleted'];
+        $this->subTaskKeterangan = $data['subTaskKeterangan'];
+        $this->subtaskUrl = $data['subtaskUrl'];
+    }
+
+    public function updateSubtask()
+    {
+        $this->validate([
+            'subtaskName' => 'required|min:3',
+            'subtaskJob' => 'required|min:3',
+            'subtaskValue' => 'numeric',
+            'subTaskStarted' => 'required|date',
+            'subTaskEnd' => 'date',
+            'subtaskCompleted' => 'required|boolean',
+            'subTaskKeterangan' => 'required',
+            'subtaskUrl' => 'nullable|url',
+        ]);
+        Subtask::where('id', $this->subtaskId)->update([
+            'name' => $this->subtaskName,
+            'pelaksana' => $this->subtaskJob,
+            'biaya' => $this->subtaskValue,
+            'started_at' => $this->subTaskStarted,
+            'end_at' => $this->subTaskEnd,
+            'keterangan' => $this->subTaskKeterangan,
+            'completed' => $this->subtaskCompleted,
+            'url' => $this->subtaskUrl,
+        ]);
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl');
+        $this->dispatch('close-taskModal', ['modalName' => 'editSubtaskModal']);
+        $this->dispatch('open-subtaskModal', ['modalName' => 'subTaskModal']);
+        $this->alert('success', 'Subtask berhasil diperbarui!');
+        $this->dispatch('refreshDatatable');
+    }
+
+    public function closeSubtaskAddModal()
+    {
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl');
+    }
 
     public function render()
     {
