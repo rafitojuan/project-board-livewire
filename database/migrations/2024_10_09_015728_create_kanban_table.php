@@ -21,12 +21,18 @@ return new class extends Migration
             $table->id();
             $table->foreignId('column_id')->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->string('work_id');
+            $table->string('contract_number')->nullable();
+            $table->string('pengadaan')->nullable();
             $table->integer('order');
             $table->string('company')->nullable();
             $table->string('location')->nullable();
             $table->decimal('value', 15, 2)->nullable();
+            $table->decimal('adendum_value', 15, 2)->nullable();
+            $table->date('contract_sign')->default(now()->format('Y-m-d'));
             $table->date('started_at')->default(now()->format('Y-m-d'));
             $table->date('end_at')->nullable();
+            $table->date('adendum')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

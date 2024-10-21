@@ -27,20 +27,29 @@
                             <th scope="col"></th>
                         </tr>
                         <tr>
-                            <td style="width: 3%">Company</td>
+                            <td style="width: 3%">Perusahaan</td>
                             <td><strong><?php echo e($tasklist->company); ?></strong></td>
                         </tr>
                         <tr>
-                            <td>Location</td>
+                            <td style="width: 3%">ID Pekerjaan</td>
+                            <td><strong><?php echo e($tasklist->work_id); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 3%">NO Kontrak</td>
+                            <td><strong><?php echo e($tasklist->contract_number); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 3%">Pengadaan</td>
+                            <td><strong><?php echo e(strtoupper($tasklist->pengadaan)); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td>Lokasi</td>
                             <td><strong><?php echo e($tasklist->location); ?></strong></td>
                         </tr>
                         <tr>
-                            <td>Value</td>
-                            <td><strong>Rp<?php echo e(number_format($tasklist->value, 2)); ?></strong></td>
-                        </tr>
-                        <tr>
                             <td>Status</td>
-                            <td><strong><?php echo e($tasklist->status->name ?? 'No Status'); ?></strong></td>
+                            <td><span class="badge text-capitalize" style="background-color: <?php echo e($tasklist->status->color); ?>; font-size: 0.7rem"><?php echo e($tasklist->status->name ?? 'No Status'); ?></span></td>
+                            </td>
                         </tr>
                         <!--[if BLOCK]><![endif]--><?php if($tasklist->url): ?>
                             <tr>
@@ -50,6 +59,10 @@
                                 </td>
                             </tr>
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        <tr>
+                            <td>Nilai</td>
+                            <td><strong>Rp<?php echo e(number_format($tasklist->value, 2)); ?></strong></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -505,7 +518,8 @@ if (isset($__slots)) unset($__slots);
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" wire:click='closeSubtaskModal(<?php echo e($kode); ?>)' data-bs-dismiss="modal">
+                    <button class="btn btn-secondary" wire:click='closeSubtaskModal(<?php echo e($kode); ?>)'
+                        data-bs-dismiss="modal">
                         Close
                     </button>
                 </div>

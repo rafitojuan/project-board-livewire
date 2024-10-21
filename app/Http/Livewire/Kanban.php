@@ -33,17 +33,23 @@ class Kanban extends Component
     public $tasklistId;
     public $tasklistColumnId;
     public $newTasklistUrl;
+    public $newTasklistContract;
+    public $tasklistPengadaan = 'pl';
+    public $contractSignDate;
 
-    protected $rules = [
-        'newTasklistName' => 'required|min:3',
-        'newTasklistCompany' => 'nullable|string',
-        'location' => 'nullable|string',
-        'newTasklistValue' => 'nullable|numeric',
-        'newTaskName' => 'required|min:3',
-        'newTasklistStartDate' => 'required|date',
-        'newTasklistEndDate' => 'date',
-        'newTasklistUrl' => 'nullable|url',
-    ];
+    // protected $rules = [
+    //     'newTasklistName' => 'required|min:3',
+    //     'newTasklistCompany' => 'required|string',
+    //     'location' => 'nullable|string',
+    //     'newTasklistValue' => 'nullable|numeric',
+    //     'newTaskName' => 'required|min:3',
+    //     'newTasklistStartDate' => 'required|date',
+    //     'newTasklistEndDate' => 'date',
+    //     'newTasklistUrl' => 'nullable|url',
+    //     'newTasklistContract' => 'required',
+    //     'tasklistPengadaan' => 'required',
+    //     'contractSignDate' => 'nullable|date',
+    // ];
 
     protected $listeners = [
         'columnAdded' => 'loadColumns',
@@ -98,6 +104,9 @@ class Kanban extends Component
         $this->newTasklistStartDate = $tasklist['started_at'];
         $this->newTasklistEndDate = $tasklist['end_at'];
         $this->newTasklistUrl = $tasklist['url'];
+        $this->newTasklistContract = $tasklist['contract_number'];
+        $this->tasklistPengadaan = $tasklist['pengadaan'];
+        $this->contractSignDate = $tasklist['contract_sign'];
     }
 
     public function closeEditTasklistModal()
@@ -156,12 +165,14 @@ class Kanban extends Component
     {
         $this->validate([
             'newTasklistName' => 'required|min:3',
-            'newTasklistCompany' => 'nullable|string',
+            'newTasklistCompany' => 'required|string',
             'location' => 'nullable|string',
             'newTasklistValue' => 'nullable|numeric',
             'newTasklistStartDate' => 'required',
             'newTasklistEndDate' => 'nullable|date',
             'newTasklistUrl' => 'nullable|url',
+            'newTasklistContract' => 'required',
+            'tasklistPengadaan' => 'required',
         ]);
 
         $existingMaxOrder = Tasklist::where('column_id', $this->editingColumn)->max('order');
@@ -170,6 +181,7 @@ class Kanban extends Component
         $tasklist = Tasklist::create([
             'column_id' => $this->editingColumn,
             'name' => $this->newTasklistName,
+            'work_id' => "K-" . rand(10000, 99999),
             'company' => $this->newTasklistCompany,
             'location' => $this->location,
             'value' => $this->newTasklistValue,
@@ -178,6 +190,8 @@ class Kanban extends Component
             'started_at' => $this->newTasklistStartDate,
             'end_at' => $this->newTasklistEndDate ?? null,
             'url' => $this->newTasklistUrl ?? null,
+            'contract_number' => $this->newTasklistContract,
+            'pengadaan' => $this->tasklistPengadaan,
         ]);
 
         $defaultColumns = ['Upcoming', 'In Progress', 'Completed'];
@@ -189,7 +203,7 @@ class Kanban extends Component
             ]);
         }
 
-        $this->reset(['newTasklistName', 'newTasklistCompany', 'location', 'newTasklistValue', 'editingColumn', 'newTasklistStartDate', 'newTasklistEndDate', 'newTasklistUrl']);
+        $this->reset(['newTasklistName', 'newTasklistCompany', 'location', 'newTasklistValue', 'editingColumn', 'newTasklistStartDate', 'newTasklistEndDate', 'newTasklistUrl', 'newTasklistContract', 'tasklistPengadaan']);
         $this->loadColumns();
         $this->dispatch('close-modal', ['modalName' => 'bs-example-modal-lg']);
         $this->alert('success', 'Tasklist berhasil ditambahkan!');
@@ -199,12 +213,15 @@ class Kanban extends Component
     {
         $this->validate([
             'newTasklistName' => 'required|min:3',
-            'newTasklistCompany' => 'nullable|string',
+            'newTasklistCompany' => 'required|string',
             'location' => 'nullable|string',
             'newTasklistValue' => 'nullable|numeric',
             'newTasklistStartDate' => 'required',
             'newTasklistEndDate' => 'nullable|date',
             'newTasklistUrl' => 'nullable|url',
+            'newTasklistContract' => 'required',
+            'tasklistPengadaan' => 'required',
+            'contractSignDate' => 'nullable|date',
         ]);
 
         $data = [
@@ -215,6 +232,9 @@ class Kanban extends Component
             'started_at' => $this->newTasklistStartDate,
             'end_at' => $this->newTasklistEndDate ?? null,
             'url' => $this->newTasklistUrl ?? null,
+            'contract_number' => $this->newTasklistContract,
+            'pengadaan' => $this->tasklistPengadaan,
+            'contract_sign' => $this->contractSignDate ?? null,
         ];
 
         Tasklist::where('id', $this->tasklistId)->update($data);

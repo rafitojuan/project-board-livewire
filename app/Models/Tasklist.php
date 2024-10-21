@@ -9,7 +9,7 @@ class Tasklist extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['column_id', 'name', 'order', 'company', 'location', 'value', 'status_id', 'started_at', 'end_at', 'url'];
+    protected $fillable = ['column_id', 'name', 'work_id', 'order', 'adendum_value', 'company', 'location', 'value', 'status_id', 'started_at', 'end_at', 'url', 'contract_number', 'pengadaan', 'conract_sign', 'adendum'];
 
     public function column()
     {

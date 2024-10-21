@@ -26,20 +26,29 @@
                             <th scope="col"></th>
                         </tr>
                         <tr>
-                            <td style="width: 3%">Company</td>
+                            <td style="width: 3%">Perusahaan</td>
                             <td><strong>{{ $tasklist->company }}</strong></td>
                         </tr>
                         <tr>
-                            <td>Location</td>
+                            <td style="width: 3%">ID Pekerjaan</td>
+                            <td><strong>{{ $tasklist->work_id }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 3%">NO Kontrak</td>
+                            <td><strong>{{ $tasklist->contract_number }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 3%">Pengadaan</td>
+                            <td><strong>{{ strtoupper($tasklist->pengadaan) }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Lokasi</td>
                             <td><strong>{{ $tasklist->location }}</strong></td>
                         </tr>
                         <tr>
-                            <td>Value</td>
-                            <td><strong>Rp{{ number_format($tasklist->value, 2) }}</strong></td>
-                        </tr>
-                        <tr>
                             <td>Status</td>
-                            <td><strong>{{ $tasklist->status->name ?? 'No Status' }}</strong></td>
+                            <td><span class="badge text-capitalize" style="background-color: {{ $tasklist->status->color }}; font-size: 0.7rem">{{ $tasklist->status->name ?? 'No Status' }}</span></td>
+                            </td>
                         </tr>
                         @if ($tasklist->url)
                             <tr>
@@ -49,6 +58,10 @@
                                 </td>
                             </tr>
                         @endif
+                        <tr>
+                            <td>Nilai</td>
+                            <td><strong>Rp{{ number_format($tasklist->value, 2) }}</strong></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -374,7 +387,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" wire:click='closeSubtaskModal({{ $kode }})' data-bs-dismiss="modal">
+                    <button class="btn btn-secondary" wire:click='closeSubtaskModal({{ $kode }})'
+                        data-bs-dismiss="modal">
                         Close
                     </button>
                 </div>

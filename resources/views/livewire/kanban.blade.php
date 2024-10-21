@@ -77,7 +77,7 @@
                                         <div class="text-end">
                                             <h5 class="font-size-15 mb-1">Rp {{ number_format($tasklist->value, 2) }}
                                             </h5>
-                                            <p class="mb-0 text-muted">Project Value</p>
+                                            <p class="mb-0 text-muted">Nilai Kontrak</p>
                                         </div>
                                     </div>
                                 </div>
@@ -105,11 +105,11 @@
     <!-- Update Tasklist Modal -->
     <div class="modal fade updateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         id="updateModal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Project
+                        Update Projek
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click='closeEditTasklistModal'
                         aria-label="Close"></button>
@@ -117,38 +117,89 @@
                 <div class="modal-body">
                     <form wire:submit='updateTasklist'>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Masukkan nama"
-                                wire:model='newTasklistName' required>
+                            <label for="company" class="form-label">Perusahaan <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('newTasklistCompany') is-invalid @enderror"
+                                id="company" placeholder="Masukkan nama perusahaan" wire:model='newTasklistCompany'>
+                            @error('newTasklistCompany')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="company" class="form-label">Company</label>
-                            <input type="text" class="form-control" id="company" placeholder="Masukkan company"
-                                wire:model='newTasklistCompany' required>
+                            <label for="name" class="form-label">Nama Projek <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('newTasklistName') is-invalid @enderror"
+                                id="name" placeholder="Masukkan nama projek" wire:model='newTasklistName'>
+                            @error('newTasklistName')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
-                            <textarea name="location" id="location" class="form-control" placeholder="Masukkan lokasi" wire:model='location'
-                                rows="3"></textarea>
+                            <label for="contract" class="form-label">NO Kontrak <span
+                                    class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control @error('newTasklistContract') is-invalid @enderror" id="contract"
+                                placeholder="Masukkan nomor kontrak" wire:model='newTasklistContract'>
+                            @error('newTasklistContract')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="pengadaan" class="form-label">Pengadaan </label> <span
+                                class="text-danger">*</span>
+                            <select name="pengadaan" id="pengadaan"
+                                class="form-select @error('tasklistPengadaan') is-invalid @enderror"
+                                wire:model='tasklistPengadaan'>
+                                <option disabled selected>Pilih Pengadaan</option>
+                                <option value="pl">PL</option>
+                            </select>
+                            @error('tasklistPengadaan')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Lokasi <span
+                                    class="text-danger">*</span></label>
+                            <textarea name="location" id="location" class="form-control @error('location') is-invalid @enderror"
+                                onkeyup="auto_grow(this)" placeholder="Masukkan lokasi" wire:model='location' rows="3"></textarea>
+                            @error('location')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="contract_date" class="form-label">TTD Kontrak <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('contractSignDate') is-invalid @enderror"
+                                wire:model='contractSignDate' value="{{ date('Y-m-d') }}" id="contract_date">
+                            @error('contractSignDate')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="row mb-3">
                             <div class="col">
-                                <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" wire:model='newTasklistStartDate'
-                                    value="" id="start_date">
+                                <label for="start_date" class="form-label">TGL Mulai Kontrak <span
+                                        class="text-danger">*</span></label>
+                                <input type="date"
+                                    class="form-control @error('newTasklistStartDate') is-invalid @enderror"
+                                    wire:model='newTasklistStartDate' value="{{ now()->format('Y-m-d\TH:i') }}"
+                                    id="start_date">
+                                @error('newTasklistStartDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col">
-                                <label for="end_date" class="form-label">End Date</label>
+                                <label for="end_date" class="form-label">TGL Akhir Kontrak <span
+                                        class="text-danger">*</span></label>
                                 <input type="date" class="form-control" wire:model='newTasklistEndDate'
-                                    value="" id="end_date">
+                                    value="{{ now()->format('Y-m-d\TH:i') }}" id="end_date">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="value">Value</label>
+                            <label for="value">Nilai Kontrak <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-text">Rp</div>
                                 <input type="number" class="form-control" id="value"
-                                    placeholder="Masukkan nilai" wire:model='newTasklistValue' required>
+                                    placeholder="Masukkan nilai kontrak" wire:model='newTasklistValue'>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -173,35 +224,61 @@
     <!-- Add Tasklist Modal -->
     <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
         aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Add Project
+                        Tambah Projek
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form wire:submit='addTasklist'>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control @error('newTasklistName') is-invalid @enderror"
-                                id="name" placeholder="Masukkan nama" wire:model='newTasklistName' required>
-                            @error('newTasklistName')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="company" class="form-label">Company</label>
+                            <label for="company" class="form-label">Perusahaan <span
+                                    class="text-danger">*</span></label>
                             <input type="text"
                                 class="form-control @error('newTasklistCompany') is-invalid @enderror" id="company"
-                                placeholder="Masukkan company" wire:model='newTasklistCompany' required>
+                                placeholder="Masukkan nama perusahaan" wire:model='newTasklistCompany'>
                             @error('newTasklistCompany')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
+                            <label for="name" class="form-label">Nama Projek <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('newTasklistName') is-invalid @enderror"
+                                id="name" placeholder="Masukkan nama projek" wire:model='newTasklistName'>
+                            @error('newTasklistName')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="contract" class="form-label">NO Kontrak <span
+                                    class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control @error('newTasklistContract') is-invalid @enderror" id="contract"
+                                placeholder="Masukkan nomor kontrak" wire:model='newTasklistContract'>
+                            @error('newTasklistContract')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="pengadaan" class="form-label">Pengadaan </label> <span
+                                class="text-danger">*</span>
+                            <select name="pengadaan" id="pengadaan"
+                                class="form-select @error('tasklistPengadaan') is-invalid @enderror"
+                                wire:model='tasklistPengadaan'>
+                                <option disabled selected>Pilih Pengadaan</option>
+                                <option value="pl">PL</option>
+                            </select>
+                            @error('tasklistPengadaan')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Lokasi <span
+                                    class="text-danger">*</span></label>
                             <textarea name="location" id="location" class="form-control @error('location') is-invalid @enderror"
                                 onkeyup="auto_grow(this)" placeholder="Masukkan lokasi" wire:model='location' rows="3"></textarea>
                             @error('location')
@@ -210,7 +287,8 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col">
-                                <label for="start_date" class="form-label">Start Date</label>
+                                <label for="start_date" class="form-label">TGL Mulai Kontrak <span
+                                        class="text-danger">*</span></label>
                                 <input type="date"
                                     class="form-control @error('newTasklistStartDate') is-invalid @enderror"
                                     wire:model='newTasklistStartDate' value="{{ now()->format('Y-m-d\TH:i') }}"
@@ -220,17 +298,18 @@
                                 @enderror
                             </div>
                             <div class="col">
-                                <label for="end_date" class="form-label">End Date</label>
+                                <label for="end_date" class="form-label">TGL Akhir Kontrak <span
+                                        class="text-danger">*</span></label>
                                 <input type="date" class="form-control" wire:model='newTasklistEndDate'
                                     value="{{ now()->format('Y-m-d\TH:i') }}" id="end_date">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="value">Value</label>
+                            <label for="value">Nilai Kontrak <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-text">Rp</div>
                                 <input type="number" class="form-control" id="value"
-                                    placeholder="Masukkan nilai" wire:model='newTasklistValue' required>
+                                    placeholder="Masukkan nilai kontrak" wire:model='newTasklistValue'>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -258,7 +337,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
-                        Update Project Column
+                        Update Kolom Projek
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
