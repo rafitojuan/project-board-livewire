@@ -180,18 +180,18 @@ class Kanban extends Component
 
         $tasklist = Tasklist::create([
             'column_id' => $this->editingColumn,
-            'name' => $this->newTasklistName,
+            'name' => trim($this->newTasklistName),
             'work_id' => "K-" . rand(10000, 99999),
-            'company' => $this->newTasklistCompany,
-            'location' => $this->location,
+            'company' => trim($this->newTasklistCompany),
+            'location' => $this->location ? trim($this->location) : null,
             'value' => $this->newTasklistValue,
             'order' => $newOrder,
             'status_id' => 1,
             'started_at' => $this->newTasklistStartDate,
             'end_at' => $this->newTasklistEndDate ?? null,
-            'url' => $this->newTasklistUrl ?? null,
-            'contract_number' => $this->newTasklistContract,
-            'pengadaan' => $this->tasklistPengadaan,
+            'url' => $this->newTasklistUrl ? trim($this->newTasklistUrl) : null,
+            'contract_number' => trim($this->newTasklistContract),
+            'pengadaan' => trim($this->tasklistPengadaan),
         ]);
 
         $defaultColumns = ['Upcoming', 'In Progress', 'Completed'];

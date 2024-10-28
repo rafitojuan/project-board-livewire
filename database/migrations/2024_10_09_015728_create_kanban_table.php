@@ -20,7 +20,7 @@ return new class extends Migration
         Schema::create('tasklists', function (Blueprint $table) {
             $table->id();
             $table->foreignId('column_id')->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->string('name', 255);
             $table->string('work_id');
             $table->string('contract_number')->nullable();
             $table->string('pengadaan')->nullable();
@@ -41,7 +41,7 @@ return new class extends Migration
         Schema::create('tasklist_columns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tasklist_id')->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->string('name', 255);
             $table->integer('order');
             $table->timestamps();
         });
@@ -50,7 +50,7 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tasklist_column_id')->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->string('name', 255);
             $table->integer('order');
             $table->date('started_at')->default(now()->format('Y-m-d'));
             $table->date('end_at')->nullable();

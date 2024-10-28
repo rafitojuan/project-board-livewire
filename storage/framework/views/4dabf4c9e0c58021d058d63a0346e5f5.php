@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <table class="table align-middle table-borderless" style="margin-top: -1rem;">
                         <tr>
-                            <th scope="col" style="width: 40%;">Tentang Projek</th>
+                            <th scope="col" style="width: 40%;">Tentang Projek </th>
                             <th scope="col"></th>
                         </tr>
                         <tr>
@@ -46,9 +46,34 @@
                             <td>Lokasi</td>
                             <td><strong><?php echo e($tasklist->location); ?></strong></td>
                         </tr>
-                        <tr>
+                        <tr x-data="{ isEditing: false, statusColor: '<?php echo e($tasklist->status->color); ?>' }" @click.away="isEditing = false">
                             <td>Status</td>
-                            <td><span class="badge text-capitalize" style="background-color: <?php echo e($tasklist->status->color); ?>; font-size: 0.7rem"><?php echo e($tasklist->status->name ?? 'No Status'); ?></span></td>
+                            <td>
+                                <template x-if="!isEditing">
+                                    <div>
+                                        <span class="badge text-capitalize"
+                                            :style="`background-color: ${statusColor}; font-size: 0.7rem`"
+                                            x-text="'<?php echo e($tasklist->status->name ?? 'No Status'); ?>'">
+                                        </span>
+                                        <i class="bi bi-pencil-fill ms-2" style="cursor: pointer;"
+                                            @click.stop="isEditing = true"></i>
+                                    </div>
+                                </template>
+                                <template x-if="isEditing">
+                                    <div class="d-flex">
+                                        <select class="form-select" wire:model="tasklistStatus">
+                                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $statuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($status->id); ?>"
+                                                    <?php echo e($tasklist->status->id == $status->id ? 'selected' : ''); ?>>
+                                                    <?php echo e($status->name); ?>
+
+                                                </option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                                        </select>
+                                        <button class="btn btn-primary btn-sm ms-2 py-0 px-1"
+                                            @click.stop="isEditing = false; $wire.saveTasklistStatus().then(color => statusColor = color);">Save</button>
+                                    </div>
+                                </template>
                             </td>
                         </tr>
                         <!--[if BLOCK]><![endif]--><?php if($tasklist->url): ?>
@@ -137,6 +162,7 @@
                                                                 <?php echo e(Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '')); ?>
 
                                                             </h5>
+                                                            <small>Divisi: ...</small><br>
                                                             <small class="text-muted mb-2">
                                                                 <?php echo e(\Carbon\Carbon::parse($task->started_at)->format('d M Y')); ?><span
                                                                     class="mx-1">-</span><?php echo e($task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A'); ?>
@@ -155,7 +181,7 @@
                                                             <div class="text-end">
                                                                 <h5 class="font-size-15 mb-1">Rp100000
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Project Value</p>
+                                                                <p class="mb-0 text-muted">Nilai Kontrak</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -481,17 +507,21 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
 
 
     
-    <div class="modal fade" id="subTaskModal" data-bs-backdrop="static" wire:ignore.self aria-hidden="true"
-        aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal fade" id="subTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" wire:ignore.self
+        aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalToggleLabel">
-                        Detail Pekerjaan
+                        Form Detail Pekerjaan
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click='closeSubtaskModal(<?php echo e($kode); ?>)' aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="float-start">
+                        <h5><?php echo e($uraian); ?></h5>
+                    </div>
                     <div class="text-end mb-3">
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#addSubtaskModal">+ Add Detail Pekerjaan</button>
@@ -585,6 +615,40 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
+                            <label for="name" class="form-label">Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" class="form-control" placeholder="Masukkan nominal"
+                                    x-data="{ subtaskValue: '' }"
+                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
+                            </div>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <textarea name="keterangan" wire:model='subTaskKeterangan' class="form-control" cols="10" rows="3"></textarea>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subTaskKeterangan'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                        <div class="mb-3">
                             <div class="row">
                                 <div class="col">
                                     <label for="name" class="form-label">Tanggal Mulai</label>
@@ -634,26 +698,6 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Biaya</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" class="form-control" placeholder="Masukkan nominal"
-                                    x-data="{ subtaskValue: '' }"
-                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
-                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
-                            </div>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                <small class="text-danger"><?php echo e($message); ?></small>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>

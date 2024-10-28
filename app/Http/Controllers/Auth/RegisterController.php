@@ -80,6 +80,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'dob' => date('Y-m-d', strtotime($data['dob'])),
             'avatar' => "/images/" . $avatarName,
+            'role_id' => 7,
         ]);
     }
 }

@@ -3,7 +3,7 @@
         <div class="d-flex">
             <!-- LOGO -->
             <div class="navbar-brand-box">
-                <a href="index" class="logo logo-dark">
+                <a href="{{ route('kanban.index') }}" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="{{ URL::asset('build/images/logo.svg') }}" alt="" height="22">
                     </span>
@@ -12,7 +12,7 @@
                     </span>
                 </a>
 
-                <a href="index" class="logo logo-light">
+                <a href="{{ route('kanban.index') }}" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="{{ URL::asset('build/images/logo-light.svg') }}" alt="" height="22">
                     </span>

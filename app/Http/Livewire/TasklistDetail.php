@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Status;
 use App\Models\Subtask;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
@@ -31,6 +32,7 @@ class TasklistDetail extends Component
     public $taskStartDate;
     public $taskEndDate;
     public $tasklistColumnName;
+    public $tasklistStatus = 1;
     public $subtaskName;
     public $subtaskJob;
     public $subtaskValue;
@@ -42,6 +44,9 @@ class TasklistDetail extends Component
     public $taskUrl;
     public $subtaskUrl;
     public $kode;
+    public $uraian;
+    public $statusColor;
+
 
     protected $rules = [
         'newColumnName' => 'required|min:3',
@@ -57,6 +62,8 @@ class TasklistDetail extends Component
         'subTaskKeterangan' => 'nullable|string',
         'taskUrl' => 'nullable|url',
         'subtaskUrl' => 'nullable|url',
+        'tasklistColumnName' => 'required|min:3',
+        'tasklistStatus' => 'required',
     ];
 
     protected $listeners = [
@@ -256,6 +263,7 @@ class TasklistDetail extends Component
     public function openSubTaskModal($task)
     {
         $this->kode = $task['id'];
+        $this->uraian = $task['name'];
         // dd($this->kode);
     }
 
@@ -273,6 +281,7 @@ class TasklistDetail extends Component
             'subtaskValue' => 'numeric',
             'subTaskStarted' => 'required|date',
             'subTaskEnd' => 'date',
+            'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
         ]);
 
@@ -282,12 +291,12 @@ class TasklistDetail extends Component
             'biaya' => $this->subtaskValue,
             'started_at' => $this->subTaskStarted,
             'end_at' => $this->subTaskEnd,
-            'task_id' => $this->taskId,
-            'keterangan' => 'order',
+            'task_id' => $this->kode,
+            'keterangan' => $this->subTaskKeterangan,
             'url' => $this->subtaskUrl,
         ]);
 
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl', 'subTaskKeterangan');
         $this->alert('success', 'Subtask berhasil ditambahkan!');
         $this->dispatch('refreshDatatable');
     }
@@ -339,8 +348,22 @@ class TasklistDetail extends Component
         $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl');
     }
 
+    public function saveTasklistStatus()
+    {
+        $this->validate([
+            'tasklistStatus' => 'required',
+        ]);
+        $tasklist = Tasklist::find($this->tasklist->id);
+        $tasklist->status_id = $this->tasklistStatus;
+        $tasklist->save();
+        $this->tasklist->refresh();
+        return $this->tasklist->status->color;
+        $this->alert('success', 'Status berhasil diperbarui!');
+    }
+
     public function render()
     {
-        return view('livewire.tasklist-detail');
+        $statuses = Status::all();
+        return view('livewire.tasklist-detail', compact('statuses'));
     }
 }

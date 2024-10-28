@@ -1,7 +1,7 @@
 <div class="container">
     <span class="fw-semibold"><?php echo e($row->name); ?></span>
     <!--[if BLOCK]><![endif]--><?php if($row->url): ?>
-        <a href="<?php echo e($row->url ?? ''); ?>"><i class="bi bi-link-45deg" title="URL"></i> </a><br>
+        <a href="<?php echo e($row->url ?? ''); ?>" target="_blank"><i class="bi bi-link-45deg" title="URL"></i> </a><br>
     <?php else: ?>
         <br>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->

@@ -92,14 +92,14 @@ class SubtasksTable extends DataTableComponent
         $this->index = $this->getPage() > 1 ? ($this->getPage() - 1) * $this->perPage() : 0;
         return [
             Column::make('No', 'id')->format(fn($row) => ++$this->index)->sortable()->searchable(),
-            Column::make("Pekerjaan", "name")->view('components.name-field'),
-            column::make("pelaksana")->hideIf(true),
-            column::make("keterangan")->hideIf(true),
-            column::make("url")->hideIf(true),
+            Column::make("Pekerjaan", "name")->view('components.name-field')->searchable(),
+            column::make("pelaksana")->hideIf(true)->searchable(),
+            column::make("keterangan")->hideIf(true)->searchable(),
+            column::make("url")->hideIf(true)->searchable(),
             DateColumn::make("Tanggal Mulai", "started_at")
-                ->sortable()->searchable()->outputFormat('d F y')->emptyValue('N/A'),
+                ->sortable()->outputFormat('d F y')->emptyValue('N/A'),
             DateColumn::make("Tanggal Akhir", "end_at")
-                ->sortable()->searchable()->outputFormat('d F y')->emptyValue('N/A'),
+                ->sortable()->outputFormat('d F y')->emptyValue('N/A'),
             Column::make("Biaya", "biaya")
                 ->format(function ($value) {
                     return 'Rp' . number_format($value, 0, ',', '.');
@@ -107,7 +107,7 @@ class SubtasksTable extends DataTableComponent
                 ->sortable()->searchable(),
             BooleanColumn::make("Status", "completed")
                 ->sortable()->searchable(),
-            Column::make('Action', 'id')->view('components.action-buttons'),
+            Column::make('Action', 'id')->view('components.action-buttons')->searchable(),
         ];
     }
 

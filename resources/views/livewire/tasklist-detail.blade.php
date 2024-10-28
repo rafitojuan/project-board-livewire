@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <table class="table align-middle table-borderless" style="margin-top: -1rem;">
                         <tr>
-                            <th scope="col" style="width: 40%;">Tentang Projek</th>
+                            <th scope="col" style="width: 40%;">Tentang Projek </th>
                             <th scope="col"></th>
                         </tr>
                         <tr>
@@ -45,9 +45,33 @@
                             <td>Lokasi</td>
                             <td><strong>{{ $tasklist->location }}</strong></td>
                         </tr>
-                        <tr>
+                        <tr x-data="{ isEditing: false, statusColor: '{{ $tasklist->status->color }}' }" @click.away="isEditing = false">
                             <td>Status</td>
-                            <td><span class="badge text-capitalize" style="background-color: {{ $tasklist->status->color }}; font-size: 0.7rem">{{ $tasklist->status->name ?? 'No Status' }}</span></td>
+                            <td>
+                                <template x-if="!isEditing">
+                                    <div>
+                                        <span class="badge text-capitalize"
+                                            :style="`background-color: ${statusColor}; font-size: 0.7rem`"
+                                            x-text="'{{ $tasklist->status->name ?? 'No Status' }}'">
+                                        </span>
+                                        <i class="bi bi-pencil-fill ms-2" style="cursor: pointer;"
+                                            @click.stop="isEditing = true"></i>
+                                    </div>
+                                </template>
+                                <template x-if="isEditing">
+                                    <div class="d-flex">
+                                        <select class="form-select" wire:model="tasklistStatus">
+                                            @foreach ($statuses as $status)
+                                                <option value="{{ $status->id }}"
+                                                    {{ $tasklist->status->id == $status->id ? 'selected' : '' }}>
+                                                    {{ $status->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <button class="btn btn-primary btn-sm ms-2 py-0 px-1"
+                                            @click.stop="isEditing = false; $wire.saveTasklistStatus().then(color => statusColor = color);">Save</button>
+                                    </div>
+                                </template>
                             </td>
                         </tr>
                         @if ($tasklist->url)
@@ -134,6 +158,7 @@
                                                                 wire:click="openSubTaskModal({{ $task }})">
                                                                 {{ Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '') }}
                                                             </h5>
+                                                            <small>Divisi: ...</small><br>
                                                             <small class="text-muted mb-2">
                                                                 {{ \Carbon\Carbon::parse($task->started_at)->format('d M Y') }}<span
                                                                     class="mx-1">-</span>{{ $task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A' }}
@@ -151,7 +176,7 @@
                                                             <div class="text-end">
                                                                 <h5 class="font-size-15 mb-1">Rp100000
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Project Value</p>
+                                                                <p class="mb-0 text-muted">Nilai Kontrak</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -365,17 +390,21 @@
 
 
     {{-- Subtask Modal --}}
-    <div class="modal fade" id="subTaskModal" data-bs-backdrop="static" wire:ignore.self aria-hidden="true"
-        aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal fade" id="subTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" wire:ignore.self
+        aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalToggleLabel">
-                        Detail Pekerjaan
+                        Form Detail Pekerjaan
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click='closeSubtaskModal({{ $kode }})' aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="float-start">
+                        <h5>{{ $uraian }}</h5>
+                    </div>
                     <div class="text-end mb-3">
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#addSubtaskModal">+ Add Detail Pekerjaan</button>
@@ -426,6 +455,26 @@
                             @enderror
                         </div>
                         <div class="mb-3">
+                            <label for="name" class="form-label">Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" class="form-control" placeholder="Masukkan nominal"
+                                    x-data="{ subtaskValue: '' }"
+                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
+                            </div>
+                            @error('subtaskValue')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <textarea name="keterangan" wire:model='subTaskKeterangan' class="form-control" cols="10" rows="3"></textarea>
+                            @error('subTaskKeterangan')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <div class="row">
                                 <div class="col">
                                     <label for="name" class="form-label">Tanggal Mulai</label>
@@ -447,19 +496,6 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Biaya</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" class="form-control" placeholder="Masukkan nominal"
-                                    x-data="{ subtaskValue: '' }"
-                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
-                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
-                            </div>
-                            @error('subtaskValue')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
