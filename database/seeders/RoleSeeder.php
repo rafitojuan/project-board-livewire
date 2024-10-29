@@ -16,8 +16,10 @@ class RoleSeeder extends Seeder
         $roles = [
             ['name' => 'SM', 'color' => '#6A2C70'],
             ['name' => 'ASM', 'color' => '#B83B5E'],
-            ['name' => 'Komersial', 'color' => '#F9ED69'],
+            ['name' => 'Staff', 'color' => '#F9ED69'],
             ['name' => 'Teknik', 'color' => '#6A2C70'],
+            ['name' => 'Superadmin', 'color' => '#605678'],
+            ['name' => 'Admin', 'color' => '#01204E'],
             ['name' => 'Guest', 'color' => '#BFECFF'],
         ];
 

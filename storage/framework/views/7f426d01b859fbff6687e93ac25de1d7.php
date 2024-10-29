@@ -31,12 +31,13 @@
                             })">
                             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasklists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tasklist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <div class="card task-box mb-3 rounded-4" data-tasklist-id="<?php echo e($tasklist->id); ?>"
-                                    style="cursor: pointer">
+                                    style="cursor: pointer; border: 4px solid <?php echo e($tasklist->end_at >= now() ? '#ff0000' : 'transparent'); ?>;">
                                     <div class="card-body">
                                         <div class="dropdown float-end">
                                             <a href="#" class="dropdown-toggle arrow-none"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
+                                                <i
+                                                    class="mdi mdi-dots-vertical m-0 text-muted h5 <?php echo e(Auth::user()->role_id != '2' ? 'd-none' : ''); ?>"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 <a class="dropdown-item" href="#" data-bs-toggle="modal"
@@ -47,8 +48,14 @@
                                             </div>
                                         </div>
                                         <div class="float-end ml-2">
-                                            <span class="badge rounded-pill font-size-12"
-                                                style="background-color: <?php echo e(isset($tasklist->status->color) ? $tasklist->status->color : 'tomato'); ?>; opacity: 65%"><?php echo e($tasklist->status->name ?? 'No Status'); ?></span>
+                                            <!--[if BLOCK]><![endif]--><?php if($tasklist->user->role->name): ?>
+                                                <span class="badge rounded-pill font-size-12"
+                                                    style="background-color: <?php echo e(isset($tasklist->user->role->color) ? $tasklist->user->role->color : 'tomato'); ?>;"><?php echo e($tasklist->user->role->name); ?></span>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                            <!--[if BLOCK]><![endif]--><?php if($tasklist->user->division_id): ?>
+                                                <span class="badge rounded-pill font-size-12"
+                                                    style="background-color: tomato; opacity: 100%"><?php echo e($tasklist->user->division->divisi); ?></span>
+                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                         </div>
                                         <div>
                                             <h5 class="font-size-15"><a
@@ -83,14 +90,14 @@
                                             <p class="mb-0 text-muted">Nilai Kontrak</p>
                                         </div>
                                     </div>
-                                </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                            </div> <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <p class="text-muted">Tidak ada project saat ini.</p>
                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
 
                         <!--[if BLOCK]><![endif]--><?php if($loop->index == 0): ?>
-                            <div class="text-center d-grid">
+                            <div
+                                class="text-center d-grid <?php echo e(Auth::user()->role_id != '3' && Auth::user()->division?->divisi != 'Komersial' ? 'd-none' : ''); ?>">
                                 <a href="javascript: void(0);"
                                     class="btn btn-primary waves-effect waves-light addtask-btn"
                                     wire:click="openAddTasklistModal(<?php echo e($column->id); ?>)">
@@ -289,10 +296,28 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                             <div class="col">
-                                <label for="end_date" class="form-label">TGL Akhir Kontrak <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
-                                    value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>" id="end_date">
+                                <label for="end_date" class="form-label">TGL Akhir Kontrak</label>
+                                <input type="date"
+                                    class="form-control <?php $__errorArgs = ['newTasklistEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='newTasklistEndDate' value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>"
+                                    id="end_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </div>
                         <div class="mb-3">
@@ -393,8 +418,8 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="contract"
-                                placeholder="Masukkan nomor kontrak" wire:model='newTasklistContract'>
+unset($__errorArgs, $__bag); ?>"
+                                id="contract" placeholder="Masukkan nomor kontrak" wire:model='newTasklistContract'>
                             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistContract'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -483,10 +508,28 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                             <div class="col">
-                                <label for="end_date" class="form-label">TGL Akhir Kontrak <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
-                                    value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>" id="end_date">
+                                <label for="end_date" class="form-label">TGL Akhir Kontrak</label>
+                                <input type="date"
+                                    class="form-control <?php $__errorArgs = ['newTasklistEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='newTasklistEndDate' value="<?php echo e(now()->format('Y-m-d\TH:i')); ?>"
+                                    id="end_date">
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistEndDate'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </div>
                         <div class="mb-3">

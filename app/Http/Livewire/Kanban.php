@@ -8,6 +8,7 @@ use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Title;
@@ -36,20 +37,7 @@ class Kanban extends Component
     public $newTasklistContract;
     public $tasklistPengadaan = 'pl';
     public $contractSignDate;
-
-    // protected $rules = [
-    //     'newTasklistName' => 'required|min:3',
-    //     'newTasklistCompany' => 'required|string',
-    //     'location' => 'nullable|string',
-    //     'newTasklistValue' => 'nullable|numeric',
-    //     'newTaskName' => 'required|min:3',
-    //     'newTasklistStartDate' => 'required|date',
-    //     'newTasklistEndDate' => 'date',
-    //     'newTasklistUrl' => 'nullable|url',
-    //     'newTasklistContract' => 'required',
-    //     'tasklistPengadaan' => 'required',
-    //     'contractSignDate' => 'nullable|date',
-    // ];
+    public $userId;
 
     protected $listeners = [
         'columnAdded' => 'loadColumns',
@@ -169,10 +157,21 @@ class Kanban extends Component
             'location' => 'nullable|string',
             'newTasklistValue' => 'nullable|numeric',
             'newTasklistStartDate' => 'required',
-            'newTasklistEndDate' => 'nullable|date',
+            'newTasklistEndDate' => 'nullable|date|after:newTasklistStartDate',
             'newTasklistUrl' => 'nullable|url',
             'newTasklistContract' => 'required',
             'tasklistPengadaan' => 'required',
+        ], [
+            'newTasklistName.required' => 'Nama tidak boleh kosong!',
+            'newTasklistName.min' => 'Nama minimal 3 karakter!',
+            'newTasklistCompany.required' => 'Perusahaan tidak boleh kosong!',
+            'newTasklistStartDate.required' => 'Tanggal mulai tidak boleh kosong!',
+            'newTasklistContract.required' => 'Nomor kontrak tidak boleh kosong!',
+            'tasklistPengadaan.required' => 'Pengadaan tidak boleh kosong!',
+            'newTasklistEndDate.date' => 'Tanggal selesai harus berupa tanggal!',
+            'newTasklistEndDate.after' => 'Tanggal selesai harus setelah tanggal mulai!',
+            'newTasklistUrl.url' => 'URL tidak valid!',
+            'newTasklistValue.numeric' => 'Nilai harus berupa angka!',
         ]);
 
         $existingMaxOrder = Tasklist::where('column_id', $this->editingColumn)->max('order');
@@ -192,9 +191,12 @@ class Kanban extends Component
             'url' => $this->newTasklistUrl ? trim($this->newTasklistUrl) : null,
             'contract_number' => trim($this->newTasklistContract),
             'pengadaan' => trim($this->tasklistPengadaan),
+            'color' => Auth::user()->role->color,
+            'user_id' => Auth::user()->role->id > 2 ? Auth::user()->id : $this->userId
         ]);
 
-        $defaultColumns = ['Upcoming', 'In Progress', 'Completed'];
+
+        $defaultColumns = ['Potential', 'In Progress', 'Completed'];
         foreach ($defaultColumns as $index => $columnName) {
             TasklistColumn::create([
                 'tasklist_id' => $tasklist->id,
@@ -235,6 +237,8 @@ class Kanban extends Component
             'contract_number' => $this->newTasklistContract,
             'pengadaan' => $this->tasklistPengadaan,
             'contract_sign' => $this->contractSignDate ?? null,
+            'color' => Auth::user()->role->color,
+            'user_id' => Auth::user()->role->id > 2 ? Auth::user()->id : Auth::user()->id
         ];
 
         Tasklist::where('id', $this->tasklistId)->update($data);

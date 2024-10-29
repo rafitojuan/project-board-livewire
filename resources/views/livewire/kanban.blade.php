@@ -31,12 +31,13 @@
                             })">
                             @forelse ($column->tasklists as $tasklist)
                                 <div class="card task-box mb-3 rounded-4" data-tasklist-id="{{ $tasklist->id }}"
-                                    style="cursor: pointer">
+                                    style="cursor: pointer; border: 4px solid {{ $tasklist->end_at >= now() ? '#ff0000' : 'transparent' }};">
                                     <div class="card-body">
                                         <div class="dropdown float-end">
                                             <a href="#" class="dropdown-toggle arrow-none"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
+                                                <i
+                                                    class="mdi mdi-dots-vertical m-0 text-muted h5 {{ Auth::user()->role_id != '2' ? 'd-none' : '' }}"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 <a class="dropdown-item" href="#" data-bs-toggle="modal"
@@ -47,8 +48,14 @@
                                             </div>
                                         </div>
                                         <div class="float-end ml-2">
-                                            <span class="badge rounded-pill font-size-12"
-                                                style="background-color: {{ isset($tasklist->status->color) ? $tasklist->status->color : 'tomato' }}; opacity: 65%">{{ $tasklist->status->name ?? 'No Status' }}</span>
+                                            @if ($tasklist->user->role->name)
+                                                <span class="badge rounded-pill font-size-12"
+                                                    style="background-color: {{ isset($tasklist->user->role->color) ? $tasklist->user->role->color : 'tomato' }};">{{ $tasklist->user->role->name }}</span>
+                                            @endif
+                                            @if ($tasklist->user->division_id)
+                                                <span class="badge rounded-pill font-size-12"
+                                                    style="background-color: tomato; opacity: 100%">{{ $tasklist->user->division->divisi }}</span>
+                                            @endif
                                         </div>
                                         <div>
                                             <h5 class="font-size-15"><a
@@ -80,14 +87,14 @@
                                             <p class="mb-0 text-muted">Nilai Kontrak</p>
                                         </div>
                                     </div>
-                                </div>
-                            @empty
+                            </div> @empty
                                 <p class="text-muted">Tidak ada project saat ini.</p>
                             @endforelse
                         </div>
 
                         @if ($loop->index == 0)
-                            <div class="text-center d-grid">
+                            <div
+                                class="text-center d-grid {{ Auth::user()->role_id != '3' && Auth::user()->division?->divisi != 'Komersial' ? 'd-none' : '' }}">
                                 <a href="javascript: void(0);"
                                     class="btn btn-primary waves-effect waves-light addtask-btn"
                                     wire:click="openAddTasklistModal({{ $column->id }})">
@@ -188,10 +195,14 @@
                                 @enderror
                             </div>
                             <div class="col">
-                                <label for="end_date" class="form-label">TGL Akhir Kontrak <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
-                                    value="{{ now()->format('Y-m-d\TH:i') }}" id="end_date">
+                                <label for="end_date" class="form-label">TGL Akhir Kontrak</label>
+                                <input type="date"
+                                    class="form-control @error('newTasklistEndDate') is-invalid @enderror"
+                                    wire:model='newTasklistEndDate' value="{{ now()->format('Y-m-d\TH:i') }}"
+                                    id="end_date">
+                                @error('newTasklistEndDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                         <div class="mb-3">
@@ -257,8 +268,8 @@
                             <label for="contract" class="form-label">NO Kontrak <span
                                     class="text-danger">*</span></label>
                             <input type="text"
-                                class="form-control @error('newTasklistContract') is-invalid @enderror" id="contract"
-                                placeholder="Masukkan nomor kontrak" wire:model='newTasklistContract'>
+                                class="form-control @error('newTasklistContract') is-invalid @enderror"
+                                id="contract" placeholder="Masukkan nomor kontrak" wire:model='newTasklistContract'>
                             @error('newTasklistContract')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -298,10 +309,14 @@
                                 @enderror
                             </div>
                             <div class="col">
-                                <label for="end_date" class="form-label">TGL Akhir Kontrak <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" wire:model='newTasklistEndDate'
-                                    value="{{ now()->format('Y-m-d\TH:i') }}" id="end_date">
+                                <label for="end_date" class="form-label">TGL Akhir Kontrak</label>
+                                <input type="date"
+                                    class="form-control @error('newTasklistEndDate') is-invalid @enderror"
+                                    wire:model='newTasklistEndDate' value="{{ now()->format('Y-m-d\TH:i') }}"
+                                    id="end_date">
+                                @error('newTasklistEndDate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                         <div class="mb-3">

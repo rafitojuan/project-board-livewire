@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\KanbanController;
+use App\Http\Controllers\RegistAuthController;
 use App\Http\Livewire\KanbanBoard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,11 @@ use App\Http\Livewire\TasklistDetail;
 */
 
 Auth::routes(['verify' => true]);
+
+Route::middleware(['guest'])->group(function () {
+  Route::get('/daftar', [RegistAuthController::class, 'index'])->name('register.index');
+  Route::post('/daftar', [RegistAuthController::class, 'register'])->name('register.submit');
+});
 
 // Route::resource('/kanban', KanbanController::class);
 Route::middleware(['auth'])->group(function () {

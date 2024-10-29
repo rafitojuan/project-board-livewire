@@ -1,14 +1,15 @@
 
 
 <?php $__env->startSection('title'); ?>
-    <?php echo app('translator')->get('translation.Register'); ?> 2
+    Registrasi
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('css'); ?>
     <!-- owl.carousel css -->
     <link rel="stylesheet" href="<?php echo e(URL::asset('build/libs/owl.carousel/assets/owl.carousel.min.css')); ?>">
     <link rel="stylesheet" href="<?php echo e(URL::asset('build/libs/owl.carousel/assets/owl.theme.default.min.css')); ?>">
-    <link href="<?php echo e(URL::asset('build/libs/bootstrap-datepicker/bootstrap-datepicker.min.css')); ?>" rel="stylesheet" type="text/css">
+    <link href="<?php echo e(URL::asset('build/libs/bootstrap-datepicker/bootstrap-datepicker.min.css')); ?>" rel="stylesheet"
+        type="text/css">
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('body'); ?>
@@ -17,7 +18,6 @@
     <?php $__env->stopSection(); ?>
 
     <?php $__env->startSection('content'); ?>
-
         <div>
             <div class="container-fluid p-0">
                 <div class="row g-0">
@@ -31,49 +31,6 @@
                                     <div class="p-4 mt-auto">
                                         <div class="row justify-content-center">
                                             <div class="col-lg-7">
-                                                <div class="text-center">
-
-                                                    <h4 class="mb-3"><i
-                                                            class="bx bxs-quote-alt-left text-primary h1 align-middle me-3"></i><span
-                                                            class="text-primary">5k</span>+ Satisfied clients</h4>
-
-                                                    <div dir="ltr">
-                                                        <div class="owl-carousel owl-theme auth-review-carousel"
-                                                            id="auth-review-carousel">
-                                                            <div class="item">
-                                                                <div class="py-3">
-                                                                    <p class="font-size-16 mb-4">" Fantastic theme with a
-                                                                        ton of options. If you just want the HTML to
-                                                                        integrate with your project, then this is the
-                                                                        package. You can find the files in the 'dist'
-                                                                        folder...no need to install git and all the other
-                                                                        stuff the documentation talks about. "</p>
-
-                                                                    <div>
-                                                                        <h4 class="font-size-16 text-primary">Abs1981</h4>
-                                                                        <p class="font-size-14 mb-0">- Skote User</p>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-
-                                                            <div class="item">
-                                                                <div class="py-3">
-                                                                    <p class="font-size-16 mb-4">" If Every Vendor on Envato
-                                                                        are as supportive as Themesbrand, Development with
-                                                                        be a nice experience. You guys are Wonderful. Keep
-                                                                        us the good work. "</p>
-
-                                                                    <div>
-                                                                        <h4 class="font-size-16 text-primary">nezerious</h4>
-                                                                        <p class="font-size-14 mb-0">- Skote User</p>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -90,33 +47,53 @@
                                 <div class="d-flex flex-column h-100">
                                     <div class="mb-4 mb-md-5">
                                         <a href="index" class="d-block auth-logo">
-                                            <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt="" height="18"
-                                                class="auth-logo-dark">
-                                            <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt="" height="18"
-                                                class="auth-logo-light">
+                                            <img src="<?php echo e(URL::asset('build/images/logo-dark.png')); ?>" alt=""
+                                                height="18" class="auth-logo-dark">
+                                            <img src="<?php echo e(URL::asset('build/images/logo-light.png')); ?>" alt=""
+                                                height="18" class="auth-logo-light">
                                         </a>
                                     </div>
                                     <div class="my-auto">
+                                        <?php if(Session::has('success')): ?>
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                <?php echo e(Session::get('success')); ?>
 
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <?php if(Session::has('error')): ?>
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <?php echo e(Session::get('error')); ?>
+
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                        <?php endif; ?>
                                         <div>
                                             <h5 class="text-primary">Register account</h5>
-                                            <p class="text-muted">Get your free Skote account now.</p>
+                                            
                                         </div>
 
                                         <div class="mt-4">
-                                            <form method="POST" class="form-horizontal" action="<?php echo e(route('register')); ?>" enctype="multipart/form-data">
+                                            <form method="POST" class="form-horizontal"
+                                                action="<?php echo e(route('register.submit')); ?>" enctype="multipart/form-data">
                                                 <?php echo csrf_field(); ?>
                                                 <div class="mb-3">
-                                                    <label for="useremail" class="form-label">Email <span class="text-danger">*</span></label>
-                                                    <input type="email" class="form-control <?php $__errorArgs = ['email'];
+                                                    <label for="useremail" class="form-label">Email <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="email"
+                                                        class="form-control <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="useremail"
-                                                    value="<?php echo e(old('email')); ?>" name="email" placeholder="Enter email" autofocus required>
+unset($__errorArgs, $__bag); ?>"
+                                                        id="useremail" value="<?php echo e(old('email')); ?>" name="email"
+                                                        placeholder="Enter email" autofocus required>
                                                     <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -130,10 +107,12 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
-        
+
                                                 <div class="mb-3">
-                                                    <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control <?php $__errorArgs = ['name'];
+                                                    <label for="name" class="form-label">Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text"
+                                                        class="form-control <?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -141,8 +120,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>"
-                                                    value="<?php echo e(old('name')); ?>" id="name" name="name" autofocus required
-                                                        placeholder="Enter name">
+                                                        value="<?php echo e(old('name')); ?>" id="name" name="name" autofocus
+                                                        required placeholder="Enter name">
                                                     <?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -156,19 +135,22 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
-        
+
                                                 <div class="mb-3">
-                                                    <label for="userpassword" class="form-label">Password <span class="text-danger">*</span></label>
-                                                    <input type="password" class="form-control <?php $__errorArgs = ['password'];
+                                                    <label for="userpassword" class="form-label">Password <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="password"
+                                                        class="form-control <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="userpassword" name="password"
-                                                        placeholder="Enter password" autofocus required>
-                                                        <?php $__errorArgs = ['password'];
+unset($__errorArgs, $__bag); ?>"
+                                                        id="userpassword" name="password" placeholder="Enter password"
+                                                        autofocus required>
+                                                    <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -181,18 +163,21 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
-        
+
                                                 <div class="mb-3">
-                                                    <label for="confirmpassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                                    <input type="password" class="form-control <?php $__errorArgs = ['password_confirmation'];
+                                                    <label for="confirmpassword" class="form-label">Confirm Password <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="password"
+                                                        class="form-control <?php $__errorArgs = ['password_confirmation'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="confirmpassword"
-                                                    name="password_confirmation" placeholder="Enter Confirm password" autofocus required>
+unset($__errorArgs, $__bag); ?>"
+                                                        id="confirmpassword" name="password_confirmation"
+                                                        placeholder="Enter Confirm password" autofocus required>
                                                     <?php $__errorArgs = ['password_confirmation'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -206,21 +191,25 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
-        
+
                                                 
-        
+
                                                 <div class="mb-3">
-                                                    <label for="avatar">Profile Picture <span class="text-danger">*</span></label>
+                                                    <label for="avatar">Profile Picture <span
+                                                            class="text-danger">*</span></label>
                                                     <div class="input-group">
-                                                        <input type="file" class="form-control <?php $__errorArgs = ['avatar'];
+                                                        <input type="file"
+                                                            class="form-control <?php $__errorArgs = ['avatar'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="inputGroupFile02" name="avatar" autofocus required>
-                                                        <label class="input-group-text" for="inputGroupFile02">Upload</label>
+unset($__errorArgs, $__bag); ?>"
+                                                            id="inputGroupFile02" name="avatar" autofocus required>
+                                                        <label class="input-group-text"
+                                                            for="inputGroupFile02">Upload</label>
                                                     </div>
                                                     <?php $__errorArgs = ['avatar'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -235,40 +224,17 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
-        
+
                                                 <div class="mt-4 d-grid">
                                                     <button class="btn btn-primary waves-effect waves-light"
                                                         type="submit">Register</button>
                                                 </div>
-        
+
+                                                
+
                                                 <div class="mt-4 text-center">
-                                                    <h5 class="font-size-14 mb-3">Sign up using</h5>
-        
-                                                    <ul class="list-inline">
-                                                        <li class="list-inline-item">
-                                                            <a href="#"
-                                                                class="social-list-item bg-primary text-white border-primary">
-                                                                <i class="mdi mdi-facebook"></i>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-inline-item">
-                                                            <a href="#"
-                                                                class="social-list-item bg-info text-white border-info">
-                                                                <i class="mdi mdi-twitter"></i>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-inline-item">
-                                                            <a href="#"
-                                                                class="social-list-item bg-danger text-white border-danger">
-                                                                <i class="mdi mdi-google"></i>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-        
-                                                <div class="mt-4 text-center">
-                                                    <p class="mb-0">By registering you agree to the Skote <a href="#"
-                                                            class="text-primary">Terms of Use</a></p>
+                                                    <p class="mb-0">By registering you agree to the Skote <a
+                                                            href="#" class="text-primary">Terms of Use</a></p>
                                                 </div>
                                             </form>
 
@@ -280,12 +246,14 @@ unset($__errorArgs, $__bag); ?>
                                         </div>
                                     </div>
 
-                                    <div class="mt-4 mt-md-3 text-center">
-                                        <p class="mb-0">© <script>
+                                    <div class="mt-4 mt-md-5 text-center">
+                                        <p class="mb-0">©
+                                            <script>
                                                 document.write(new Date().getFullYear())
-
-                                            </script> Skote. Crafted with <i class="mdi mdi-heart text-danger"></i> by
-                                            Themesbrand</p>
+                                            </script> kanbanan. Dibuat dengan <i
+                                                class="mdi mdi-heart text-danger"></i> oleh
+                                            Tim IT EPI
+                                        </p>
                                     </div>
                                 </div>
 
@@ -299,7 +267,6 @@ unset($__errorArgs, $__bag); ?>
             </div>
             <!-- end container-fluid -->
         </div>
-
     <?php $__env->stopSection(); ?>
     <?php $__env->startSection('script'); ?>
         <script src="<?php echo e(URL::asset('build/libs/bootstrap-datepicker/bootstrap-datepicker.min.js')); ?>"></script>

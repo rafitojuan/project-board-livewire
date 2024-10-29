@@ -7,6 +7,7 @@ use App\Models\Subtask;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Attributes\Title;
@@ -46,25 +47,7 @@ class TasklistDetail extends Component
     public $kode;
     public $uraian;
     public $statusColor;
-
-
-    protected $rules = [
-        'newColumnName' => 'required|min:3',
-        'taskName' => 'required|min:3',
-        'taskStartDate' => 'required|date',
-        'taskEndDate' => 'date',
-        'subtaskName' => 'required|min:3',
-        'subtaskJob' => 'required|min:3',
-        'subtaskValue' => 'min:3|numeric',
-        'subTaskStarted' => 'required|date',
-        'subTaskEnd' => 'date',
-        'subtaskCompleted' => 'boolean',
-        'subTaskKeterangan' => 'nullable|string',
-        'taskUrl' => 'nullable|url',
-        'subtaskUrl' => 'nullable|url',
-        'tasklistColumnName' => 'required|min:3',
-        'tasklistStatus' => 'required',
-    ];
+    public $newTasklistStartDate;
 
     protected $listeners = [
         'refreshTasklistColumns' => '$refresh',
@@ -111,9 +94,15 @@ class TasklistDetail extends Component
     {
         $this->validate([
             'taskName' => 'required|min:3',
-            'taskStartDate' => 'required|date',
-            'taskEndDate' => 'date',
+            'taskStartDate' => ['required', 'date', 'after_or_equal:' . $this->tasklist->started_at, 'before_or_equal:' . $this->tasklist->end_at],
+            'taskEndDate' => ['date', 'before_or_equal:' . $this->tasklist->end_at, 'after_or_equal:' . $this->tasklist->started_at],
             'taskUrl' => 'nullable|url',
+        ], [
+            'taskStartDate.after_or_equal' => 'Mulai kontrak harus setelah tanggal mulai project.',
+            'taskStartDate.before_or_equal' => 'Mulai kontrak melewati tanggal akhir project.',
+            'taskEndDate.before_or_equal' => 'Akhir kontrak harus sebelum tanggal akhir project.',
+            'taskEndDate.after_or_equal' => 'Akhir kontrak tidak boleh mendahului.',
+            'taskUrl.url' => 'Link harus valid.',
         ]);
 
         Task::create([
@@ -123,6 +112,7 @@ class TasklistDetail extends Component
             'end_at' => $this->taskEndDate,
             'order' => Task::where('tasklist_column_id', $this->editingTasklistColumnId)->max('order') + 1,
             'status_id' => 1,
+            'user_id' => Auth::user()->id,
             'url' => $this->taskUrl,
         ]);
 

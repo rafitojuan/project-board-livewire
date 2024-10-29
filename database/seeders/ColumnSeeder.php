@@ -15,7 +15,7 @@ class ColumnSeeder extends Seeder
     {
         $columns = [
             [
-                'name' => 'Upcoming',
+                'name' => 'Potential',
             ],
             [
                 'name' => 'In Progress',

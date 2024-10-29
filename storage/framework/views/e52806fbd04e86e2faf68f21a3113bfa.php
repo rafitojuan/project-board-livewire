@@ -52,7 +52,8 @@
             </div>
 
             <div class="dropdown d-none d-lg-inline-block ms-1">
-                <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
+                <button type="button" class="btn header-item noti-icon waves-effect" id="fullscreen-button"
+                    onclick="toggleFullscreen()">
                     <i class="bx bx-fullscreen"></i>
                 </button>
             </div>
@@ -150,14 +151,17 @@
             </div>
 
             <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn header-item waves-effect d-flex align-items-center"
+                    id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                    <div class="text-start me-1 d-none d-xl-inline-block">
+                        <span class="fw-bold"><?php echo e(Auth::user()->name); ?></span>
+                        <p class="mb-0 text-muted text-lowercase"><?php echo e(Auth::user()->role->name ?? ''); ?></p>
+                    </div>
                     <img class="rounded-circle header-profile-user"
                         src="<?php echo e(isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('build/images/users/avatar-1.jpg')); ?>"
                         alt="Header Avatar">
-                    <span class="d-none d-xl-inline-block ms-1"
-                        key="t-henry"><?php echo e(ucfirst(Auth::user()->name)); ?></span>
-                    <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                    <i class="mdi mdi-chevron-down ms-2"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <!-- item-->
@@ -183,11 +187,6 @@
                         <?php echo csrf_field(); ?>
                     </form>
                 </div>
-            </div>
-            <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
-                    <i class="bx bx-cog bx-spin"></i>
-                </button>
             </div>
         </div>
     </div>

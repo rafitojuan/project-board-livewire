@@ -76,6 +76,16 @@
                                 </template>
                             </td>
                         </tr>
+                        <tr>
+                            <td>Dibuat</td>
+                            <td>
+                                <span class="badge text-capitalize"
+                                    style="background-color: <?php echo e($tasklist->user->role->color); ?>; font-size: 0.7rem">
+                                    <?php echo e($tasklist->user->division->divisi); ?>
+
+                                </span>
+                            </td>
+                        </tr>
                         <!--[if BLOCK]><![endif]--><?php if($tasklist->url): ?>
                             <tr>
                                 <td>Url <small class="text-sm">(Lampiran)</small></td>
@@ -97,15 +107,16 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5 class="card-title">Kegiatan</h5>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#addColumnModal">Add Column</button>
+                        <button class="btn btn-primary btn-sm <?php echo e($tasklist->role_id != 2 ? 'd-none' : ''); ?>"
+                            data-bs-toggle="modal" data-bs-target="#addColumnModal">Add Column</button>
                     </div>
                     <div class="row">
                         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $tasklistColumns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="col-lg-4">
                                 <div class="card rounded-4">
                                     <div class="card-body">
-                                        <div class="dropdown float-end">
+                                        <div
+                                            class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
                                             <a href="#" class="dropdown-toggle arrow-none"
                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
@@ -135,7 +146,8 @@
                                                     data-task-id="<?php echo e($task->id); ?>"
                                                     style="cursor: move; height: 13rem;">
                                                     <div class="card-body">
-                                                        <div class="dropdown float-end">
+                                                        <div
+                                                            class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
                                                             <a href="#" class="dropdown-toggle arrow-none"
                                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                                 <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
@@ -150,10 +162,9 @@
                                                         </div>
                                                         <div class="float-end ml-2">
                                                             <span class="badge rounded-pill font-size-12"
-                                                                style="background-color: <?php echo e(isset($task->status->color) ? $task->status->color : 'tomato'); ?>; opacity: 65%">
-                                                                <?php echo e($task->status->name ?? 'No Status'); ?>
-
-                                                            </span>
+                                                                style="background-color: <?php echo e(isset($task->user->role->color) ? $task->user->role->color : 'tomato'); ?>;"><?php echo e($task->user->role->name); ?></span>
+                                                            <span class="badge rounded-pill font-size-12"
+                                                                style="background-color: tomato; opacity: 100%"><?php echo e($task->user->division->divisi); ?></span>
                                                         </div>
                                                         <div>
                                                             <h5 class="font-size-15" style="cursor: pointer"
@@ -162,7 +173,8 @@
                                                                 <?php echo e(Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '')); ?>
 
                                                             </h5>
-                                                            <small>Divisi: ...</small><br>
+                                                            <small>Divisi:
+                                                                <?php echo e($task->user->division->divisi ?? '-'); ?></small><br>
                                                             <small class="text-muted mb-2">
                                                                 <?php echo e(\Carbon\Carbon::parse($task->started_at)->format('d M Y')); ?><span
                                                                     class="mx-1">-</span><?php echo e($task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A'); ?>
@@ -192,7 +204,8 @@
                                         </div>
 
                                         <!--[if BLOCK]><![endif]--><?php if($loop->index == 0): ?>
-                                            <div class="text-center d-grid">
+                                            <div
+                                                class="text-center d-grid <?php echo e(Auth::user()->role_id === 7 ? 'd-none' : ''); ?>">
                                                 <a href="javascript: void(0);"
                                                     class="btn btn-primary waves-effect waves-light addtask-btn"
                                                     wire:click="openTaskModal(<?php echo e($column->id); ?>)">

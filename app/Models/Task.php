@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    protected $fillable = ['tasklist_column_id', 'name', 'order', 'status_id', 'started_at', 'end_at', 'url'];
+    protected $fillable = ['tasklist_column_id', 'name', 'order', 'status_id', 'started_at', 'end_at', 'url', 'user_id'];
 
     public function tasklistColumn()
     {
@@ -16,5 +16,10 @@ class Task extends Model
     public function status()
     {
         return $this->belongsTo(Status::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

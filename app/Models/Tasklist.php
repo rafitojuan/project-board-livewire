@@ -9,7 +9,7 @@ class Tasklist extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['column_id', 'name', 'work_id', 'order', 'adendum_value', 'company', 'location', 'value', 'status_id', 'started_at', 'end_at', 'url', 'contract_number', 'pengadaan', 'conract_sign', 'adendum'];
+    protected $fillable = ['column_id', 'name', 'work_id', 'order', 'adendum_value', 'company', 'location', 'value', 'status_id', 'started_at', 'end_at', 'url', 'contract_number', 'pengadaan', 'conract_sign', 'adendum', 'color', 'user_id'];
 
     public function column()
     {
@@ -24,5 +24,10 @@ class Tasklist extends Model
     public function tasklistColumns()
     {
         return $this->hasMany(TasklistColumn::class)->orderBy('order');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
