@@ -192,7 +192,8 @@ class Kanban extends Component
             'contract_number' => trim($this->newTasklistContract),
             'pengadaan' => trim($this->tasklistPengadaan),
             'color' => Auth::user()->role->color,
-            'user_id' => Auth::user()->role->id > 2 ? Auth::user()->id : $this->userId
+            // 'user_id' => Auth::user()->role->id > 2 ? Auth::user()->id : $this->userId
+            'user_id' => Auth::user()->id,
         ]);
 
 

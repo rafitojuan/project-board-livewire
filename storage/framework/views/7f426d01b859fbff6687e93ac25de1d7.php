@@ -31,7 +31,7 @@
                             })">
                             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasklists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tasklist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <div class="card task-box mb-3 rounded-4" data-tasklist-id="<?php echo e($tasklist->id); ?>"
-                                    style="cursor: pointer; border: 4px solid <?php echo e($tasklist->end_at >= now() ? '#ff0000' : 'transparent'); ?>;">
+                                    style="cursor: pointer; border: 4px solid <?php echo e(now() > $tasklist->end_at ? '#ff0000' : 'transparent'); ?>;">
                                     <div class="card-body">
                                         <div class="dropdown float-end">
                                             <a href="#" class="dropdown-toggle arrow-none"

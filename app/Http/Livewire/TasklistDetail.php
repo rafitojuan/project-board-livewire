@@ -48,6 +48,8 @@ class TasklistDetail extends Component
     public $uraian;
     public $statusColor;
     public $newTasklistStartDate;
+    public $taskValue;
+    public $taskSubtotals = [];
 
     protected $listeners = [
         'refreshTasklistColumns' => '$refresh',
@@ -55,6 +57,7 @@ class TasklistDetail extends Component
         'hapusTask' => 'hapusTask',
         'deleteTasklistColumnConfirmed' => 'deleteColumn',
         'editSubtask' => 'editSubtask',
+        'subtotal-updated' => 'handleSubtotalUpdate'
     ];
 
     public function mount($encryptedId)
@@ -97,12 +100,14 @@ class TasklistDetail extends Component
             'taskStartDate' => ['required', 'date', 'after_or_equal:' . $this->tasklist->started_at, 'before_or_equal:' . $this->tasklist->end_at],
             'taskEndDate' => ['date', 'before_or_equal:' . $this->tasklist->end_at, 'after_or_equal:' . $this->tasklist->started_at],
             'taskUrl' => 'nullable|url',
+            'taskValue' => 'nullable|numeric',
         ], [
             'taskStartDate.after_or_equal' => 'Mulai kontrak harus setelah tanggal mulai project.',
             'taskStartDate.before_or_equal' => 'Mulai kontrak melewati tanggal akhir project.',
             'taskEndDate.before_or_equal' => 'Akhir kontrak harus sebelum tanggal akhir project.',
             'taskEndDate.after_or_equal' => 'Akhir kontrak tidak boleh mendahului.',
             'taskUrl.url' => 'Link harus valid.',
+            'taskValue.numeric' => 'Nilai harus berupa angka.',
         ]);
 
         Task::create([
@@ -114,6 +119,7 @@ class TasklistDetail extends Component
             'status_id' => 1,
             'user_id' => Auth::user()->id,
             'url' => $this->taskUrl,
+            'value' => $this->taskValue,
         ]);
 
         $this->reset('taskName', 'taskStartDate', 'taskEndDate', 'taskUrl');
@@ -130,6 +136,7 @@ class TasklistDetail extends Component
         $this->taskStartDate = $task['started_at'];
         $this->taskEndDate = $task['end_at'];
         $this->taskUrl = $task['url'];
+        $this->taskValue = $task['value'];
     }
 
     public function closeTaskModal()
@@ -141,9 +148,15 @@ class TasklistDetail extends Component
     {
         $this->validate([
             'taskName' => 'required|min:3',
-            'taskStartDate' => 'required',
-            'taskEndDate' => 'date',
+            'taskStartDate' => ['required', 'date', 'after_or_equal:' . $this->tasklist->started_at, 'before_or_equal:' . $this->tasklist->end_at],
+            'taskEndDate' => ['date', 'before_or_equal:' . $this->tasklist->end_at, 'after_or_equal:' . $this->tasklist->started_at],
             'taskUrl' => 'nullable|url',
+        ], [
+            'taskStartDate.after_or_equal' => 'Mulai kontrak harus setelah tanggal mulai project.',
+            'taskStartDate.before_or_equal' => 'Mulai kontrak melewati tanggal akhir project.',
+            'taskEndDate.before_or_equal' => 'Akhir kontrak harus sebelum tanggal akhir project.',
+            'taskEndDate.after_or_equal' => 'Akhir kontrak tidak boleh mendahului.',
+            'taskUrl.url' => 'Link harus valid.',
         ]);
 
         Task::where('id', $this->taskId)->update([
@@ -151,6 +164,7 @@ class TasklistDetail extends Component
             'started_at' => $this->taskStartDate,
             'end_at' => $this->taskEndDate,
             'url' => $this->taskUrl,
+            'value' => $this->taskValue,
         ]);
 
         $this->reset('taskName', 'taskStartDate', 'taskEndDate', 'taskUrl');
@@ -269,10 +283,24 @@ class TasklistDetail extends Component
             'subtaskName' => 'required|min:3',
             'subtaskJob' => 'required|min:3',
             'subtaskValue' => 'numeric',
-            'subTaskStarted' => 'required|date',
-            'subTaskEnd' => 'date',
+            'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before:' . Task::find($this->kode)->end_at],
+            'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
             'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
+        ], [
+            'subtaskName.required' => 'Nama harus diisi.',
+            'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
+            'subtaskJob.required' => 'Pelaksana harus diisi.',
+            'subtaskJob.min' => 'Pelaksana minimal 3 karakter.',
+            'subtaskValue.numeric' => 'Biaya harus berupa angka.',
+            'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
+            'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
+            'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
+            'subtaskUrl.url' => 'URL subtask harus berupa URL yang valid.',
+            'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
+            'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
         ]);
 
         Subtask::create([
@@ -310,12 +338,26 @@ class TasklistDetail extends Component
             'subtaskName' => 'required|min:3',
             'subtaskJob' => 'required|min:3',
             'subtaskValue' => 'numeric',
-            'subTaskStarted' => 'required|date',
-            'subTaskEnd' => 'date',
-            'subtaskCompleted' => 'required|boolean',
-            'subTaskKeterangan' => 'required',
+            'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before:' . Task::find($this->kode)->end_at],
+            'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
+            'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
+        ], [
+            'subtaskName.required' => 'Nama harus diisi.',
+            'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
+            'subtaskJob.required' => 'Pelaksana harus diisi.',
+            'subtaskJob.min' => 'Pelaksana minimal 3 karakter.',
+            'subtaskValue.numeric' => 'Biaya harus berupa angka.',
+            'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
+            'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
+            'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
+            'subtaskUrl.url' => 'URL subtask harus berupa URL yang valid.',
+            'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
+            'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
         ]);
+        
         Subtask::where('id', $this->subtaskId)->update([
             'name' => $this->subtaskName,
             'pelaksana' => $this->subtaskJob,
@@ -350,6 +392,12 @@ class TasklistDetail extends Component
         return $this->tasklist->status->color;
         $this->alert('success', 'Status berhasil diperbarui!');
     }
+
+    public function getSubtotal($taskId)
+    {
+        return Subtask::where('task_id', $taskId)->sum('biaya');
+    }
+
 
     public function render()
     {

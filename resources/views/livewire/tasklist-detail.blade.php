@@ -186,7 +186,9 @@
                                                                 </a>
                                                             @endif
                                                             <div class="text-end">
-                                                                <h5 class="font-size-15 mb-1">Rp100000
+                                                                <h5 class="font-size-15 mb-1">
+                                                                    Rp
+                                                                    {{ number_format($this->getSubtotal($task->id), 0, ',', '.') }}
                                                                 </h5>
                                                                 <p class="mb-0 text-muted">Nilai Kontrak</p>
                                                             </div>
@@ -259,6 +261,19 @@
                             </div>
                         </div>
                         <div class="mb-3">
+                            <label for="name" class="form-label">Nilai Kontrak</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" class="form-control" placeholder="Masukkan nominal"
+                                    x-data="{ taskValue: '' }"
+                                    x-on:keydown="if(taskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    wire:model="taskValue" x-model="taskValue" maxlength="10">
+                            </div>
+                            @error('taskValue')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
                                 placeholder="https://example.com"" wire:model='taskUrl'>
@@ -315,6 +330,19 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nilai Kontrak</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" class="form-control" placeholder="Masukkan nominal"
+                                    x-data="{ taskValue: '' }"
+                                    x-on:keydown="if(taskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    wire:model="taskValue" x-model="taskValue" maxlength="10">
+                            </div>
+                            @error('taskValue')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
@@ -608,12 +636,7 @@
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="status" value="0"
                                     wire:model='subtaskCompleted' />
-                                <label class="form-check-label" for="">new</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="3"
-                                    wire:model='subtaskCompleted' />
-                                <label class="form-check-label" for="">progress</label>
+                                <label class="form-check-label" for="">on progress</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="status" value="1"

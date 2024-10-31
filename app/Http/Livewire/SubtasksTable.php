@@ -16,6 +16,7 @@ class SubtasksTable extends DataTableComponent
 {
     use LivewireAlert, WithPagination;
 
+    public $task_id;
     public $subtaskName;
     public $subtaskId;
     public $subtaskJob;
@@ -104,9 +105,12 @@ class SubtasksTable extends DataTableComponent
                 ->format(function ($value) {
                     return 'Rp' . number_format($value, 0, ',', '.');
                 })
-                ->sortable()->searchable(),
+                ->sortable()->searchable()->footer(function ($rows) {
+                    $subtotal = $rows->sum('biaya');
+                    return 'Subtotal: Rp' . number_format($subtotal, 0, ',', '.');
+                }),
             BooleanColumn::make("Status", "completed")
-                ->sortable()->searchable(),
+                ->sortable()->searchable()->setView('components.status-field'),
             Column::make('Action', 'id')->view('components.action-buttons')->searchable(),
         ];
     }
