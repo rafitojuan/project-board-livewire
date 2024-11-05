@@ -43,7 +43,7 @@
         $('.updateTaskModal').modal('hide');
         $('.updateTasklistColumnModal').modal('hide');
         $('.addColumnModal').modal('hide');
-        $('#editSubtaskModal').modal('hide');
+        $('#editModal').modal('hide');
     })
 
     function toggleFullscreen() {

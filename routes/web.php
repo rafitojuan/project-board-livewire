@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Kanban\Index;
 use App\Http\Livewire\TasklistDetail;
+use App\Http\Livewire\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,14 +23,17 @@ use App\Http\Livewire\TasklistDetail;
 Auth::routes(['verify' => true]);
 
 Route::middleware(['guest'])->group(function () {
-  Route::get('/daftar', [RegistAuthController::class, 'index'])->name('register.index');
-  Route::post('/daftar', [RegistAuthController::class, 'register'])->name('register.submit');
+    Route::get('/daftar', [RegistAuthController::class, 'index'])->name('register.index');
+    Route::post('/daftar', [RegistAuthController::class, 'register'])->name('register.submit');
 });
 
 // Route::resource('/kanban', KanbanController::class);
 Route::middleware(['auth'])->group(function () {
-  Route::get('/project', Index::class)->name('kanban.index');
-  Route::get('/tasklist/{encryptedId}', TasklistDetail::class)->name('tasklist.detail');
+    Route::get('/project', Index::class)->name('kanban.index');
+    Route::get('/tasklist/{encryptedId}', TasklistDetail::class)->name('tasklist.detail');
+    Route::get('/user', User::class)->name('user.index');
+    Route::get('/logs', [App\Http\Livewire\Kanban::class, 'allLogs'])->name('logs');
+    Route::get('/log/{tasklist}', [App\Http\Livewire\Kanban::class, 'log'])->name('livewire.log');
 });
 
 // Route::get('/kanban', KanbanBoard::class)->name('kanban');

@@ -31,5 +31,9 @@ unset($__params);
 unset($__split);
 if (isset($__slots)) unset($__slots);
 ?>
+    <p>
+        <span class="fw-bold">Keterangan:</span> <br>
+        <span class="text-danger align-baseline" style="font-size: 24px;">●</span> = Projek yang melewati waktu akhir<br>
+    </p>
 </div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/kanban/index.blade.php ENDPATH**/ ?>

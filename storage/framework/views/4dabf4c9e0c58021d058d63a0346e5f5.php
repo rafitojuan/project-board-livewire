@@ -55,8 +55,8 @@
                                             :style="`background-color: ${statusColor}; font-size: 0.7rem`"
                                             x-text="'<?php echo e($tasklist->status->name ?? 'No Status'); ?>'">
                                         </span>
-                                        <i class="bi bi-pencil-fill ms-2" style="cursor: pointer;"
-                                            @click.stop="isEditing = true"></i>
+                                        <i class="bi bi-pencil-fill ms-2 <?php echo e(Auth::user()->role_id > 2 && Auth::user()->role_id != 5 ? 'd-none' : ''); ?>"
+                                            style="cursor: pointer;" @click.stop="isEditing = true"></i>
                                     </div>
                                 </template>
                                 <template x-if="isEditing">
@@ -96,7 +96,21 @@
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         <tr>
                             <td>Nilai</td>
-                            <td><strong>Rp<?php echo e(number_format($tasklist->value, 2)); ?></strong></td>
+                            <td><strong>Rp<?php echo e(number_format($tasklist->value, 0)); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td>Biaya</td>
+                            <td><strong
+                                    class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>">Rp<?php echo e(number_format($this->getTotalBiaya(), 0, ',', '.')); ?></strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Akumulasi</td>
+                            <td><strong
+                                    class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>"><?php echo e($tasklist->value - $this->getTotalBiaya() < 0 ? '- Rp' : 'Rp'); ?><?php echo e(number_format(abs($tasklist->value - $this->getTotalBiaya()), 0, ',', '.')); ?>
+
+                                </strong>
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -196,7 +210,7 @@
                                                                     <?php echo e(number_format($this->getSubtotal($task->id), 0, ',', '.')); ?>
 
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Nilai Kontrak</p>
+                                                                <p class="mb-0 text-muted">Biaya</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -308,26 +322,7 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nilai Kontrak</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" class="form-control" placeholder="Masukkan nominal"
-                                    x-data="{ taskValue: '' }"
-                                    x-on:keydown="if(taskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
-                                    wire:model="taskValue" x-model="taskValue" maxlength="10">
-                            </div>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskValue'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                <small class="text-danger"><?php echo e($message); ?></small>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
-                        </div>
+                        
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
@@ -428,26 +423,7 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nilai Kontrak</label>
-                            <div class="input-group">
-                                <span class="input-group-text">Rp</span>
-                                <input type="number" class="form-control" placeholder="Masukkan nominal"
-                                    x-data="{ taskValue: '' }"
-                                    x-on:keydown="if(taskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
-                                    wire:model="taskValue" x-model="taskValue" maxlength="10">
-                            </div>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['taskValue'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                <small class="text-danger"><?php echo e($message); ?></small>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
-                        </div>
+                        
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
@@ -775,7 +751,7 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
     
 
     
-    <div class="modal fade" id="editSubtaskModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         role="dialog" aria-labelledby="modalTitleId" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
             <div class="modal-content">

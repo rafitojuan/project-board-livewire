@@ -8,8 +8,9 @@
     <meta content="Dashboard EPI" name="description" />
     <meta content="Themesbrand" name="author" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ URL::asset('build/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ URL::asset('build/images/logo_project_board.png') }}">
     @include('layouts.head-css')
+    @livewireStyles
 </head>
 
 @section('body')
@@ -43,6 +44,7 @@
 
     <!-- JAVASCRIPT -->
     @include('layouts.vendor-scripts')
+    @livewireScripts
 </body>
 
 </html>

@@ -16,6 +16,25 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ route('logs') }}" class="waves-effect">
+                        <i class="bx bx-history"></i>
+                        <span>Log Aktivitas</span>
+                    </a>
+                </li>
+
+
+                {{-- <li>
+                    <a href="javascript:void(0);" class="has-arrow waves-effect">
+                        <i class='bx bx-group'></i>
+                        <span>User Management</span>
+                    </a>
+                    <ul class="sub-menu navbar-collapse" aria-expanded="true">
+                        <li><a href="{{ route('user.index') }}">User</a></li>
+                        <li><a href="">Roles</a></li>
+                        <li><a href="">Divisi</a></li>
+                    </ul>
+                </li> --}}
             </ul>
         </div>
         <!-- Sidebar -->

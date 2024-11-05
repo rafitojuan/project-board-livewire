@@ -357,7 +357,7 @@ class TasklistDetail extends Component
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
         ]);
-        
+
         Subtask::where('id', $this->subtaskId)->update([
             'name' => $this->subtaskName,
             'pelaksana' => $this->subtaskJob,
@@ -369,7 +369,7 @@ class TasklistDetail extends Component
             'url' => $this->subtaskUrl,
         ]);
         $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl');
-        $this->dispatch('close-taskModal', ['modalName' => 'editSubtaskModal']);
+        $this->dispatch('close-taskModal', ['modalName' => 'editModal']);
         $this->dispatch('open-subtaskModal', ['modalName' => 'subTaskModal']);
         $this->alert('success', 'Subtask berhasil diperbarui!');
         $this->dispatch('refreshDatatable');
@@ -387,6 +387,9 @@ class TasklistDetail extends Component
         ]);
         $tasklist = Tasklist::find($this->tasklist->id);
         $tasklist->status_id = $this->tasklistStatus;
+        if ($this->tasklistStatus == 1) {
+            $tasklist->column_id = 1;
+        }
         $tasklist->save();
         $this->tasklist->refresh();
         return $this->tasklist->status->color;
@@ -398,6 +401,16 @@ class TasklistDetail extends Component
         return Subtask::where('task_id', $taskId)->sum('biaya');
     }
 
+    public function getTotalBiaya()
+    {
+        $columnIds = $this->tasklist->tasklistColumns->pluck('id')->toArray();
+        $tasks = Task::whereIn('tasklist_column_id', $columnIds)->get();
+        $total = 0;
+        foreach ($tasks as $task) {
+            $total += $this->getSubtotal($task->id);
+        }
+        return $total;
+    }
 
     public function render()
     {

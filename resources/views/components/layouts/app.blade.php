@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>{{ $title ?? 'Page Title' }}</title>
+    <title>{{ $title ?? 'EPI Dashboard' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Dashboard EPI" name="description" />
     <meta content="Themesbrand" name="author" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ URL::asset('build/images/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ URL::asset('build/images/logo_project_board.png') }}">
     @include('layouts.head-css')
     @livewireStyles
 </head>

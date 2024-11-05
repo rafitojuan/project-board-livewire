@@ -5,7 +5,7 @@
             <div class="navbar-brand-box">
                 <a href="{{ route('kanban.index') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ URL::asset('build/images/logo.svg') }}" alt="" height="22">
+                        <img src="{{ URL::asset('build/images/logo_project_board.png') }}" alt="" height="22">
                     </span>
                     <span class="logo-lg">
                         <img src="{{ URL::asset('build/images/logo-dark.png') }}" alt="" height="17">
@@ -14,12 +14,14 @@
 
                 <a href="{{ route('kanban.index') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ URL::asset('build/images/logo-light.svg') }}" alt="" height="22">
+                        <img src="{{ URL::asset('build/images/logo_project_board.png') }}" alt=""
+                            height="22">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ URL::asset('build/images/logo-light.png') }}" alt="" height="19">
-                    </span>
-                </a>
+                        <img src="{{ URL::asset('build/images/logo_project_board.png') }}" alt="" height="55"
+                            class="sidebar-logo" style="margin-right: -5px; vertical-align: middle;"><span
+                            class="logo-text text-white fs-2" style="vertical-align: middle;">Glide</span>
+                    </span> </a>
             </div>
 
             <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect" id="vertical-menu-btn">

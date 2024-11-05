@@ -1,5 +1,5 @@
 <div class="btn-group">
-    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editSubtaskModal"
+    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal"
         wire:click="edit(<?php echo e($row->id); ?>)">
         <i class="bi bi-pencil-square"></i>
     </button>

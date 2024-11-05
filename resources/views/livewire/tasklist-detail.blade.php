@@ -54,8 +54,8 @@
                                             :style="`background-color: ${statusColor}; font-size: 0.7rem`"
                                             x-text="'{{ $tasklist->status->name ?? 'No Status' }}'">
                                         </span>
-                                        <i class="bi bi-pencil-fill ms-2" style="cursor: pointer;"
-                                            @click.stop="isEditing = true"></i>
+                                        <i class="bi bi-pencil-fill ms-2 {{ Auth::user()->role_id > 2 && Auth::user()->role_id != 5 ? 'd-none' : '' }}"
+                                            style="cursor: pointer;" @click.stop="isEditing = true"></i>
                                     </div>
                                 </template>
                                 <template x-if="isEditing">
@@ -93,7 +93,20 @@
                         @endif
                         <tr>
                             <td>Nilai</td>
-                            <td><strong>Rp{{ number_format($tasklist->value, 2) }}</strong></td>
+                            <td><strong>Rp{{ number_format($tasklist->value, 0) }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Biaya</td>
+                            <td><strong
+                                    class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">Rp{{ number_format($this->getTotalBiaya(), 0, ',', '.') }}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Akumulasi</td>
+                            <td><strong
+                                    class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">{{ $tasklist->value - $this->getTotalBiaya() < 0 ? '- Rp' : 'Rp' }}{{ number_format(abs($tasklist->value - $this->getTotalBiaya()), 0, ',', '.') }}
+                                </strong>
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -190,7 +203,7 @@
                                                                     Rp
                                                                     {{ number_format($this->getSubtotal($task->id), 0, ',', '.') }}
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Nilai Kontrak</p>
+                                                                <p class="mb-0 text-muted">Biaya</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -260,7 +273,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="name" class="form-label">Nilai Kontrak</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
@@ -272,7 +285,7 @@
                             @error('taskValue')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
-                        </div>
+                        </div> --}}
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
@@ -331,7 +344,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="name" class="form-label">Nilai Kontrak</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
@@ -343,7 +356,7 @@
                             @error('taskValue')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
-                        </div>
+                        </div> --}}
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
@@ -558,7 +571,7 @@
     {{-- End --}}
 
     {{-- Modal Detail Pekerjaan --}}
-    <div class="modal fade" id="editSubtaskModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         role="dialog" aria-labelledby="modalTitleId" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
             <div class="modal-content">

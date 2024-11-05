@@ -23,15 +23,34 @@
                             x-init="dropzone = new Sortable($el, {
                                 group: 'tasklists',
                                 animation: 150,
+                                filter: '.undraggable',
                                 onEnd: function(evt) {
                                     let columnId = evt.to.dataset.columnId;
                                     let tasklistOrder = Array.from(evt.to.children).map(el => el.dataset.tasklistId);
+                                    if (columnId == 3) {
+                                        let taskElement = evt.item;
+                                        let statusId = parseInt(taskElement.getAttribute('data-status-id'));
+                                        if (statusId < 5) {
+                                            evt.from.appendChild(taskElement);
+                                            Swal.fire({
+                                                position: 'top-end',
+                                                icon: 'error',
+                                                title: 'Tunggu approval by SM!',
+                                                showConfirmButton: false,
+                                                timer: 3000,
+                                                toast: true,
+                                                timerProgressBar: true
+                                            });
+                                            return;
+                                        }
+                                    }
                                     $wire.updateTasklistOrder(columnId, tasklistOrder);
                                 }
                             })">
                             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasklists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tasklist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                <div class="card task-box mb-3 rounded-4" data-tasklist-id="<?php echo e($tasklist->id); ?>"
-                                    style="cursor: pointer; border: 4px solid <?php echo e(now() > $tasklist->end_at ? '#ff0000' : 'transparent'); ?>;">
+                                <div class="card task-box mb-3 rounded-4 <?php echo e($tasklist->status_id <= 1 ? 'undraggable' : ''); ?>"
+                                    data-tasklist-id="<?php echo e($tasklist->id); ?>" data-status-id="<?php echo e($tasklist->status_id); ?>"
+                                    style="cursor: <?php echo e($tasklist->status_id <= 1 ? 'default' : 'pointer'); ?>; border: 4px solid <?php echo e(now() > $tasklist->end_at ? '#F46A6A' : 'transparent'); ?>;">
                                     <div class="card-body">
                                         <div class="dropdown float-end">
                                             <a href="#" class="dropdown-toggle arrow-none"

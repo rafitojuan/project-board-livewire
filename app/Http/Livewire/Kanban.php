@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Title;
+use Spatie\Activitylog\Models\Activity;
 
 #[Title('Kanban')]
 
@@ -38,6 +39,7 @@ class Kanban extends Component
     public $tasklistPengadaan = 'pl';
     public $contractSignDate;
     public $userId;
+    public $logs;
 
     protected $listeners = [
         'columnAdded' => 'loadColumns',
@@ -57,17 +59,48 @@ class Kanban extends Component
         }])->orderBy('id')->get();
     }
 
+    // public function updateTasklistOrder($columnId, $tasklistOrder)
+    // {
+    //     DB::transaction(function () use ($columnId, $tasklistOrder) {
+    //         foreach ($tasklistOrder as $index => $tasklistId) {
+    //             $order = $index + 1;
+    //             Tasklist::where('id', $tasklistId)->update(['column_id' => $columnId, 'order' => $order]);cls
+    //             activity()->log('Project dipindahkan cuk');
+    //         }
+    //     });
+
+    //     $this->loadColumns();
+    // }
+
     public function updateTasklistOrder($columnId, $tasklistOrder)
     {
         DB::transaction(function () use ($columnId, $tasklistOrder) {
             foreach ($tasklistOrder as $index => $tasklistId) {
                 $order = $index + 1;
-                Tasklist::where('id', $tasklistId)->update(['column_id' => $columnId, 'order' => $order, 'status_id' => 1]);
+                $tasklist = Tasklist::findOrFail($tasklistId);
+                $oldColumn = Column::findOrFail($tasklist->column_id);
+                $newColumn = Column::findOrFail($columnId);
+
+                $tasklist->update([
+                    'column_id' => $columnId,
+                    'order' => $order
+                ]);
+
+                activity()
+                    ->performedOn($tasklist)
+                    ->withProperties([
+                        'tasklist_name' => $tasklist->name,
+                        'old_column' => $oldColumn->name,
+                        'new_column' => $newColumn->name,
+                        'new_order' => $order
+                    ])
+                    ->log("Project '{$tasklist->name}' moved from {$oldColumn->name} to {$newColumn->name}");
             }
         });
 
         $this->loadColumns();
     }
+
 
     public function openEditColumnModal($column)
     {
@@ -301,6 +334,44 @@ class Kanban extends Component
             }])->findOrFail($this->currentTasklist->id);
         }
     }
+
+    // public function log(Tasklist $tasklist)
+    // {
+    //     $this->logs = Activity::where('subject_type', Tasklist::class)
+    //         ->where('subject_id', $tasklist->id)
+    //         ->latest()
+    //         ->get();
+
+    //     return view('livewire.log', [
+    //         'logs' => $this->logs
+    //     ])->extends('livewire.kanban');
+    // }
+
+    public function allLogs()
+    {
+        $this->logs = Activity::where('subject_type', Tasklist::class)
+            ->latest()
+            ->get();
+
+        return view('livewire.log', [
+            'logs' => $this->logs
+        ]);
+    }
+
+    // public function log(Tasklist $tasklist)
+    // {
+    //     $this->logs = Activity::where('subject_type', Tasklist::class)
+    //         ->where('subject_id', $tasklist->id)
+    //         ->latest()
+    //         ->get();
+
+    //     return view('livewire.log', [
+    //         'logs' => $this->logs,
+    //         'tasklist' => $tasklist
+    //     ])->extends('layouts.app');
+    // }
+
+
 
     public function render()
     {

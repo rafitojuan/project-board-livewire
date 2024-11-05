@@ -26,7 +26,7 @@ class AddColumn extends Component
         $this->dispatch('close-columnModal', ['modalName' => 'modalColumn']);
         $this->reset();
         $this->alert('success', 'Column ditambahkan', [
-            'position' => 'center',
+            'position' => 'top-end',
         ]);
         $this->dispatch('columnAdded');
     }

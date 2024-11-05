@@ -16,6 +16,15 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="<?php echo e(route('logs')); ?>" class="waves-effect">
+                        <i class="bx bx-history"></i>
+                        <span>Log Aktivitas</span>
+                    </a>
+                </li>
+
+
+                
             </ul>
         </div>
         <!-- Sidebar -->
