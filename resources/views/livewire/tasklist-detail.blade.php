@@ -154,7 +154,7 @@
                                             @forelse ($column->tasks as $task)
                                                 <div class="card task-box mb-3 rounded-4 shadow-lg"
                                                     data-task-id="{{ $task->id }}"
-                                                    style="cursor: move; height: 13rem;">
+                                                    style="cursor: grab; height: 13rem;">
                                                     <div class="card-body">
                                                         <div
                                                             class="dropdown float-end {{ Auth::user()->role_id > 3 ? 'd-none' : '' }}">
@@ -188,6 +188,16 @@
                                                                 {{ \Carbon\Carbon::parse($task->started_at)->format('d M Y') }}<span
                                                                     class="mx-1">-</span>{{ $task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A' }}
                                                             </small>
+                                                            @foreach ($detil->where('id_tasks', $task->id) as $detail)
+                                                                <div class="progress mt-2" style="height: 15px;">
+                                                                    <div class="progress-bar" role="progressbar"
+                                                                        style="width: {{ $detail->jlh_score }}%; background-color: {{ $detail->warna_status }}"
+                                                                        aria-valuenow="{{ $detail->jlh_score }}"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                        {{ $detail->jlh_score }}%
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
                                                         </div>
 
                                                         <div class="position-absolute bottom-0 start-0 end-0 p-3">
@@ -388,7 +398,7 @@
                 </div>
                 <div class="modal-body">
                     <form wire:submit='addTasklistColumn'>
-                        <input type="hidden" value="{{ $tasklist->id }}" wire:model='columnId'>
+                        {{-- <input type="hidden" value="{{ $tasklist->id }}" wire:model='columnId'> --}}
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control @error('taskName') is-invalid @enderror"
@@ -509,15 +519,15 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Biaya</label>
+                            <label for="biaya" class="form-label">Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input type="number" class="form-control" placeholder="Masukkan nominal"
-                                    x-data="{ subtaskValue: '' }"
+                                <input id="biaya" type="number" class="form-control"
+                                    placeholder="Masukkan nominal" x-data="{ subtaskValue: '' }"
+                                    x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
                                     x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
                                     wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
-                            </div>
-                            @error('subtaskValue')
+                            </div> @error('subtaskValue')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -638,25 +648,19 @@
                             @enderror
                         </div>
                         <div class="mb-3">
+                            <label for="statusa" class="form-label">Status</label>
+                            <select id="statusa" class="form-select" wire:model='subTaskStatus'>
+                                <option value="" disabled>Pilih Status</option>
+                                @foreach ($statusSubtask as $status)
+                                    <option class="text-capitalize" value="{{ $status->id }}">{{ $status->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
                             <textarea name="keterangan" wire:model='subTaskKeterangan' class="form-control" cols="10" rows="3"></textarea>
                             @error('subTaskKeterangan')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label me-2">Status : </label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="0"
-                                    wire:model='subtaskCompleted' />
-                                <label class="form-check-label" for="">on progress</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="1"
-                                    wire:model='subtaskCompleted' />
-                                <label class="form-check-label" for="">finished</label>
-                            </div>
-                            @error('subtaskCompleted')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

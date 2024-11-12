@@ -10,10 +10,11 @@ use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
-#[Title('Tasklist Detail')]
+#[Title('EPI | Tasklist Detail')]
 class TasklistDetail extends Component
 {
     use LivewireAlert;
@@ -41,6 +42,7 @@ class TasklistDetail extends Component
     public $subTaskEnd;
     public $subtaskId;
     public $subtaskCompleted;
+    public $subTaskStatus;
     public $subTaskKeterangan;
     public $taskUrl;
     public $subtaskUrl;
@@ -312,9 +314,10 @@ class TasklistDetail extends Component
             'task_id' => $this->kode,
             'keterangan' => $this->subTaskKeterangan,
             'url' => $this->subtaskUrl,
+            'status_id' => 1
         ]);
 
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl', 'subTaskKeterangan');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl', 'subTaskKeterangan', 'subTaskStatus');
         $this->alert('success', 'Subtask berhasil ditambahkan!');
         $this->dispatch('refreshDatatable');
     }
@@ -324,6 +327,7 @@ class TasklistDetail extends Component
         $this->subtaskName = $data['subtaskName'];
         $this->subtaskId = $data['subtaskId'];
         $this->subtaskJob = $data['subtaskJob'];
+        $this->subTaskStatus = $data['subTaskStatus'];
         $this->subtaskValue = $data['subtaskValue'];
         $this->subTaskStarted = $data['subTaskStarted'];
         $this->subTaskEnd = $data['subTaskEnd'];
@@ -342,6 +346,7 @@ class TasklistDetail extends Component
             'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
             'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
+            'subTaskStatus' => 'required',
         ], [
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
@@ -356,6 +361,7 @@ class TasklistDetail extends Component
             'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
+            'subTaskStatus.required' => 'Status subtask harus diisi.',
         ]);
 
         Subtask::where('id', $this->subtaskId)->update([
@@ -367,17 +373,18 @@ class TasklistDetail extends Component
             'keterangan' => $this->subTaskKeterangan,
             'completed' => $this->subtaskCompleted,
             'url' => $this->subtaskUrl,
+            'status_id' => $this->subTaskStatus,
         ]);
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus');
         $this->dispatch('close-taskModal', ['modalName' => 'editModal']);
         $this->dispatch('open-subtaskModal', ['modalName' => 'subTaskModal']);
-        $this->alert('success', 'Subtask berhasil diperbarui!');
         $this->dispatch('refreshDatatable');
+        $this->alert('success', 'Subtask berhasil diperbarui!');
     }
 
     public function closeSubtaskAddModal()
     {
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus');
     }
 
     public function saveTasklistStatus()
@@ -414,7 +421,12 @@ class TasklistDetail extends Component
 
     public function render()
     {
+        $tasks = DB::table('v_tasks_rekap')
+            ->get();
         $statuses = Status::all();
-        return view('livewire.tasklist-detail', compact('statuses'));
+        $statusSubtask = Status::whereNotIn('id', [4, 5])->get();
+        return view('livewire.tasklist-detail', compact('statusSubtask', 'statuses'), [
+            'detil' => $tasks
+        ]);
     }
 }

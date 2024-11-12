@@ -26,6 +26,7 @@ class SubtasksTable extends DataTableComponent
     public $subtaskCompleted;
     public $subTaskKeterangan;
     public $subtaskUrl;
+    public $subTaskStatus;
     public $id;
     public string $kode;
     protected $index = 0;
@@ -109,8 +110,8 @@ class SubtasksTable extends DataTableComponent
                     $subtotal = $rows->sum('biaya');
                     return 'Subtotal: Rp' . number_format($subtotal, 0, ',', '.');
                 }),
-            BooleanColumn::make("Status", "completed")
-                ->sortable()->searchable()->setView('components.status-field'),
+            Column::make("Status", "status.name")->view('components.status-badge')->searchable(),
+            Column::make("Status", "status.color")->hideIf(true),
             Column::make('Action', 'id')->view('components.action-buttons')->searchable(),
         ];
     }
@@ -128,6 +129,7 @@ class SubtasksTable extends DataTableComponent
         $this->subtaskCompleted = $subtask->completed;
         $this->subTaskKeterangan = $subtask->keterangan;
         $this->subtaskUrl = $subtask->url;
+        $this->subTaskStatus = $subtask->status_id;
 
         $this->dispatch('editSubtask', [
             'subtaskName' => $this->subtaskName,
@@ -138,7 +140,8 @@ class SubtasksTable extends DataTableComponent
             'subTaskEnd' => $this->subTaskEnd,
             'subtaskCompleted' => $this->subtaskCompleted,
             'subTaskKeterangan' => $this->subTaskKeterangan,
-            'subtaskUrl' => $this->subtaskUrl
+            'subtaskUrl' => $this->subtaskUrl,
+            'subTaskStatus' => $this->subTaskStatus
         ]);
     }
 

@@ -17,7 +17,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table id="datatable" class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Waktu</th>
@@ -29,7 +29,7 @@
                         <tbody>
                             @forelse ($logs as $log)
                                 <tr>
-                                    <td>{{ $log->created_at->format('d M Y H:i:s') }}</td>
+                                    <td>{{ $log->created_at->setTimezone('Asia/Jakarta') }}</td>
                                     <td>{{ $log->subject->name ?? 'N/A' }}</td>
                                     <td>{{ $log->description }}</td>
                                     <td>{{ $log->causer ? $log->causer->name : 'System' }}</td>
@@ -50,3 +50,13 @@
 @endsection
 
 @section('script')
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable({
+                order: [
+                    [0, 'desc']
+                ]
+            });
+        });
+    </script>
+@endsection

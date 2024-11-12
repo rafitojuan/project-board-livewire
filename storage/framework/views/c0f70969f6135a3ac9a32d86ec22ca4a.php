@@ -1,0 +1,1 @@
+<?php /**PATH C:\laragon\www\epi-dasbor\vendor\rappasoft\laravel-livewire-tables\resources\views\stubs\custom.blade.php ENDPATH**/ ?>

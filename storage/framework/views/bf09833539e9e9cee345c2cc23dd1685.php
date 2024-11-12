@@ -1,10 +1,11 @@
 <!-- JAVASCRIPT -->
 <script src="<?php echo e(URL::asset('build/libs/jquery/jquery.min.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/bootstrap/js/bootstrap.bundle.min.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/metismenu/metisMenu.min.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('build/libs/simplebar/simplebar.min.js')); ?>"></script>
+<script data-navigate-once src="<?php echo e(URL::asset('build/libs/bootstrap/js/bootstrap.bundle.min.js')); ?>"></script>
+<script data-navigate-once src="<?php echo e(URL::asset('build/libs/metismenu/metisMenu.min.js')); ?>"></script>
+<script data-navigate-once src="<?php echo e(URL::asset('build/libs/simplebar/simplebar.min.js')); ?>"></script>
 <script src="<?php echo e(URL::asset('build/libs/node-waves/waves.min.js')); ?>"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.js"></script>
 <script>
     window.addEventListener('open-modal', event => {
         $('.bs-example-modal-lg').modal('show');

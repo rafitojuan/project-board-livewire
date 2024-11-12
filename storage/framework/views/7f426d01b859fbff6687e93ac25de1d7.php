@@ -35,7 +35,7 @@
                                             Swal.fire({
                                                 position: 'top-end',
                                                 icon: 'error',
-                                                title: 'Tunggu approval by SM!',
+                                                title: 'Belum approved!',
                                                 showConfirmButton: false,
                                                 timer: 3000,
                                                 toast: true,
@@ -48,9 +48,9 @@
                                 }
                             })">
                             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasklists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tasklist): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                <div class="card task-box mb-3 rounded-4 <?php echo e($tasklist->status_id <= 1 ? 'undraggable' : ''); ?>"
+                                <div class="card task-box mb-3 rounded-4 <?php echo e($detilTasklist->where('tasklists_id', $tasklist->id)->first()?->progress < 10 ? 'undraggable' : ''); ?>"
                                     data-tasklist-id="<?php echo e($tasklist->id); ?>" data-status-id="<?php echo e($tasklist->status_id); ?>"
-                                    style="cursor: <?php echo e($tasklist->status_id <= 1 ? 'default' : 'pointer'); ?>; border: 4px solid <?php echo e(now() > $tasklist->end_at ? '#F46A6A' : 'transparent'); ?>;">
+                                    style="cursor: <?php echo e($detilTasklist->where('tasklists_id', $tasklist->id)->first()?->progress < 10 ? 'not-allowed' : 'grab'); ?>; border: 2px solid <?php echo e(now() > $tasklist->end_at ? '#F46A6A' : '#A6AEBF'); ?>;">
                                     <div class="card-body">
                                         <div class="dropdown float-end">
                                             <a href="#" class="dropdown-toggle arrow-none"
@@ -89,12 +89,36 @@
 
                                             </p>
                                         </div>
-
+                                        <!--[if BLOCK]><![endif]--><?php $__empty_2 = true; $__currentLoopData = $detilTasklist->where('tasklists_id', $tasklist->id); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
+                                            <div class="progress mt-2" style="height: 15px;">
+                                                <!--[if BLOCK]><![endif]--><?php if(empty($detail->progress)): ?>
+                                                    <div class="progress-bar" role="progressbar"
+                                                        style="width: 100%; background-color: #ccc; display: flex; justify-content: center; align-items: center;"
+                                                        aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                        Belum ada progress
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="progress-bar" role="progressbar"
+                                                        style="width: <?php echo e($detail->progress); ?>%; background-color: <?php echo e($detail->warna_status); ?>"
+                                                        aria-valuenow="<?php echo e($detail->progress); ?>" aria-valuemin="0"
+                                                        aria-valuemax="100">
+                                                        <?php echo e($detail->progress); ?>%
+                                                    </div>
+                                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                            </div>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
+                                            <div class="progress mt-2" style="height: 15px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                    style="width: 100%; background-color: #ccc; display: flex; justify-content: center; align-items: center;"
+                                                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    no progress yet
+                                                </div>
+                                            </div>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                         <ul class="ps-3 mb-4 text-muted">
                                             <li class="py-1"><?php echo e($tasklist->company); ?></li>
                                             <li class="py-1"><?php echo e($tasklist->location); ?></li>
                                         </ul>
-
                                         <!--[if BLOCK]><![endif]--><?php if($tasklist->url): ?>
                                             <a href="<?php echo e($tasklist->url); ?>" target="_blank"
                                                 class="float-start d-flex align-items-center text-decoration-none">
@@ -140,23 +164,24 @@
                     <h5 class="modal-title" id="modalTitleId">
                         Update Projek
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click='closeEditTasklistModal'
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click='closeEditTasklistModal' aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form wire:submit='updateTasklist'>
                         <div class="mb-3">
                             <label for="company" class="form-label">Perusahaan <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control <?php $__errorArgs = ['newTasklistCompany'];
+                            <input type="text"
+                                class="form-control <?php $__errorArgs = ['newTasklistCompany'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>"
-                                id="company" placeholder="Masukkan nama perusahaan" wire:model='newTasklistCompany'>
+unset($__errorArgs, $__bag); ?>" id="company"
+                                placeholder="Masukkan nama perusahaan" wire:model='newTasklistCompany'>
                             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['newTasklistCompany'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

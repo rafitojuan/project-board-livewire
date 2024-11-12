@@ -35,7 +35,7 @@
                                             Swal.fire({
                                                 position: 'top-end',
                                                 icon: 'error',
-                                                title: 'Tunggu approval by SM!',
+                                                title: 'Belum approved!',
                                                 showConfirmButton: false,
                                                 timer: 3000,
                                                 toast: true,
@@ -48,9 +48,9 @@
                                 }
                             })">
                             @forelse ($column->tasklists as $tasklist)
-                                <div class="card task-box mb-3 rounded-4 {{ $tasklist->status_id <= 1 ? 'undraggable' : '' }}"
+                                <div class="card task-box mb-3 rounded-4 {{ $detilTasklist->where('tasklists_id', $tasklist->id)->first()?->progress < 10 ? 'undraggable' : '' }}"
                                     data-tasklist-id="{{ $tasklist->id }}" data-status-id="{{ $tasklist->status_id }}"
-                                    style="cursor: {{ $tasklist->status_id <= 1 ? 'default' : 'pointer' }}; border: 4px solid {{ now() > $tasklist->end_at ? '#F46A6A' : 'transparent' }};">
+                                    style="cursor: {{ $detilTasklist->where('tasklists_id', $tasklist->id)->first()?->progress < 10 ? 'not-allowed' : 'grab' }}; border: 2px solid {{ now() > $tasklist->end_at ? '#F46A6A' : '#A6AEBF' }};">
                                     <div class="card-body">
                                         <div class="dropdown float-end">
                                             <a href="#" class="dropdown-toggle arrow-none"
@@ -87,12 +87,36 @@
                                                 {{ $tasklist->end_at ? \Carbon\Carbon::parse($tasklist->end_at)->format('d F Y') : 'N/A' }}
                                             </p>
                                         </div>
-
+                                        @forelse ($detilTasklist->where('tasklists_id', $tasklist->id) as $detail)
+                                            <div class="progress mt-2" style="height: 15px;">
+                                                @if (empty($detail->progress))
+                                                    <div class="progress-bar" role="progressbar"
+                                                        style="width: 100%; background-color: #ccc; display: flex; justify-content: center; align-items: center;"
+                                                        aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                        Belum ada progress
+                                                    </div>
+                                                @else
+                                                    <div class="progress-bar" role="progressbar"
+                                                        style="width: {{ $detail->progress }}%; background-color: {{ $detail->warna_status }}"
+                                                        aria-valuenow="{{ $detail->progress }}" aria-valuemin="0"
+                                                        aria-valuemax="100">
+                                                        {{ $detail->progress }}%
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @empty
+                                            <div class="progress mt-2" style="height: 15px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                    style="width: 100%; background-color: #ccc; display: flex; justify-content: center; align-items: center;"
+                                                    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    no progress yet
+                                                </div>
+                                            </div>
+                                        @endforelse
                                         <ul class="ps-3 mb-4 text-muted">
                                             <li class="py-1">{{ $tasklist->company }}</li>
                                             <li class="py-1">{{ $tasklist->location }}</li>
                                         </ul>
-
                                         @if ($tasklist->url)
                                             <a href="{{ $tasklist->url }}" target="_blank"
                                                 class="float-start d-flex align-items-center text-decoration-none">
@@ -137,16 +161,17 @@
                     <h5 class="modal-title" id="modalTitleId">
                         Update Projek
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click='closeEditTasklistModal'
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click='closeEditTasklistModal' aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form wire:submit='updateTasklist'>
                         <div class="mb-3">
                             <label for="company" class="form-label">Perusahaan <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('newTasklistCompany') is-invalid @enderror"
-                                id="company" placeholder="Masukkan nama perusahaan" wire:model='newTasklistCompany'>
+                            <input type="text"
+                                class="form-control @error('newTasklistCompany') is-invalid @enderror" id="company"
+                                placeholder="Masukkan nama perusahaan" wire:model='newTasklistCompany'>
                             @error('newTasklistCompany')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror

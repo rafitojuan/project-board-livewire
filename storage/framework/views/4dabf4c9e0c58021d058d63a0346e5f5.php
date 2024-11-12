@@ -158,7 +158,7 @@
                                             <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                                 <div class="card task-box mb-3 rounded-4 shadow-lg"
                                                     data-task-id="<?php echo e($task->id); ?>"
-                                                    style="cursor: move; height: 13rem;">
+                                                    style="cursor: grab; height: 13rem;">
                                                     <div class="card-body">
                                                         <div
                                                             class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
@@ -194,6 +194,16 @@
                                                                     class="mx-1">-</span><?php echo e($task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A'); ?>
 
                                                             </small>
+                                                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $detil->where('id_tasks', $task->id); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <div class="progress mt-2" style="height: 15px;">
+                                                                    <div class="progress-bar" role="progressbar"
+                                                                        style="width: <?php echo e($detail->jlh_score); ?>%; background-color: <?php echo e($detail->warna_status); ?>"
+                                                                        aria-valuenow="<?php echo e($detail->jlh_score); ?>"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                        <?php echo e($detail->jlh_score); ?>%
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                                                         </div>
 
                                                         <div class="position-absolute bottom-0 start-0 end-0 p-3">
@@ -455,7 +465,7 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                 </div>
                 <div class="modal-body">
                     <form wire:submit='addTasklistColumn'>
-                        <input type="hidden" value="<?php echo e($tasklist->id); ?>" wire:model='columnId'>
+                        
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control <?php $__errorArgs = ['taskName'];
@@ -647,15 +657,15 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Biaya</label>
+                            <label for="biaya" class="form-label">Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input type="number" class="form-control" placeholder="Masukkan nominal"
-                                    x-data="{ subtaskValue: '' }"
+                                <input id="biaya" type="number" class="form-control"
+                                    placeholder="Masukkan nominal" x-data="{ subtaskValue: '' }"
+                                    x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
                                     x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
                                     wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
-                            </div>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+                            </div> <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -888,32 +898,20 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
+                            <label for="statusa" class="form-label">Status</label>
+                            <select id="statusa" class="form-select" wire:model='subTaskStatus'>
+                                <option value="" disabled>Pilih Status</option>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $statusSubtask; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option class="text-capitalize" value="<?php echo e($status->id); ?>"><?php echo e($status->name); ?>
+
+                                    </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
                             <textarea name="keterangan" wire:model='subTaskKeterangan' class="form-control" cols="10" rows="3"></textarea>
                             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subTaskKeterangan'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                <small class="text-danger"><?php echo e($message); ?></small>
-                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label me-2">Status : </label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="0"
-                                    wire:model='subtaskCompleted' />
-                                <label class="form-check-label" for="">on progress</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="status" value="1"
-                                    wire:model='subtaskCompleted' />
-                                <label class="form-check-label" for="">finished</label>
-                            </div>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskCompleted'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }

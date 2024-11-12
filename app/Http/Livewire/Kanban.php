@@ -7,18 +7,20 @@ use App\Models\Column;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Title;
+use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
-#[Title('Kanban')]
+#[Title('EPI | Project')]
 
 class Kanban extends Component
 {
-    use LivewireAlert;
+    use LivewireAlert, WithPagination;
 
     public $columns;
     public $tasklistColumnName;
@@ -64,7 +66,7 @@ class Kanban extends Component
     //     DB::transaction(function () use ($columnId, $tasklistOrder) {
     //         foreach ($tasklistOrder as $index => $tasklistId) {
     //             $order = $index + 1;
-    //             Tasklist::where('id', $tasklistId)->update(['column_id' => $columnId, 'order' => $order]);cls
+    //             Tasklist::where('id', $tasklistId)->update(['column_id' => $columnId, 'order' => $order]);
     //             activity()->log('Project dipindahkan cuk');
     //         }
     //     });
@@ -72,33 +74,59 @@ class Kanban extends Component
     //     $this->loadColumns();
     // }
 
-    public function updateTasklistOrder($columnId, $tasklistOrder)
+    public function updateTasklistOrder(int $columnId, array $tasklistOrder): void
     {
-        DB::transaction(function () use ($columnId, $tasklistOrder) {
-            foreach ($tasklistOrder as $index => $tasklistId) {
-                $order = $index + 1;
-                $tasklist = Tasklist::findOrFail($tasklistId);
-                $oldColumn = Column::findOrFail($tasklist->column_id);
-                $newColumn = Column::findOrFail($columnId);
+        try {
+            $tasklistOrder = array_values(array_filter($tasklistOrder, function ($id) {
+                return !is_null($id) && $id !== '';
+            }));
 
-                $tasklist->update([
-                    'column_id' => $columnId,
-                    'order' => $order
-                ]);
+            $tasklistOrder = array_map('intval', $tasklistOrder);
 
-                activity()
-                    ->performedOn($tasklist)
-                    ->withProperties([
-                        'tasklist_name' => $tasklist->name,
-                        'old_column' => $oldColumn->name,
-                        'new_column' => $newColumn->name,
-                        'new_order' => $order
-                    ])
-                    ->log("Project '{$tasklist->name}' moved from {$oldColumn->name} to {$newColumn->name}");
+            if (empty($tasklistOrder)) {
+                throw new \InvalidArgumentException("No valid tasklist IDs provided");
             }
-        });
 
-        $this->loadColumns();
+            DB::transaction(function () use ($columnId, $tasklistOrder) {
+                $existingTasklists = Tasklist::whereIn('id', $tasklistOrder)->pluck('id')->toArray();
+                $missingTasklists = array_diff($tasklistOrder, $existingTasklists);
+
+                if (!empty($missingTasklists)) {
+                    throw new ModelNotFoundException("Could not find tasklist(s): " . implode(', ', $missingTasklists));
+                }
+
+                foreach ($tasklistOrder as $index => $tasklistId) {
+                    $order = $index + 1;
+
+                    $tasklist = Tasklist::findOrFail($tasklistId);
+                    $oldColumn = Column::findOrFail($tasklist->column_id);
+                    $newColumn = Column::findOrFail($columnId);
+
+                    $tasklist->column_id = $columnId;
+                    $tasklist->order = $order;
+                    $tasklist->save();
+
+                    activity()
+                        ->performedOn($tasklist)
+                        ->withProperties([
+                            'tasklist_name' => $tasklist->name,
+                            'old_column' => $oldColumn->name,
+                            'new_column' => $newColumn->name,
+                            'new_order' => $order
+                        ])
+                        ->log("Projek '{$tasklist->name}' dipindahkan dari {$oldColumn->name} ke {$newColumn->name}");
+                }
+            });
+
+            $this->loadColumns();
+        } catch (\Exception $e) {
+            Log::error("Error in updateTasklistOrder: " . $e->getMessage(), [
+                'columnId' => $columnId,
+                'original_tasklistOrder' => $tasklistOrder,
+                'filtered_tasklistOrder' => array_filter($tasklistOrder)
+            ]);
+            throw $e;
+        }
     }
 
 
@@ -275,13 +303,29 @@ class Kanban extends Component
             'user_id' => Auth::user()->role->id > 2 ? Auth::user()->id : Auth::user()->id
         ];
 
-        Tasklist::where('id', $this->tasklistId)->update($data);
+        $tasklist = Tasklist::find($this->tasklistId);
+
+        $changes = array_diff_assoc($data, $tasklist->toArray());
+        $changeLog = [];
+        foreach ($changes as $field => $value) {
+            $changeLog[] = "Kolom ($field) di project " . $tasklist->name . " telah diperbarui";
+        }
+
+        activity()
+            ->performedOn($tasklist)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'old' => $tasklist->toArray(),
+                'new' => $data
+            ])
+            ->log(implode(', ', $changeLog));
+
+        $tasklist->update($data);
         $this->reset();
         $this->loadColumns();
         $this->dispatch('close-updateModal', ['modalName' => 'updateModal']);
         $this->alert('success', 'Tasklist berhasil diperbarui!');
     }
-
     public function deleteTasklist($tasklistId)
     {
         $this->tasklistId = $tasklistId;
@@ -303,12 +347,20 @@ class Kanban extends Component
 
     public function hapusTasklist()
     {
-        $tasklist = Tasklist::where('id', $this->tasklistId);
+        $tasklist = Tasklist::where('id', $this->tasklistId)->first();
+
+        activity()
+            ->performedOn($tasklist)
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'deleted' => $tasklist->toArray()
+            ])
+            ->log("Project {$tasklist->name} dihapus");
+
         $tasklist->delete();
         $this->loadColumns();
         $this->alert('success', 'Tasklist berhasil dihapus!');
     }
-
     public function addTask()
     {
         $this->validate([
@@ -375,6 +427,10 @@ class Kanban extends Component
 
     public function render()
     {
-        return view('livewire.kanban');
+        $tasklists = DB::table('v_tasklists_rekap')
+            ->get();
+        return view('livewire.kanban', [
+            'detilTasklist' => $tasklists
+        ]);
     }
 }

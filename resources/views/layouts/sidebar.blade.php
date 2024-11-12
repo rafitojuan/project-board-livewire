@@ -11,8 +11,17 @@
 
                 <li>
                     <a href="{{ route('kanban.index') }}" class="waves-effect">
+                        <i class="bx bxs-dashboard"></i>
+                        <span key="t-dashboards">Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="menu-title" key="t-menu">Menu Projek</li>
+
+                <li>
+                    <a href="{{ route('kanban.index') }}" class="waves-effect">
                         <i class="bx bx-chalkboard"></i>
-                        <span key="t-dashboards">{{--  @lang('translation.Dashboards') --}} Project</span>
+                        <span key="t-dashboards">{{--  @lang('translation.Dashboards') --}} Projek</span>
                     </a>
                 </li>
 

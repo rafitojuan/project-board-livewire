@@ -9,18 +9,25 @@ class Subtask extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'task_id',
-        'name',
-        'value',
-        'completed',
-        'pelaksana',
-        'biaya',
-        'started_at',
-        'end_at',
-        'keterangan',
-        'url',
-    ];
+    protected $guarded = ['id'];
+    // protected $fillable = [
+    //     'task_id',
+    //     'name',
+    //     'value',
+    //     'completed',
+    //     'pelaksana',
+    //     'biaya',
+    //     'started_at',
+    //     'end_at',
+    //     'keterangan',
+    //     'url',
+    //     'status_id',
+    // ];
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
+    }
 
     public function task()
     {

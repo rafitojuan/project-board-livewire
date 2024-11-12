@@ -1,0 +1,1 @@
+<img src="<?php echo e($path); ?>" <?php echo count($attributes) ? $column->arrayToAttributes($attributes) : ''; ?> /><?php /**PATH C:\laragon\www\epi-dasbor\vendor\rappasoft\laravel-livewire-tables\resources\views\includes\columns\image.blade.php ENDPATH**/ ?>

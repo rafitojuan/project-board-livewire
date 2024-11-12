@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>{{ $title ?? 'EPI Dashboard' }}</title>
+    <title>{{ $title | 'EPI' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Dashboard EPI" name="description" />
     <meta content="Themesbrand" name="author" />

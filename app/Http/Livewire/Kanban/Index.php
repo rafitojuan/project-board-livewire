@@ -6,7 +6,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 
-#[Title('Kanban Board')]
+#[Title('EPI | Project Board')]
 class Index extends Component
 {
 
