@@ -7,6 +7,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const verticalMenuBtn = document.getElementById('vertical-menu-btn');
+        const body = document.body;
+
+        verticalMenuBtn.addEventListener('click', function() {
+            if (body.clientWidth >= 992) {
+                body.classList.toggle('vertical-collpsed');
+                body.classList.toggle('sidebar-enable');
+            } else {
+                body.classList.toggle('sidebar-enable');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.vertical-menu') && !e.target.closest('#vertical-menu-btn')) {
+                if (body.classList.contains('sidebar-enable') && body.clientWidth < 992) {
+                    body.classList.remove('sidebar-enable');
+                }
+            }
+        });
+    });
+
+
     window.addEventListener('open-modal', event => {
         $('.bs-example-modal-lg').modal('show');
     })

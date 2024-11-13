@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\RegistAuthController;
-use App\Http\Livewire\KanbanBoard;
+use App\Http\Livewire\Dashboard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Kanban\Index;
@@ -29,18 +28,28 @@ Route::middleware(['guest'])->group(function () {
 
 // Route::resource('/kanban', KanbanController::class);
 Route::middleware(['auth'])->group(function () {
-    Route::get('/project', Index::class)->name('kanban.index');
+    // Project
+    Route::get('/projek', Index::class)->name('kanban.index');
+
+    // Tasklist
     Route::get('/tasklist/{encryptedId}', TasklistDetail::class)->name('tasklist.detail');
+
+    // User
     Route::get('/user', User::class)->name('user.index');
+
+    // Log
     Route::get('/logs', [App\Http\Livewire\Kanban::class, 'allLogs'])->name('logs');
     Route::get('/log/{tasklist}', [App\Http\Livewire\Kanban::class, 'log'])->name('livewire.log');
+
+    // Dashboard
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 });
 
 // Route::get('/kanban', KanbanBoard::class)->name('kanban');
 
 Route::get('/test', App\Http\Livewire\KanbanBoard::class);
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
+// Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
 
 // customers route
 Route::get('/customers', [App\Http\Controllers\CustomerController::class, 'index'])->name('customers.list');
