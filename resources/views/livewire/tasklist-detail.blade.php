@@ -1,4 +1,11 @@
 <div>
+
+    <div class="mb-3">
+        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
+    </div>
+
     <div class="row">
         <div class="col-3">
             <div class="card rounded-4 shadow-lg">
@@ -164,7 +171,8 @@
                                                             </a>
                                                             <div class="dropdown-menu dropdown-menu-end">
                                                                 <a class="dropdown-item" href="#"
-                                                                    data-bs-toggle="modal" data-bs-target="#updateModal"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#updateModal"
                                                                     wire:click="openEditTaskModal({{ $task }})">Edit</a>
                                                                 <a class="dropdown-item" href="#"
                                                                     wire:click="deleteTask({{ $task->id }})">Delete</a>

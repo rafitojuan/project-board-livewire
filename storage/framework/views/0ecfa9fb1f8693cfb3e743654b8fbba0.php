@@ -9,7 +9,12 @@
             <ul class="metismenu list-unstyled" id="side-menu">
                 <li class="menu-title" key="t-menu"><?php echo app('translator')->get('translation.Menu'); ?></li>
 
-                
+                <li>
+                    <a href="<?php echo e(route('root')); ?>" class="waves-effect">
+                        <i class="bx bxs-dashboard"></i>
+                        <span key="t-dashboards">Dashboard</span>
+                    </a>
+                </li>
 
                 <li class="menu-title" key="t-menu">Menu Projek</li>
 

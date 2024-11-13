@@ -14,7 +14,7 @@ return new class extends Migration
     {
         DB::statement("
         CREATE OR REPLACE VIEW
-            v_tasklists AS
+            v_tasklists_rekap AS
         SELECT
             tl.id AS tasklists_id,
             tl.name AS tasklists_name,

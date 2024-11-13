@@ -11,7 +11,7 @@
                             </div>
                         </div>
                         <div class="col-5 align-self-end">
-                            <img src="{{ URL::asset('build/images/profile-img.png') }}" alt="" class="img-fluid">
+                            <img src="<?php echo e(URL::asset('build/images/profile-img.png')); ?>" alt="" class="img-fluid">
                         </div>
                     </div>
                 </div>
@@ -19,11 +19,11 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="avatar-md profile-user-wid mb-4">
-                                <img src="{{ isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('build/images/users/avatar-1.jpg') }}"
+                                <img src="<?php echo e(isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('build/images/users/avatar-1.jpg')); ?>"
                                     alt="" class="img-thumbnail rounded-circle">
                             </div>
-                            <h5 class="font-size-15 text-truncate">{{ Str::ucfirst(Auth::user()->name) }}</h5>
-                            <p class="text-muted mb-0 text-truncate">{{ Str::ucfirst(Auth::user()->role->name) }}</p>
+                            <h5 class="font-size-15 text-truncate"><?php echo e(Str::ucfirst(Auth::user()->name)); ?></h5>
+                            <p class="text-muted mb-0 text-truncate"><?php echo e(Str::ucfirst(Auth::user()->role->name)); ?></p>
                         </div>
 
                         <div class="col-sm-8">
@@ -31,21 +31,16 @@
 
                                 <div class="row">
                                     <div class="col-6">
-                                        <h5 class="font-size-15">{{ $dashboard[0]->jlh_tasklists_aktif }}</h5>
+                                        <h5 class="font-size-15"><?php echo e($dashboard[0]->jlh_tasklists_aktif); ?></h5>
                                         <p class="text-muted mb-0">Projek</p>
                                     </div>
                                     <div class="col-6">
                                         <h5 class="font-size-15">
-                                            Rp{{ number_format($dashboard[0]->total_nilai, 0, ',', '.') }}</h5>
+                                            Rp<?php echo e(number_format($dashboard[0]->total_nilai, 0, ',', '.')); ?></h5>
                                         <p class="text-muted mb-0">Nilai</p>
                                     </div>
                                 </div>
-                                {{-- <div class="mt-4">
-                                    <a href="" class="disabled btn btn-primary waves-effect waves-light btn-sm">
-                                        Lihat Profile
-                                        <i class="mdi mdi-arrow-right ms-1 slide-arrow"></i>
-                                    </a>
-                                </div> --}}
+                                
                             </div>
                         </div>
                     </div>
@@ -54,30 +49,31 @@
             <div class="card rounded-4 shadow-sm" style="max-height: calc(81vh - 300px); overflow-y: auto;">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Semua Projek Aktif</h4>
-                    @foreach ($tasklistsRekapActive as $tasklists)
+                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $tasklistsRekapActive; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tasklists): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="mb-4 d-flex align-items-center">
-                            <h5 class="font-size-14 mb-0 flex-grow-1">{{ Str::limit($tasklists->tasklists_name, 31) }}
+                            <h5 class="font-size-14 mb-0 flex-grow-1"><?php echo e(Str::limit($tasklists->tasklists_name, 31)); ?>
+
                             </h5>
                             <div class="progress w-50 ms-3">
-                                @if ($tasklists->progress !== null)
+                                <!--[if BLOCK]><![endif]--><?php if($tasklists->progress !== null): ?>
                                     <div class="progress-bar progress-bar-striped progress-bar-animated"
                                         role="progressbar"
-                                        style="width: {{ $tasklists->progress }}%; background-color: {{ $tasklists->warna_status }};"
-                                        aria-valuenow="{{ $tasklists->progress }}" aria-valuemin="0"
+                                        style="width: <?php echo e($tasklists->progress); ?>%; background-color: <?php echo e($tasklists->warna_status); ?>;"
+                                        aria-valuenow="<?php echo e($tasklists->progress); ?>" aria-valuemin="0"
                                         aria-valuemax="100">
-                                        {{ $tasklists->progress }}%
+                                        <?php echo e($tasklists->progress); ?>%
                                     </div>
-                                @else
+                                <?php else: ?>
                                     <div class="progress-bar" role="progressbar"
                                         style="width: 100%; background-color: #e9ecef;">
                                         <span class="text-dark">Belum ada progress</span>
                                     </div>
-                                @endif
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                     <div class="text-end">
-                        <a href="{{ route('kanban.index') }}" class="btn btn-primary waves-effect waves-light btn-sm">
+                        <a href="<?php echo e(route('kanban.index')); ?>" class="btn btn-primary waves-effect waves-light btn-sm">
                             Lihat Projek
                             <i class="mdi mdi-arrow-right ms-1"></i>
                         </a>
@@ -94,7 +90,7 @@
                                 <div class="flex-grow-1">
                                     <p class="text-muted fw-medium">Nilai</p>
                                     <h4 class="mb-0">Rp
-                                        {{ number_format($dashboard[0]->total_nilai, 0, ',', '.') }}</h4>
+                                        <?php echo e(number_format($dashboard[0]->total_nilai, 0, ',', '.')); ?></h4>
                                 </div>
 
                                 <div class="flex-shrink-0 align-self-center">
@@ -115,7 +111,7 @@
                                 <div class="flex-grow-1">
                                     <p class="text-muted fw-medium">Biaya</p>
                                     <h4 class="mb-0">Rp
-                                        {{ number_format($dashboard[0]->total_keseluruhan_biaya, 0, ',', '.') }}</h4>
+                                        <?php echo e(number_format($dashboard[0]->total_keseluruhan_biaya, 0, ',', '.')); ?></h4>
                                 </div>
 
                                 <div class="flex-shrink-0 align-self-center ">
@@ -136,7 +132,8 @@
                                 <div class="flex-grow-1">
                                     <p class="text-muted fw-medium">Completed</p>
                                     <h4 class="mb-0">
-                                        {{ $dashboard[0]->jlh_tasklists_selesai ? $dashboard[0]->jlh_tasklists_selesai : '-' }}
+                                        <?php echo e($dashboard[0]->jlh_tasklists_selesai ? $dashboard[0]->jlh_tasklists_selesai : '-'); ?>
+
                                     </h4>
                                 </div>
 
@@ -181,11 +178,12 @@
     </div>
     <!-- end row -->
 
-    @section('script')
+    <?php $__env->startSection('script'); ?>
         <!-- apexcharts -->
-        <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
+        <script src="<?php echo e(URL::asset('build/libs/apexcharts/apexcharts.min.js')); ?>"></script>
 
         <!-- dashboard init -->
-        <script src="{{ URL::asset('build/js/pages/dashboard.init.js') }}"></script>
-    @endsection
+        <script src="<?php echo e(URL::asset('build/js/pages/dashboard.init.js')); ?>"></script>
+    <?php $__env->stopSection(); ?>
 </div>
+<?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/dashboard.blade.php ENDPATH**/ ?>

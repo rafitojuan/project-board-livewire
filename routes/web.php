@@ -29,7 +29,7 @@ Route::middleware(['guest'])->group(function () {
 // Route::resource('/kanban', KanbanController::class);
 Route::middleware(['auth'])->group(function () {
     // Project
-    Route::get('/projek', Index::class)->name('kanban.index');
+    Route::get('/project', Index::class)->name('kanban.index');
 
     // Tasklist
     Route::get('/tasklist/{encryptedId}', TasklistDetail::class)->name('tasklist.detail');
@@ -42,10 +42,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/log/{tasklist}', [App\Http\Livewire\Kanban::class, 'log'])->name('livewire.log');
 
     // Dashboard
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
+    Route::get('/dashboard', Dashboard::class);
+    Route::get('/', Dashboard::class)->name('root');
 });
 
-// Route::get('/kanban', KanbanBoard::class)->name('kanban');
 
 Route::get('/test', App\Http\Livewire\KanbanBoard::class);
 
@@ -58,7 +58,7 @@ Route::get('/customers', [App\Http\Controllers\CustomerController::class, 'index
 Route::post('/update-profile/{id}', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('updateProfile');
 Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('updatePassword');
 
-Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
+Route::get('{any}', Dashboard::class)->name('index');
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
