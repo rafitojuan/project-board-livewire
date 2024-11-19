@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Kanban\Index;
 use App\Http\Livewire\TasklistDetail;
+use App\Http\Livewire\Tugas;
 use App\Http\Livewire\User;
 
 /*
@@ -44,10 +45,17 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', Dashboard::class);
     Route::get('/', Dashboard::class)->name('root');
+
+    // Tugas
+    Route::get('/tugas', Tugas::class)->name('tugas.index');
+
+
+
+
+    Route::get('{any}', Dashboard::class)->name('index');
 });
 
 
-Route::get('/test', App\Http\Livewire\KanbanBoard::class);
 
 // Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
 
@@ -58,7 +66,6 @@ Route::get('/customers', [App\Http\Controllers\CustomerController::class, 'index
 Route::post('/update-profile/{id}', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('updateProfile');
 Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('updatePassword');
 
-Route::get('{any}', Dashboard::class)->name('index');
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);

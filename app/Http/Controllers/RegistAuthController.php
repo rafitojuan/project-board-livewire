@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Hash;
 
 class RegistAuthController extends Controller
 {
-    // public function __invoke(Request $request){
-    //     return view('auth.register');
-    // }
     public function index()
     {
         return view('auth.register');
@@ -19,7 +16,6 @@ class RegistAuthController extends Controller
     public function register(Request $request)
     {
         try {
-            // Validate all inputs first
             $request->validate([
                 'password' => 'required|min:6',
                 'email' => 'required|email|unique:users',
@@ -27,14 +23,12 @@ class RegistAuthController extends Controller
                 'avatar' => 'required|image|mimes:jpg,jpeg,png|max:1024',
             ]);
 
-            // Handle file upload after validation passes
             $avatarName = '';
             if ($request->hasFile('avatar')) {
                 $avatar = $request->file('avatar');
                 $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
                 $avatarPath = public_path('/images/');
 
-                // Ensure directory exists
                 if (!file_exists($avatarPath)) {
                     mkdir($avatarPath, 0777, true);
                 }
@@ -42,7 +36,6 @@ class RegistAuthController extends Controller
                 $avatar->move($avatarPath, $avatarName);
             }
 
-            // Create user after successful file upload
             User::create([
                 'name' => $request['name'],
                 'email' => $request['email'],

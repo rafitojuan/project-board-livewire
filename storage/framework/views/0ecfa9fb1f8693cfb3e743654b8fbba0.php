@@ -26,6 +26,13 @@
                 </li>
 
                 <li>
+                    <a href="<?php echo e(route('tugas.index')); ?>" class="waves-effect">
+                        <i class="bx bx-task"></i>
+                        <span key="t-dashboards">Tugas</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="<?php echo e(route('logs')); ?>" class="waves-effect">
                         <i class="bx bx-history"></i>
                         <span>Log Aktivitas</span>

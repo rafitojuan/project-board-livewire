@@ -7,10 +7,15 @@ use App\Models\Subtask;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
+use App\Models\User;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
@@ -52,6 +57,7 @@ class TasklistDetail extends Component
     public $newTasklistStartDate;
     public $taskValue;
     public $taskSubtotals = [];
+    public $userList;
 
     protected $listeners = [
         'refreshTasklistColumns' => '$refresh',
@@ -71,6 +77,18 @@ class TasklistDetail extends Component
         } catch (\Exception $e) {
             abort(404);
         }
+        $this->userList();
+    }
+
+    public function userList()
+    {
+        // $this->userList = DB::table('users')
+        //     ->select('id', 'name')
+        //     ->where('id', '!=', Auth::id())
+        //     ->get();
+
+        $this->userList = User::all();
+        return $this->userList;
     }
 
     public function loadTasklistColumns()
@@ -283,9 +301,9 @@ class TasklistDetail extends Component
     {
         $this->validate([
             'subtaskName' => 'required|min:3',
-            'subtaskJob' => 'required|min:3',
+            'subtaskJob' => 'required',
             'subtaskValue' => 'numeric',
-            'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before:' . Task::find($this->kode)->end_at],
+            'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
             'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
@@ -293,7 +311,6 @@ class TasklistDetail extends Component
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
             'subtaskJob.required' => 'Pelaksana harus diisi.',
-            'subtaskJob.min' => 'Pelaksana minimal 3 karakter.',
             'subtaskValue.numeric' => 'Biaya harus berupa angka.',
             'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
             'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
@@ -301,6 +318,7 @@ class TasklistDetail extends Component
             'subtaskUrl.url' => 'URL subtask harus berupa URL yang valid.',
             'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
             'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
         ]);
@@ -340,7 +358,7 @@ class TasklistDetail extends Component
     {
         $this->validate([
             'subtaskName' => 'required|min:3',
-            'subtaskJob' => 'required|min:3',
+            'subtaskJob' => 'required',
             'subtaskValue' => 'numeric',
             'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before:' . Task::find($this->kode)->end_at],
             'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
@@ -351,7 +369,6 @@ class TasklistDetail extends Component
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
             'subtaskJob.required' => 'Pelaksana harus diisi.',
-            'subtaskJob.min' => 'Pelaksana minimal 3 karakter.',
             'subtaskValue.numeric' => 'Biaya harus berupa angka.',
             'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
             'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
@@ -389,18 +406,46 @@ class TasklistDetail extends Component
 
     public function saveTasklistStatus()
     {
-        $this->validate([
-            'tasklistStatus' => 'required',
-        ]);
-        $tasklist = Tasklist::find($this->tasklist->id);
-        $tasklist->status_id = $this->tasklistStatus;
-        if ($this->tasklistStatus == 1) {
-            $tasklist->column_id = 1;
+        try {
+            $this->validate([
+                'tasklistStatus' => ['required', 'exists:statuses,id'],
+            ]);
+
+            $tasklist = Tasklist::findOrFail($this->tasklist->id);
+
+            DB::beginTransaction();
+
+            $tasklist->update([
+                'status_id' => $this->tasklistStatus,
+                'column_id' => $this->tasklistStatus == 1 ? 1 : $tasklist->column_id,
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+
+            $this->tasklist = $tasklist->fresh(['status']);
+
+            $this->alert('success', 'Status berhasil diperbarui!');
+
+            return $this->tasklist->status->color;
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            $this->alert('error', 'Tasklist tidak ditemukan.');
+            return null;
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            $this->alert('error', 'Status tidak valid.');
+            return null;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating tasklist status:', [
+                'tasklist_id' => $this->tasklist->id,
+                'status_id' => $this->tasklistStatus,
+                'error' => $e->getMessage()
+            ]);
+            $this->alert('error', 'Terjadi kesalahan saat memperbarui status.');
+            return null;
         }
-        $tasklist->save();
-        $this->tasklist->refresh();
-        return $this->tasklist->status->color;
-        $this->alert('success', 'Status berhasil diperbarui!');
     }
 
     public function getSubtotal($taskId)
@@ -426,7 +471,8 @@ class TasklistDetail extends Component
         $statuses = Status::all();
         $statusSubtask = Status::whereNotIn('id', [4, 5])->get();
         return view('livewire.tasklist-detail', compact('statusSubtask', 'statuses'), [
-            'detil' => $tasks
+            'detil' => $tasks,
+            'userList' => $this->userList,
         ]);
     }
 }

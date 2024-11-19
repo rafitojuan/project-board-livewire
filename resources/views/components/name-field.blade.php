@@ -5,6 +5,6 @@
     @else
         <br>
     @endif
-    <span>PIC: {{ $row->pelaksana }}</span> <br>
+    <span>PIC: {{ ucwords($row['user.name']) }}</span> <br>
     <small class="text-muted">Cttn: {{ $row->keterangan ? $row->keterangan : '-' }}</small>
 </div>

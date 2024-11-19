@@ -6,6 +6,22 @@
         </a>
     </div>
 
+    <style>
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
     <div class="row">
         <div class="col-3">
             <div class="card rounded-4 shadow-lg">
@@ -31,7 +47,8 @@
                     <table class="table align-middle table-borderless" style="margin-top: -1rem;">
                         <tr>
                             <th scope="col" style="width: 40%;">Tentang Projek </th>
-                            <th scope="col"></th>
+                            <th scope="col" class="text-end"><i class="bi bi-pencil-fill me-2" id="edit-detail"
+                                    style="cursor: pointer"></i></th>
                         </tr>
                         <tr>
                             <td style="width: 3%">Perusahaan</td>
@@ -53,22 +70,49 @@
                             <td>Lokasi</td>
                             <td><strong><?php echo e($tasklist->location); ?></strong></td>
                         </tr>
-                        <tr x-data="{ isEditing: false, statusColor: '<?php echo e($tasklist->status->color); ?>' }" @click.away="isEditing = false">
+                        <tr x-data="{
+                            isEditing: false,
+                            isLoading: false,
+                            statusColor: '<?php echo e($tasklist->status->color); ?>',
+                            saveStatus() {
+                                this.isLoading = true;
+                                this.isEditing = false;
+                        
+                                $wire.saveTasklistStatus()
+                                    .then(color => {
+                                        this.statusColor = color;
+                                        return new Promise(resolve => setTimeout(resolve, 8000));
+                                    })
+                                    .finally(() => {
+                                        this.isLoading = false;
+                                    });
+                            }
+                        }" @click.away="isEditing = false">
                             <td>Status</td>
                             <td>
                                 <template x-if="!isEditing">
-                                    <div>
+                                    <div class="d-flex align-items-center">
                                         <span class="badge text-capitalize"
-                                            :style="`background-color: ${statusColor}; font-size: 0.7rem`"
-                                            x-text="'<?php echo e($tasklist->status->name ?? 'No Status'); ?>'">
-                                        </span>
-                                        <i class="bi bi-pencil-fill ms-2 <?php echo e(Auth::user()->role_id > 2 && Auth::user()->role_id != 5 ? 'd-none' : ''); ?>"
-                                            style="cursor: pointer;" @click.stop="isEditing = true"></i>
+                                            :style="`background-color: ${statusColor}; font-size: 0.7rem`"><?php echo e($tasklist->status->name ?? 'No Status'); ?></span>
+
+                                        <!--[if BLOCK]><![endif]--><?php if(Auth::user()->role_id <= 2 || Auth::user()->role_id === 5): ?>
+                                            <i class="bi bi-pencil-fill ms-2" :class="{ 'opacity-50': isLoading }"
+                                                style="cursor: pointer;"
+                                                @click.stop="!isLoading && (isEditing = true)"></i>
+                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+
+                                        <i class="bi bi-arrow-repeat ms-1 spin" x-show="isLoading"
+                                            x-transition:enter="transition ease-out duration-300"
+                                            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                            x-transition:leave="transition ease-in duration-200"
+                                            x-transition:leave-start="opacity-100"
+                                            x-transition:leave-end="opacity-0"></i>
                                     </div>
                                 </template>
+
                                 <template x-if="isEditing">
                                     <div class="d-flex">
-                                        <select class="form-select" wire:model="tasklistStatus">
+                                        <select class="form-select" wire:model="tasklistStatus" :disabled="isLoading">
                                             <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $statuses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="<?php echo e($status->id); ?>"
                                                     <?php echo e($tasklist->status->id == $status->id ? 'selected' : ''); ?>>
@@ -77,8 +121,11 @@
                                                 </option>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                                         </select>
-                                        <button class="btn btn-primary btn-sm ms-2 py-0 px-1"
-                                            @click.stop="isEditing = false; $wire.saveTasklistStatus().then(color => statusColor = color);">Save</button>
+
+                                        <button class="btn btn-primary btn-sm ms-2 py-0 px-1" @click.stop="saveStatus()"
+                                            :disabled="isLoading">
+                                            Save
+                                        </button>
                                     </div>
                                 </template>
                             </td>
@@ -620,7 +667,8 @@ if (isset($__slots)) unset($__slots);
                 <div class="modal-body">
                     <form wire:submit='addSubtask'>
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label">Nama Pekerjaan <span
+                                    class="text-danger">*</span></label>
                             <input type="text" class="form-control <?php $__errorArgs = ['subtaskName'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -644,15 +692,20 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         <div class="mb-3">
                             <label for="name" class="form-label">Pelaksana <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control <?php $__errorArgs = ['subtaskJob'];
+                            <select class="form-select <?php $__errorArgs = ['subtaskJob'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>"
-                                id="name" placeholder="Masukkan pelaksana" wire:model='subtaskJob' required>
+unset($__errorArgs, $__bag); ?>" id="name"
+                                wire:model='subtaskJob' required>
+                                <option value="">Pilih Pelaksana</option>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $userList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($user->id); ?>"><?php echo e($user->name); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            </select>
                             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskJob'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -805,15 +858,20 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         <div class="mb-3">
                             <label for="name" class="form-label">Pelaksana <span
                                     class="text-danger">*</span></label>
-                            <input type="text" class="form-control <?php $__errorArgs = ['subtaskName'];
+                            <select class="form-select <?php $__errorArgs = ['subtaskJob'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>"
-                                id="name" placeholder="Masukkan pelaksana" wire:model='subtaskJob' required>
+unset($__errorArgs, $__bag); ?>" id="name"
+                                wire:model='subtaskJob' required>
+                                <option value="">Pilih Pelaksana</option>
+                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $userList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($user->id); ?>"><?php echo e($user->name); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            </select>
                             <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskJob'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

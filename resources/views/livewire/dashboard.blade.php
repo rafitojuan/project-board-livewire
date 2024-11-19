@@ -18,7 +18,8 @@
                 <div class="card-body pt-0">
                     <div class="row">
                         <div class="col-sm-4">
-                            <div class="avatar-md profile-user-wid mb-4">
+                            <div class="avatar-md profile-user-wid mb-4" style="cursor: pointer;" data-bs-toggle="modal"
+                                data-bs-target="#imagePreviewModal" onclick="showPreview(this)">
                                 <img src="{{ isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('build/images/users/avatar-1.jpg') }}"
                                     alt="" class="img-thumbnail rounded-circle">
                             </div>
@@ -87,7 +88,7 @@
         </div>
         <div class="col-xl-8">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card rounded-4 mini-stats-wid shadow-sm">
                         <div class="card-body">
                             <div class="d-flex">
@@ -108,7 +109,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card rounded-4 mini-stats-wid shadow-sm">
                         <div class="card-body">
                             <div class="d-flex">
@@ -129,7 +130,29 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="card rounded-4 mini-stats-wid shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <p class="text-muted fw-medium">On Progress</p>
+                                    <h4 class="mb-0">
+                                        {{ $dashboard[0]->jlh_tasklists_progress ? $dashboard[0]->jlh_tasklists_progress : '-' }}
+                                    </h4>
+                                </div>
+
+                                <div class="flex-shrink-0 align-self-center">
+                                    <div class="avatar-sm rounded-circle bg-primary mini-stat-icon">
+                                        <span class="avatar-title rounded-circle bg-primary">
+                                            <i class="bx bxs-hourglass font-size-24"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="card rounded-4 mini-stats-wid shadow-sm">
                         <div class="card-body">
                             <div class="d-flex">
@@ -181,11 +204,27 @@
     </div>
     <!-- end row -->
 
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body text-center p-0">
+                    <img id="previewImage" src="" class="img-fluid rounded" style="max-height: 80vh;">
+                </div>
+            </div>
+        </div>
+    </div>
+
     @section('script')
         <!-- apexcharts -->
         <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
 
         <!-- dashboard init -->
         <script src="{{ URL::asset('build/js/pages/dashboard.init.js') }}"></script>
+        <script>
+            function showPreview(element) {
+                const imgSrc = element.querySelector('img').src;
+                document.getElementById('previewImage').src = imgSrc;
+            }
+        </script>
     @endsection
 </div>

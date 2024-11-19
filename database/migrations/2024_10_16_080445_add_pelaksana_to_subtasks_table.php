@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subtasks', function (Blueprint $table) {
-            $table->string('pelaksana')->nullable();
+            $table->integer('pelaksana')->nullable();
             $table->integer('biaya')->nullable();
             $table->string('keterangan')->default('order');
         });

@@ -5,7 +5,7 @@
     <?php else: ?>
         <br>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-    <span>PIC: <?php echo e($row->pelaksana); ?></span> <br>
+    <span>PIC: <?php echo e(ucwords($row['user.name'])); ?></span> <br>
     <small class="text-muted">Cttn: <?php echo e($row->keterangan ? $row->keterangan : '-'); ?></small>
 </div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/components/name-field.blade.php ENDPATH**/ ?>

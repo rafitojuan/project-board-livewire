@@ -6,11 +6,9 @@ use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use App\Models\Subtask;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Columns\BooleanColumn;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Rappasoft\LaravelLivewireTables\Views\Columns\DateColumn;
 use Livewire\WithPagination;
-use Rappasoft\LaravelLivewireTables\Views\Actions\Action;
 
 class SubtasksTable extends DataTableComponent
 {
@@ -38,7 +36,9 @@ class SubtasksTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        return Subtask::query()->where('task_id', $this->kode);
+        return Subtask::query()
+            ->with('status')
+            ->where('task_id', $this->kode);
     }
 
     public function configure(): void
@@ -95,7 +95,7 @@ class SubtasksTable extends DataTableComponent
         return [
             Column::make('No', 'id')->format(fn($row) => ++$this->index)->sortable()->searchable(),
             Column::make("Pekerjaan", "name")->view('components.name-field')->searchable(),
-            column::make("pelaksana")->hideIf(true)->searchable(),
+            column::make("User", "user.name")->hideIf(true)->searchable(),
             column::make("keterangan")->hideIf(true)->searchable(),
             column::make("url")->hideIf(true)->searchable(),
             DateColumn::make("Tanggal Mulai", "started_at")
@@ -119,7 +119,7 @@ class SubtasksTable extends DataTableComponent
 
     public function edit($row)
     {
-        $subtask = Subtask::findOrFail($row);
+        $subtask = Subtask::with('status')->findOrFail($row);
         $this->subtaskName = $subtask->name;
         $this->subtaskId = $subtask->id;
         $this->subtaskJob = $subtask->pelaksana;

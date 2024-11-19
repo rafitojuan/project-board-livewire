@@ -6,8 +6,6 @@ use App\Models\Column;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
-
-
 class AddColumn extends Component
 {
     use LivewireAlert;
