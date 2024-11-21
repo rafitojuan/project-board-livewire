@@ -46,8 +46,11 @@
                     <table class="table align-middle table-borderless" style="margin-top: -1rem;">
                         <tr>
                             <th scope="col" style="width: 40%;">Tentang Projek </th>
-                            <th scope="col" class="text-end"><i class="bi bi-pencil-fill me-2" id="edit-detail"
-                                    style="cursor: pointer"></i></th>
+                            <th scope="col" class="text-end">
+                                @if (Auth::user()->role_id <= 2 || Auth::user()->role_id === 5)
+                                    <i class="bi bi-pencil-fill me-2" id="edit-detail" style="cursor: pointer"></i>
+                                @endif
+                            </th>
                         </tr>
                         <tr>
                             <td style="width: 3%">Perusahaan</td>
@@ -150,7 +153,7 @@
                             <td><strong>Rp{{ number_format($tasklist->value, 0) }}</strong></td>
                         </tr>
                         <tr>
-                            <td>Biaya</td>
+                            <td>Biaya (RAPP)</td>
                             <td><strong
                                     class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">Rp{{ number_format($this->getTotalBiaya(), 0, ',', '.') }}</strong>
                             </td>
@@ -158,7 +161,7 @@
                         <tr>
                             <td>Akumulasi</td>
                             <td><strong
-                                    class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">{{ $tasklist->value - $this->getTotalBiaya() < 0 ? '- Rp' : 'Rp' }}{{ number_format(abs($tasklist->value - $this->getTotalBiaya()), 0, ',', '.') }}
+                                    class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">{{ $this->getSelisihBiaya()['prefix'] }}{{ $this->getSelisihBiaya()['value'] }}
                                 </strong>
                             </td>
                         </tr>
@@ -268,7 +271,7 @@
                                                                     Rp
                                                                     {{ number_format($this->getSubtotal($task->id), 0, ',', '.') }}
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Biaya</p>
+                                                                <p class="mb-0 text-muted">Biaya (RAPP)</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -580,17 +583,25 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="biaya" class="form-label">Biaya</label>
+                            <label for="rab" class="form-label">RAB</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input id="biaya" type="number" class="form-control"
-                                    placeholder="Masukkan nominal" x-data="{ subtaskValue: '' }"
+                                <input id="rab" type="number" class="form-control"
+                                    placeholder="Masukkan nominal" x-data="{ subtaskRAB: '' }"
                                     x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
-                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
-                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
-                            </div> @error('subtaskValue')
+                                    x-on:keydown="if(subtaskRAB.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    wire:model="subtaskRAB" x-model="subtaskRAB" maxlength="13">
+                            </div> @error('subtaskRAB')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
@@ -644,7 +655,7 @@
     {{-- Modal Detail Pekerjaan --}}
     <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         role="dialog" aria-labelledby="modalTitleId" aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
@@ -699,20 +710,90 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Biaya</label> <small
-                                class="text-danger">*</small>
+                        <div x-data="{ subtaskRAB: @entangle('subtaskRAB').defer }" class="mb-3">
+                            <label for="rab" class="form-label">RAB</label> <small class="text-danger">*</small>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="number"
-                                    class="form-control @error('subtaskValue') is-invalid @enderror" id="name"
-                                    placeholder="Masukkan nominal" wire:model='subtaskValue' x-model="subtaskValue"
-                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()">
+                                    class="form-control
+                                    @error('subtaskRAB') is-invalid @enderror"
+                                    id="rab" placeholder="Masukkan nominal" wire:model.defer='subtaskRAB'
+                                    x-model="subtaskRAB"
+                                    x-on:keydown="if(subtaskRAB.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    {{ $subtaskRAP && Auth::user()->role_id > 2 ? 'readonly' : '' }}>
                             </div>
-                            @error('subtaskValue')
+                            @error('subtaskRAB')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
+                        @if ($subtaskSAP && Auth::user()->role_id <= 2)
+                            <div class='mb-3' x-data="{
+                                subtaskRAP: {{ $subtaskRAP ?? 'null' }},
+                                init() {
+                                    this.subtaskRAP = {{ $subtaskRAP ?? 'null' }};
+                                    $watch('subtaskRAP', value => {
+                                        @this.set('subtaskRAP', value)
+                                    })
+                                }
+                            }">
+                                <label for="rap" class="form-label">RAP <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number"
+                                        class="form-control @error('subtaskRAP') is-invalid @enderror"
+                                        :class="{ 'is-invalid': parseInt(subtaskRAP) >= {{ $subtaskRAB }} }"
+                                        id="rap" placeholder="Masukkan nominal" x-model.number="subtaskRAP"
+                                        wire:model.defer='subtaskRAP'
+                                        x-on:keydown="if(!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight','ArrowUp','ArrowDown', 'Tab'].includes($event.key) && (!$event.key.match(/^\d$/) || subtaskRAP.length >= 13 || parseInt(subtaskRAP + $event.key) > {{ $subtaskRAB }})) $event.preventDefault()"
+                                        min="1" :max="{{ $subtaskRAB - 1 }}"
+                                        oninvalid="this.setCustomValidity('RAP tidak bisa lebih atau sama dengan RAB')"
+                                        oninput="this.setCustomValidity('')"
+                                        {{ Auth::user()->role_id > 2 ? 'readonly' : '' }}>
+                                </div>
+                                @error('subtaskRAP')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                                <template x-if="parseInt(subtaskRAP) >= {{ $subtaskRAB }}">
+                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB (RAB:
+                                        {{ $subtaskRAB }})</small>
+                                </template>
+                            </div>
+                        @endif
+                        @if ($subtaskRAP && Auth::user()->role_id != 7)
+                            <div x-data="{ subtaskRAPP: @entangle('subtaskRAPP').defer }" class="mb-3">
+                                <label for="RAPP" class="form-label">RAPP <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number"
+                                        class="form-control @error('subtaskRAPP') is-invalid @enderror"
+                                        :class="{ 'is-invalid': parseInt(subtaskRAPP) >= {{ $subtaskRAP }} }"
+                                        id="RAPP" placeholder="Masukkan nominal" wire:model.defer='subtaskRAPP'
+                                        x-model="subtaskRAPP"
+                                        x-on:keydown="if(!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight','ArrowUp','ArrowDown', 'Tab'].includes($event.key) && (!$event.key.match(/^\d$/) || subtaskRAPP.length >= 13 || parseInt(subtaskRAPP + $event.key) > {{ $subtaskRAP }})) $event.preventDefault()"
+                                        min="0" :max="{{ $subtaskRAP - 1 }}"
+                                        oninvalid="this.setCustomValidity('RAPP tidak bisa lebih atau sama dengan RAP')"
+                                        oninput="this.setCustomValidity('')"
+                                        {{ Auth::user()->role_id > 2 ? 'readonly' : '' }}>
+                                </div>
+                                @error('subtaskRAPP')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                                <template x-if="parseInt(subtaskRAPP) >= {{ $subtaskRAP }}">
+                                    <small class="text-danger">RAPP tidak bisa melebihi RAP (RAP:
+                                        {{ $subtaskRAP }})</small>
+                                </template>
+                            </div>
+                        @endif
                         <div class="mb-3">
                             <label for="statusa" class="form-label">Status</label>
                             <select id="statusa" class="form-select" wire:model='subTaskStatus'>
@@ -733,15 +814,15 @@
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
-                                placeholder="https://example.com"" wire:model='subtaskUrl'>
+                                placeholder="https://example.com" wire:model='subtaskUrl'>
                         </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" wire:click="closeSubtaskAddModal"
-                        data-bs-toggle="modal" data-bs-target="#subTaskModal">
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" wire:click="closeSubtaskAddModal"
+                                data-bs-toggle="modal" data-bs-target="#subTaskModal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
                     </form>
                 </div>
             </div>

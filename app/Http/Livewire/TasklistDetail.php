@@ -8,6 +8,7 @@ use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
 use App\Models\User;
+use App\Notifications\TugasNotification;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -43,6 +45,9 @@ class TasklistDetail extends Component
     public $subtaskName;
     public $subtaskJob;
     public $subtaskValue;
+    public $subtaskRAB;
+    public $subtaskRAP;
+    public $subtaskRAPP;
     public $subTaskStarted;
     public $subTaskEnd;
     public $subtaskId;
@@ -58,6 +63,7 @@ class TasklistDetail extends Component
     public $taskValue;
     public $taskSubtotals = [];
     public $userList;
+    public $subtaskSAP;
 
     protected $listeners = [
         'refreshTasklistColumns' => '$refresh',
@@ -288,7 +294,6 @@ class TasklistDetail extends Component
     {
         $this->kode = $task['id'];
         $this->uraian = $task['name'];
-        // dd($this->kode);
     }
 
     public function closeSubtaskModal($kode)
@@ -302,7 +307,7 @@ class TasklistDetail extends Component
         $this->validate([
             'subtaskName' => 'required|min:3',
             'subtaskJob' => 'required',
-            'subtaskValue' => 'numeric',
+            'subtaskRAB' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
             'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
             'subTaskKeterangan' => 'nullable|min:3',
@@ -311,7 +316,96 @@ class TasklistDetail extends Component
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
             'subtaskJob.required' => 'Pelaksana harus diisi.',
-            'subtaskValue.numeric' => 'Biaya harus berupa angka.',
+            'subtaskRAB.numeric' => 'RAB harus berupa angka.',
+            'subtaskRAB.lte' => 'RAB tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
+            'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
+            'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
+            'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
+            'subtaskUrl.url' => 'URL harus valid.',
+            'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
+            'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
+            'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
+        ]);
+
+        Subtask::create([
+            'name' => $this->subtaskName,
+            'pelaksana' => $this->subtaskJob,
+            'sap' => $this->subtaskSAP ?? false,
+            'rab' => $this->subtaskRAB,
+            'started_at' => $this->subTaskStarted,
+            'end_at' => $this->subTaskEnd,
+            'task_id' => $this->kode,
+            'keterangan' => $this->subTaskKeterangan,
+            'url' => $this->subtaskUrl,
+            'status_id' => 1
+        ]);
+
+
+        $this->notifApprove();
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl', 'subTaskKeterangan', 'subTaskStatus', 'subtaskSAP', 'subtaskRAB', 'subtaskRAP', 'subtaskRAPP');
+        $this->alert('success', 'Subtask berhasil ditambahkan!');
+        $this->dispatch('refreshDatatable');
+    }
+
+    public function notifApprove()
+    {
+        $user = User::all();
+        $userNow = Auth::user();
+        $notif = Notification::send($user, new TugasNotification($userNow));
+
+        return $notif;
+    }
+
+    public function editSubtask($data)
+    {
+        $this->subtaskName = $data['subtaskName'];
+        $this->subtaskId = $data['subtaskId'];
+        $this->subtaskJob = $data['subtaskJob'];
+        $this->subTaskStatus = $data['subTaskStatus'];
+        $this->subtaskValue = $data['subtaskValue'];
+        $this->subtaskRAB = $data['subtaskRAB'];
+        $this->subtaskRAP = $data['subtaskRAP'];
+        $this->subtaskRAPP = $data['subtaskRAPP'];
+        $this->subTaskStarted = $data['subTaskStarted'];
+        $this->subTaskEnd = $data['subTaskEnd'];
+        $this->subtaskCompleted = $data['subtaskCompleted'];
+        $this->subTaskKeterangan = $data['subTaskKeterangan'];
+        $this->subtaskUrl = $data['subtaskUrl'];
+        $this->subtaskSAP = $data['subtaskSAP'];
+    }
+
+    public function getSelisihBiaya()
+    {
+        $totalBiaya = $this->getTotalBiaya() ?? 0;
+        $tasklistValue = $this->tasklist->value ?? 0;
+        $selisih = $tasklistValue - $totalBiaya;
+        $textClass = $totalBiaya > $tasklistValue ? 'text-danger' : ($totalBiaya < $tasklistValue ? 'text-success' : 'text-dark');
+
+        return [
+            'class' => $textClass,
+            'prefix' => $selisih < 0 ? '- Rp' : 'Rp',
+            'rawValue' => $selisih,
+            'value' => number_format(abs($selisih), 0, ',', '.')
+        ];
+    }
+    public function updateSubtask()
+    {
+        $this->validate([
+            'subtaskName' => 'required|min:3',
+            'subtaskJob' => 'required',
+            'subtaskRAB' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
+            'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
+            'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
+            'subTaskKeterangan' => 'nullable|min:3',
+            'subtaskUrl' => 'nullable|url',
+        ], [
+            'subtaskName.required' => 'Nama harus diisi.',
+            'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
+            'subtaskJob.required' => 'Pelaksana harus diisi.',
+            'subtaskRAB.numeric' => 'RAB harus berupa angka.',
+            'subtaskRAB.lte' => 'RAB tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
             'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
             'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
             'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
@@ -323,68 +417,14 @@ class TasklistDetail extends Component
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
         ]);
 
-        Subtask::create([
-            'name' => $this->subtaskName,
-            'pelaksana' => $this->subtaskJob,
-            'biaya' => $this->subtaskValue,
-            'started_at' => $this->subTaskStarted,
-            'end_at' => $this->subTaskEnd,
-            'task_id' => $this->kode,
-            'keterangan' => $this->subTaskKeterangan,
-            'url' => $this->subtaskUrl,
-            'status_id' => 1
-        ]);
-
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl', 'subTaskKeterangan', 'subTaskStatus');
-        $this->alert('success', 'Subtask berhasil ditambahkan!');
-        $this->dispatch('refreshDatatable');
-    }
-
-    public function editSubtask($data)
-    {
-        $this->subtaskName = $data['subtaskName'];
-        $this->subtaskId = $data['subtaskId'];
-        $this->subtaskJob = $data['subtaskJob'];
-        $this->subTaskStatus = $data['subTaskStatus'];
-        $this->subtaskValue = $data['subtaskValue'];
-        $this->subTaskStarted = $data['subTaskStarted'];
-        $this->subTaskEnd = $data['subTaskEnd'];
-        $this->subtaskCompleted = $data['subtaskCompleted'];
-        $this->subTaskKeterangan = $data['subTaskKeterangan'];
-        $this->subtaskUrl = $data['subtaskUrl'];
-    }
-
-    public function updateSubtask()
-    {
-        $this->validate([
-            'subtaskName' => 'required|min:3',
-            'subtaskJob' => 'required',
-            'subtaskValue' => 'numeric',
-            'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before:' . Task::find($this->kode)->end_at],
-            'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
-            'subTaskKeterangan' => 'nullable|min:3',
-            'subtaskUrl' => 'nullable|url',
-            'subTaskStatus' => 'required',
-        ], [
-            'subtaskName.required' => 'Nama harus diisi.',
-            'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
-            'subtaskJob.required' => 'Pelaksana harus diisi.',
-            'subtaskValue.numeric' => 'Biaya harus berupa angka.',
-            'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
-            'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
-            'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
-            'subtaskUrl.url' => 'URL subtask harus berupa URL yang valid.',
-            'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
-            'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
-            'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
-            'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
-            'subTaskStatus.required' => 'Status subtask harus diisi.',
-        ]);
-
         Subtask::where('id', $this->subtaskId)->update([
             'name' => $this->subtaskName,
             'pelaksana' => $this->subtaskJob,
             'biaya' => $this->subtaskValue,
+            'sap' => $this->subtaskSAP,
+            'rab' => $this->subtaskRAB,
+            'rap' => $this->subtaskRAP,
+            'rapp' => $this->subtaskRAPP,
             'started_at' => $this->subTaskStarted,
             'end_at' => $this->subTaskEnd,
             'keterangan' => $this->subTaskKeterangan,
@@ -392,7 +432,7 @@ class TasklistDetail extends Component
             'url' => $this->subtaskUrl,
             'status_id' => $this->subTaskStatus,
         ]);
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus', 'subtaskRAB', 'subtaskRAP', 'subtaskRAPP', 'subtaskSAP');
         $this->dispatch('close-taskModal', ['modalName' => 'editModal']);
         $this->dispatch('open-subtaskModal', ['modalName' => 'subTaskModal']);
         $this->dispatch('refreshDatatable');
@@ -401,7 +441,7 @@ class TasklistDetail extends Component
 
     public function closeSubtaskAddModal()
     {
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus');
+        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus', 'subtaskRAB', 'subtaskRAP', 'subtaskRAPP', 'subtaskSAP');
     }
 
     public function saveTasklistStatus()
@@ -450,7 +490,7 @@ class TasklistDetail extends Component
 
     public function getSubtotal($taskId)
     {
-        return Subtask::where('task_id', $taskId)->sum('biaya');
+        return Subtask::where('task_id', $taskId)->sum('rapp');
     }
 
     public function getTotalBiaya()

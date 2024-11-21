@@ -19,6 +19,10 @@ class SubtasksTable extends DataTableComponent
     public $subtaskId;
     public $subtaskJob;
     public $subtaskValue;
+    public $subtaskSAP;
+    public $subtaskRAB;
+    public $subtaskRAP;
+    public $subtaskRAPP;
     public $subTaskStarted;
     public $subTaskEnd;
     public $subtaskCompleted;
@@ -37,8 +41,12 @@ class SubtasksTable extends DataTableComponent
     public function builder(): Builder
     {
         return Subtask::query()
-            ->with('status')
-            ->where('task_id', $this->kode);
+            ->select('subtasks.*')
+            ->with(['status' => function ($query) {
+                $query->select('id', 'name');
+            }])
+            ->where('task_id', $this->kode)
+            ->orderBy('id');
     }
 
     public function configure(): void
@@ -102,6 +110,30 @@ class SubtasksTable extends DataTableComponent
                 ->sortable()->outputFormat('d F y')->emptyValue('N/A'),
             DateColumn::make("Tanggal Akhir", "end_at")
                 ->sortable()->outputFormat('d F y')->emptyValue('N/A'),
+            Column::make("RAB", "rab")
+                ->format(function ($value) {
+                    return 'Rp' . number_format($value, 0, ',', '.');
+                })
+                ->sortable()->searchable()->footer(function ($rows) {
+                    $subtotal = $rows->sum('rab');
+                    return 'Total RAB: Rp' . number_format($subtotal, 0, ',', '.');
+                }),
+            Column::make("RAP", "rap")
+                ->format(function ($value) {
+                    return 'Rp' . number_format($value, 0, ',', '.');
+                })
+                ->sortable()->searchable()->footer(function ($rows) {
+                    $subtotal = $rows->sum('rap');
+                    return 'Total RAP: Rp' . number_format($subtotal, 0, ',', '.');
+                }),
+            Column::make("RAPP", "rapp")
+                ->format(function ($value) {
+                    return 'Rp' . number_format($value, 0, ',', '.');
+                })
+                ->sortable()->searchable()->footer(function ($rows) {
+                    $subtotal = $rows->sum('rapp');
+                    return 'Total RAPP: Rp' . number_format($subtotal, 0, ',', '.');
+                }),
             Column::make("Biaya", "biaya")
                 ->format(function ($value) {
                     return 'Rp' . number_format($value, 0, ',', '.');
@@ -109,7 +141,7 @@ class SubtasksTable extends DataTableComponent
                 ->sortable()->searchable()->footer(function ($rows) {
                     $subtotal = $rows->sum('biaya');
                     return 'Subtotal: Rp' . number_format($subtotal, 0, ',', '.');
-                }),
+                })->hideIf(true),
             Column::make("Status", "status.name")->view('components.status-badge')->searchable(),
             Column::make("Status", "status.color")->hideIf(true),
             Column::make('Action', 'id')->view('components.action-buttons')->searchable(),
@@ -130,6 +162,10 @@ class SubtasksTable extends DataTableComponent
         $this->subTaskKeterangan = $subtask->keterangan;
         $this->subtaskUrl = $subtask->url;
         $this->subTaskStatus = $subtask->status_id;
+        $this->subtaskRAB = (int)($subtask->rab);
+        $this->subtaskRAP = (int)($subtask->rap);
+        $this->subtaskRAPP = (int)($subtask->rapp);
+        $this->subtaskSAP = (bool)$subtask->sap;
 
         $this->dispatch('editSubtask', [
             'subtaskName' => $this->subtaskName,
@@ -141,7 +177,11 @@ class SubtasksTable extends DataTableComponent
             'subtaskCompleted' => $this->subtaskCompleted,
             'subTaskKeterangan' => $this->subTaskKeterangan,
             'subtaskUrl' => $this->subtaskUrl,
-            'subTaskStatus' => $this->subTaskStatus
+            'subTaskStatus' => $this->subTaskStatus,
+            'subtaskRAB' => $this->subtaskRAB,
+            'subtaskRAP' => $this->subtaskRAP,
+            'subtaskRAPP' => $this->subtaskRAPP,
+            'subtaskSAP' => $this->subtaskSAP,
         ]);
     }
 

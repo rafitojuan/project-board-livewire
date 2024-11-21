@@ -47,8 +47,11 @@
                     <table class="table align-middle table-borderless" style="margin-top: -1rem;">
                         <tr>
                             <th scope="col" style="width: 40%;">Tentang Projek </th>
-                            <th scope="col" class="text-end"><i class="bi bi-pencil-fill me-2" id="edit-detail"
-                                    style="cursor: pointer"></i></th>
+                            <th scope="col" class="text-end">
+                                <!--[if BLOCK]><![endif]--><?php if(Auth::user()->role_id <= 2 || Auth::user()->role_id === 5): ?>
+                                    <i class="bi bi-pencil-fill me-2" id="edit-detail" style="cursor: pointer"></i>
+                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                            </th>
                         </tr>
                         <tr>
                             <td style="width: 3%">Perusahaan</td>
@@ -153,7 +156,7 @@
                             <td><strong>Rp<?php echo e(number_format($tasklist->value, 0)); ?></strong></td>
                         </tr>
                         <tr>
-                            <td>Biaya</td>
+                            <td>Biaya (RAPP)</td>
                             <td><strong
                                     class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>">Rp<?php echo e(number_format($this->getTotalBiaya(), 0, ',', '.')); ?></strong>
                             </td>
@@ -161,7 +164,7 @@
                         <tr>
                             <td>Akumulasi</td>
                             <td><strong
-                                    class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>"><?php echo e($tasklist->value - $this->getTotalBiaya() < 0 ? '- Rp' : 'Rp'); ?><?php echo e(number_format(abs($tasklist->value - $this->getTotalBiaya()), 0, ',', '.')); ?>
+                                    class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>"><?php echo e($this->getSelisihBiaya()['prefix']); ?><?php echo e($this->getSelisihBiaya()['value']); ?>
 
                                 </strong>
                             </td>
@@ -275,7 +278,7 @@
                                                                     <?php echo e(number_format($this->getSubtotal($task->id), 0, ',', '.')); ?>
 
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Biaya</p>
+                                                                <p class="mb-0 text-muted">Biaya (RAPP)</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -718,15 +721,15 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
-                            <label for="biaya" class="form-label">Biaya</label>
+                            <label for="rab" class="form-label">RAB</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input id="biaya" type="number" class="form-control"
-                                    placeholder="Masukkan nominal" x-data="{ subtaskValue: '' }"
+                                <input id="rab" type="number" class="form-control"
+                                    placeholder="Masukkan nominal" x-data="{ subtaskRAB: '' }"
                                     x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
-                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
-                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="10">
-                            </div> <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+                                    x-on:keydown="if(subtaskRAB.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    wire:model="subtaskRAB" x-model="subtaskRAB" maxlength="13">
+                            </div> <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskRAB'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -736,6 +739,14 @@ $message = $__bag->first($__errorArgs[0]); ?>
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
@@ -824,7 +835,7 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
     
     <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         role="dialog" aria-labelledby="modalTitleId" aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitleId">
@@ -935,24 +946,26 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Biaya</label> <small
-                                class="text-danger">*</small>
+                        <div x-data="{ subtaskRAB: <?php if ((object) ('subtaskRAB') instanceof \Livewire\WireDirective) : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAB'->value()); ?>')<?php echo e('subtaskRAB'->hasModifier('live') ? '.live' : ''); ?><?php else : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAB'); ?>')<?php endif; ?>.defer }" class="mb-3">
+                            <label for="rab" class="form-label">RAB</label> <small class="text-danger">*</small>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="number"
-                                    class="form-control <?php $__errorArgs = ['subtaskValue'];
+                                    class="form-control
+                                    <?php $__errorArgs = ['subtaskRAB'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" id="name"
-                                    placeholder="Masukkan nominal" wire:model='subtaskValue' x-model="subtaskValue"
-                                    x-on:keydown="if(subtaskValue.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()">
+unset($__errorArgs, $__bag); ?>"
+                                    id="rab" placeholder="Masukkan nominal" wire:model.defer='subtaskRAB'
+                                    x-model="subtaskRAB"
+                                    x-on:keydown="if(subtaskRAB.length >= 10 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    <?php echo e($subtaskRAP && Auth::user()->role_id > 2 ? 'readonly' : ''); ?>>
                             </div>
-                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskRAB'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -963,6 +976,102 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
+                        <!--[if BLOCK]><![endif]--><?php if($subtaskSAP && Auth::user()->role_id <= 2): ?>
+                            <div class='mb-3' x-data="{
+                                subtaskRAP: <?php echo e($subtaskRAP ?? 'null'); ?>,
+                                init() {
+                                    this.subtaskRAP = <?php echo e($subtaskRAP ?? 'null'); ?>;
+                                    $watch('subtaskRAP', value => {
+                                        window.Livewire.find('<?php echo e($_instance->getId()); ?>').set('subtaskRAP', value)
+                                    })
+                                }
+                            }">
+                                <label for="rap" class="form-label">RAP <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number"
+                                        class="form-control <?php $__errorArgs = ['subtaskRAP'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                        :class="{ 'is-invalid': parseInt(subtaskRAP) >= <?php echo e($subtaskRAB); ?> }"
+                                        id="rap" placeholder="Masukkan nominal" x-model.number="subtaskRAP"
+                                        wire:model.defer='subtaskRAP'
+                                        x-on:keydown="if(!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight','ArrowUp','ArrowDown', 'Tab'].includes($event.key) && (!$event.key.match(/^\d$/) || subtaskRAP.length >= 13 || parseInt(subtaskRAP + $event.key) > <?php echo e($subtaskRAB); ?>)) $event.preventDefault()"
+                                        min="1" :max="<?php echo e($subtaskRAB - 1); ?>"
+                                        oninvalid="this.setCustomValidity('RAP tidak bisa lebih atau sama dengan RAB')"
+                                        oninput="this.setCustomValidity('')"
+                                        <?php echo e(Auth::user()->role_id > 2 ? 'readonly' : ''); ?>>
+                                </div>
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskRAP'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                                <template x-if="parseInt(subtaskRAP) >= <?php echo e($subtaskRAB); ?>">
+                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB (RAB:
+                                        <?php echo e($subtaskRAB); ?>)</small>
+                                </template>
+                            </div>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]--><?php if($subtaskRAP && Auth::user()->role_id != 7): ?>
+                            <div x-data="{ subtaskRAPP: <?php if ((object) ('subtaskRAPP') instanceof \Livewire\WireDirective) : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAPP'->value()); ?>')<?php echo e('subtaskRAPP'->hasModifier('live') ? '.live' : ''); ?><?php else : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAPP'); ?>')<?php endif; ?>.defer }" class="mb-3">
+                                <label for="RAPP" class="form-label">RAPP <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number"
+                                        class="form-control <?php $__errorArgs = ['subtaskRAPP'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                        :class="{ 'is-invalid': parseInt(subtaskRAPP) >= <?php echo e($subtaskRAP); ?> }"
+                                        id="RAPP" placeholder="Masukkan nominal" wire:model.defer='subtaskRAPP'
+                                        x-model="subtaskRAPP"
+                                        x-on:keydown="if(!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight','ArrowUp','ArrowDown', 'Tab'].includes($event.key) && (!$event.key.match(/^\d$/) || subtaskRAPP.length >= 13 || parseInt(subtaskRAPP + $event.key) > <?php echo e($subtaskRAP); ?>)) $event.preventDefault()"
+                                        min="0" :max="<?php echo e($subtaskRAP - 1); ?>"
+                                        oninvalid="this.setCustomValidity('RAPP tidak bisa lebih atau sama dengan RAP')"
+                                        oninput="this.setCustomValidity('')"
+                                        <?php echo e(Auth::user()->role_id > 2 ? 'readonly' : ''); ?>>
+                                </div>
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskRAPP'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                                <template x-if="parseInt(subtaskRAPP) >= <?php echo e($subtaskRAP); ?>">
+                                    <small class="text-danger">RAPP tidak bisa melebihi RAP (RAP:
+                                        <?php echo e($subtaskRAP); ?>)</small>
+                                </template>
+                            </div>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         <div class="mb-3">
                             <label for="statusa" class="form-label">Status</label>
                             <select id="statusa" class="form-select" wire:model='subTaskStatus'>
@@ -991,15 +1100,15 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         <div class="mb-3">
                             <label for="value">URL <span class="text-sm">(Lampiran)</span></label>
                             <input type="url" class="form-control" id="url"
-                                placeholder="https://example.com"" wire:model='subtaskUrl'>
+                                placeholder="https://example.com" wire:model='subtaskUrl'>
                         </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" wire:click="closeSubtaskAddModal"
-                        data-bs-toggle="modal" data-bs-target="#subTaskModal">
-                        Close
-                    </button>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" wire:click="closeSubtaskAddModal"
+                                data-bs-toggle="modal" data-bs-target="#subTaskModal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
                     </form>
                 </div>
             </div>
