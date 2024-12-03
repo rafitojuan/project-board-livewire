@@ -7,7 +7,7 @@
         <div id="sidebar-menu">
             <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
-                <li class="menu-title" key="t-menu"><?php echo app('translator')->get('translation.Menu'); ?></li>
+                <li class="menu-title" key="t-menu">Menu</li>
 
                 <li>
                     <a href="<?php echo e(route('root')); ?>" class="waves-effect">
@@ -33,12 +33,18 @@
                 </li>
 
                 <li>
+                    <a href="<?php echo e(route('kalendar.index')); ?>" class="waves-effect">
+                        <i class="bx bx-calendar"></i>
+                        <span>Kalendarku</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="<?php echo e(route('logs')); ?>" class="waves-effect">
                         <i class="bx bx-history"></i>
                         <span>Log Aktivitas</span>
                     </a>
                 </li>
-
 
                 
             </ul>

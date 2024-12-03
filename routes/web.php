@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Kanban\Index;
 use App\Http\Livewire\TasklistDetail;
 use App\Http\Livewire\Tugas;
+use App\Http\Livewire\TugasCalendar;
 use App\Http\Livewire\User;
 
 /*
@@ -48,6 +49,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Tugas
     Route::get('/tugas', Tugas::class)->name('tugas.index');
+
+    // Kalendar
+    Route::get('/kalendar', TugasCalendar::class)->name('kalendar.index');
 
 
 

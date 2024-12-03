@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('EPI | Dashboard')]
+#[Title('Glide | Dashboard')]
 class Dashboard extends Component
 {
     public $dashboardData;

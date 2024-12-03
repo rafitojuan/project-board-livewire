@@ -3,6 +3,7 @@
 <script data-navigate-once src="<?php echo e(URL::asset('build/libs/bootstrap/js/bootstrap.bundle.min.js')); ?>"></script>
 <script data-navigate-once src="<?php echo e(URL::asset('build/libs/metismenu/metisMenu.min.js')); ?>"></script>
 <script data-navigate-once src="<?php echo e(URL::asset('build/libs/simplebar/simplebar.min.js')); ?>"></script>
+<script data-navigate-once src="<?php echo e(URL::asset('build/libs/fullcalendar/index.global.min.js')); ?>"></script>
 <script src="<?php echo e(URL::asset('build/libs/node-waves/waves.min.js')); ?>"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.js"></script>
@@ -125,7 +126,8 @@
                 }
             },
             error: function(response) {
-                $('#current_passwordError').text(response.responseJSON.errors.current_password);
+                $('#current_passwordError').text(response.responseJSON.errors
+                    .current_password);
                 $('#passwordError').text(response.responseJSON.errors.password);
                 $('#password_confirmError').text(response.responseJSON.errors
                     .password_confirmation);

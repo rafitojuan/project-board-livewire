@@ -8,6 +8,7 @@ use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
 use App\Models\User;
+use App\Notifications\ApproveNotification;
 use App\Notifications\TugasNotification;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -21,7 +22,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
-#[Title('EPI | Tasklist Detail')]
+#[Title('Glide | Detail Projek')]
 class TasklistDetail extends Component
 {
     use LivewireAlert;
@@ -309,7 +310,7 @@ class TasklistDetail extends Component
             'subtaskJob' => 'required',
             'subtaskRAB' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
             'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
-            'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
+            'subTaskEnd' => ['date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
         ], [
@@ -324,7 +325,6 @@ class TasklistDetail extends Component
             'subtaskUrl.url' => 'URL harus valid.',
             'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
             'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
-            'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
         ]);
@@ -342,20 +342,33 @@ class TasklistDetail extends Component
             'status_id' => 1
         ]);
 
-
-        $this->notifApprove();
-        $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskUrl', 'subTaskKeterangan', 'subTaskStatus', 'subtaskSAP', 'subtaskRAB', 'subtaskRAP', 'subtaskRAPP');
+        $this->notifTugas();
+        $this->reset([
+            'subtaskName',
+            'subtaskJob',
+            'subtaskValue',
+            'subTaskStarted',
+            'subTaskEnd',
+            'subtaskUrl',
+            'subTaskKeterangan',
+            'subTaskStatus',
+            'subtaskSAP',
+            'subtaskRAB',
+            'subtaskRAP',
+            'subtaskRAPP'
+        ]);
         $this->alert('success', 'Subtask berhasil ditambahkan!');
         $this->dispatch('refreshDatatable');
     }
 
-    public function notifApprove()
+    public function notifTugas()
     {
-        $user = User::all();
-        $userNow = Auth::user();
-        $notif = Notification::send($user, new TugasNotification($userNow));
+        $user = User::find($this->subtaskJob);
 
-        return $notif;
+        if ($user) {
+            $pelaksana = $user;
+            Notification::send($user, new TugasNotification($pelaksana));
+        }
     }
 
     public function editSubtask($data)
@@ -390,6 +403,7 @@ class TasklistDetail extends Component
             'value' => number_format(abs($selisih), 0, ',', '.')
         ];
     }
+
     public function updateSubtask()
     {
         $this->validate([
@@ -432,12 +446,29 @@ class TasklistDetail extends Component
             'url' => $this->subtaskUrl,
             'status_id' => $this->subTaskStatus,
         ]);
+
+        if ($this->subtaskRAP != null) {
+            $this->notifApprove();
+            $this->subtaskRAP = null;
+        }
+
         $this->reset('subtaskName', 'subtaskJob', 'subtaskValue', 'subTaskStarted', 'subTaskEnd', 'subtaskCompleted', 'subTaskKeterangan', 'subtaskUrl', 'subTaskStatus', 'subtaskRAB', 'subtaskRAP', 'subtaskRAPP', 'subtaskSAP');
         $this->dispatch('close-taskModal', ['modalName' => 'editModal']);
         $this->dispatch('open-subtaskModal', ['modalName' => 'subTaskModal']);
         $this->dispatch('refreshDatatable');
         $this->alert('success', 'Subtask berhasil diperbarui!');
     }
+
+    public function notifApprove()
+    {
+        $approvers = User::whereIn('role_id', [1, 2])->get();
+        $user = Auth::user();
+
+        if ($approvers->isNotEmpty()) {
+            Notification::send($approvers, new ApproveNotification($user));
+        }
+    }
+
 
     public function closeSubtaskAddModal()
     {

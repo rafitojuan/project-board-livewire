@@ -22,6 +22,36 @@
                                                 @if ($kegiatan->subtasks)
                                                     <ul>
                                                         @foreach ($kegiatan->subtasks as $tugas)
+                                                            @if ($tugas->rap != null && Auth::user()->role_id <= 2)
+                                                                <li>
+                                                                    {{ $tugas->nama_tugas }}
+                                                                    <span class="ms-2" style="cursor: pointer"
+                                                                        x-data="{ isOpen: false, lastClicked: null }"
+                                                                        @click="
+                                                                            if (lastClicked === {{ $tugas->id_tugas }}) {
+                                                                                isOpen = false;
+                                                                                lastClicked = null;
+                                                                                $refs.detailTugas.classList.remove('fade-left');
+                                                                                $refs.detailTugas.style.display = 'none';
+                                                                            } else {
+                                                                                $dispatch('close-others');
+                                                                                isOpen = true;
+                                                                                lastClicked = {{ $tugas->id_tugas }};
+                                                                                $refs.detailTugas.classList.add('fade-left');
+                                                                                $refs.detailTugas.style.display = 'block';
+                                                                                $wire.showTugasUser({{ $tugas->id_tugas }})
+                                                                            }
+                                                                        ">
+                                                                        <i class="fas"
+                                                                            :class="{
+                                                                                'fa-eye': !isOpen,
+                                                                                'fa-eye-slash': isOpen
+                                                                            }"
+                                                                            @close-others.window="if (!$el.isSameNode($event.target)) { isOpen = false; lastClicked = null; }">
+                                                                        </i>
+                                                                    </span>
+                                                                </li>
+                                                            @endif
                                                             @if ($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id)
                                                                 <li>
                                                                     {{ $tugas->nama_tugas }}

@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
         "livewire/livewire": "^3.5",
+        "omnia-digital/livewire-calendar": "*",
         "rappasoft/laravel-livewire-tables": "^3.4",
         "realrashid/sweet-alert": "^7.2",
         "spatie/laravel-activitylog": "^4.9",

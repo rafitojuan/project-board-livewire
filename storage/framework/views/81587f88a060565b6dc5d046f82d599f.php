@@ -22,6 +22,32 @@
                                                 <!--[if BLOCK]><![endif]--><?php if($kegiatan->subtasks): ?>
                                                     <ul>
                                                         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $kegiatan->subtasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tugas): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <!--[if BLOCK]><![endif]--><?php if($tugas->rap != null && Auth::user()->role_id <= 2): ?>
+                                                                <li>
+                                                                    <?php echo e($tugas->nama_tugas); ?>
+
+                                                                    <span class="ms-2" style="cursor: pointer"
+                                                                        x-data="{ isOpen: false, lastClicked: null }"
+                                                                        @click="
+                                                                            if {
+                                                                                $dispatch('close-others');
+                                                                                isOpen = true;
+                                                                                lastClicked = <?php echo e($tugas->id_tugas); ?>;
+                                                                                $refs.detailTugas.classList.add('fade-left');
+                                                                                $refs.detailTugas.style.display = 'block';
+                                                                                $wire.showTugasUser(<?php echo e($tugas->id_tugas); ?>)
+                                                                            }
+                                                                        ">
+                                                                        <i class="fas"
+                                                                            :class="{
+                                                                                'fa-eye': !isOpen,
+                                                                                'fa-eye-slash': isOpen
+                                                                            }"
+                                                                            @close-others.window="if (!$el.isSameNode($event.target)) { isOpen = false; lastClicked = null; }">
+                                                                        </i>
+                                                                    </span>
+                                                                </li>
+                                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                                             <!--[if BLOCK]><![endif]--><?php if($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id): ?>
                                                                 <li>
                                                                     <?php echo e($tugas->nama_tugas); ?>

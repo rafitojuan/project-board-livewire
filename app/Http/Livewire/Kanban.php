@@ -16,7 +16,7 @@ use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
 
-#[Title('EPI | Project')]
+#[Title('Glide | Project')]
 
 class Kanban extends Component
 {

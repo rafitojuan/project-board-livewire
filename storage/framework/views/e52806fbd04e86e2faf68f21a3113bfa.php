@@ -108,7 +108,7 @@ if (isset($__slots)) unset($__slots);
                     <a class="dropdown-item text-danger" href="javascript:void();"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
                             class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span
-                            key="t-logout"><?php echo app('translator')->get('translation.Logout'); ?></span></a>
+                            key="t-logout"><?php echo app('translator')->get('Logout'); ?></span></a>
                     <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
                         <?php echo csrf_field(); ?>
                     </form>

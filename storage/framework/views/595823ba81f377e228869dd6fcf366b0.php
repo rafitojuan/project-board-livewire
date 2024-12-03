@@ -193,7 +193,6 @@
                             </ul>
                         </div>
                     </div>
-
                     <div id="stacked-column-chart" data-colors='["--bs-primary", "--bs-warning", "--bs-success"]'
                         class="apex-charts" dir="ltr"></div>
                 </div>

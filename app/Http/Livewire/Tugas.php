@@ -12,7 +12,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Title('EPI | Tugas')]
+#[Title('Glide | Tugas')]
 class Tugas extends Component
 {
     use WithPagination, LivewireAlert;
@@ -49,12 +49,25 @@ class Tugas extends Component
                     if (!isset($kegiatan['subtasks']) || empty($kegiatan['subtasks'])) {
                         return false;
                     }
+
+                    if (Auth::user()?->role_id <= 2) {
+                        return collect($kegiatan['subtasks'])->some(function ($subtask) {
+                            return isset($subtask['rap']) && $subtask['rap'] !== null;
+                        });
+                    }
+
+                    $kegiatan['subtasks'] = collect($kegiatan['subtasks'])->map(function ($subtask) {
+                        if (isset($subtask['rap'])) {
+                            $subtask['rap'] = null;
+                        }
+                        return $subtask;
+                    })->all();
+
                     return collect($kegiatan['subtasks'])->some(function ($subtask) {
                         return isset($subtask['pelaksana_id']) && $subtask['pelaksana_id'] === Auth::user()?->id;
                     });
                 });
             });
-
         $this->tugasUser = $data;
     }
 
