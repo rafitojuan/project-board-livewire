@@ -1,4 +1,4 @@
-<?php foreach ((['component','isTailwind','isBootstrap']) as $__key => $__value) {
+<?php foreach ((['isTailwind','isBootstrap']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -34,8 +34,8 @@ unset($__defined_vars); ?>
 
 <th x-cloak <?php echo e($attributes); ?> scope="col"
     <?php echo e($attributes->merge($customAttributes)->class([
-            'table-cell px-3 py-2 md:px-6 md:py-3 text-center md:text-left bg-gray-50 dark:bg-gray-800 laravel-livewire-tables-reorderingMinimised' => ($isTailwind) && ($customAttributes['default-colors'] ?? true || $customAttributes['default'] ?? true),
-            'laravel-livewire-tables-reorderingMinimised' => ($isBootstrap) && ($customAttributes['default-colors'] ?? true || $customAttributes['default'] ?? true),
+            'table-cell px-3 py-2 md:px-6 md:py-3 text-center md:text-left bg-gray-50 dark:bg-gray-800 laravel-livewire-tables-reorderingMinimised' => ($isTailwind) && (($customAttributes['default-colors'] ?? true) || ($customAttributes['default'] ?? true)),
+            'laravel-livewire-tables-reorderingMinimised' => ($isBootstrap) && (($customAttributes['default-colors'] ?? true) || ($customAttributes['default'] ?? true)),
         ])); ?>
 
     <?php if($hideUntilReorder): ?> :class="!reorderDisplayColumn && 'w-0 p-0 hidden'" <?php endif; ?>

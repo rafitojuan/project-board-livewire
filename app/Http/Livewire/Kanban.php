@@ -387,18 +387,6 @@ class Kanban extends Component
         }
     }
 
-    // public function log(Tasklist $tasklist)
-    // {
-    //     $this->logs = Activity::where('subject_type', Tasklist::class)
-    //         ->where('subject_id', $tasklist->id)
-    //         ->latest()
-    //         ->get();
-
-    //     return view('livewire.log', [
-    //         'logs' => $this->logs
-    //     ])->extends('livewire.kanban');
-    // }
-
     public function allLogs()
     {
         $this->logs = Activity::where('subject_type', Tasklist::class)
@@ -409,21 +397,6 @@ class Kanban extends Component
             'logs' => $this->logs
         ]);
     }
-
-    // public function log(Tasklist $tasklist)
-    // {
-    //     $this->logs = Activity::where('subject_type', Tasklist::class)
-    //         ->where('subject_id', $tasklist->id)
-    //         ->latest()
-    //         ->get();
-
-    //     return view('livewire.log', [
-    //         'logs' => $this->logs,
-    //         'tasklist' => $tasklist
-    //     ])->extends('layouts.app');
-    // }
-
-
 
     public function render()
     {

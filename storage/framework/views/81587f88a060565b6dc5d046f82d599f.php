@@ -29,7 +29,12 @@
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
                                                                         @click="
-                                                                            if {
+                                                                            if (lastClicked === <?php echo e($tugas->id_tugas); ?>) {
+                                                                                isOpen = false;
+                                                                                lastClicked = null;
+                                                                                $refs.detailTugas.classList.remove('fade-left');
+                                                                                $refs.detailTugas.style.display = 'none';
+                                                                            } else {
                                                                                 $dispatch('close-others');
                                                                                 isOpen = true;
                                                                                 lastClicked = <?php echo e($tugas->id_tugas); ?>;

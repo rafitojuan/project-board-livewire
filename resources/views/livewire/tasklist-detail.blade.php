@@ -79,7 +79,6 @@
                             saveStatus() {
                                 this.isLoading = true;
                                 this.isEditing = false;
-                        
                                 $wire.saveTasklistStatus()
                                     .then(color => {
                                         this.statusColor = color;
@@ -172,129 +171,145 @@
         <div class="col-9">
             <div class="card rounded-4">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title">Kegiatan</h5>
-                        <button class="btn btn-primary btn-sm {{ $tasklist->role_id != 2 ? 'd-none' : '' }}"
-                            data-bs-toggle="modal" data-bs-target="#addColumnModal">Add Column</button>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="btn-card" onclick="switchToCard()"><i
+                                    class="bx bx-notepad"></i></button>
+                            <button class="btn btn-outline-secondary" id="btn-calendar" onclick="switchToCalendar()"><i
+                                    class="bx bx-calendar"></i></button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm {{ $tasklist->role_id != 2 ? 'd-none' : '' }}"
+                                data-bs-toggle="modal" data-bs-target="#addColumnModal">Add Column</button>
+                        </div>
                     </div>
-                    <div class="row">
-                        @foreach ($tasklistColumns as $column)
-                            <div class="col-lg-4">
-                                <div class="card rounded-4">
-                                    <div class="card-body">
-                                        <div
-                                            class="dropdown float-end {{ Auth::user()->role_id > 3 ? 'd-none' : '' }}">
-                                            <a href="#" class="dropdown-toggle arrow-none"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                    data-bs-target="#updateTasklistColumnModal"
-                                                    wire:click="openEditTasklistColumnModal({{ $column }})">Edit</a>
-                                                <a class="dropdown-item" href="#"
-                                                    wire:click="deleteTasklistColumn({{ $column->id }})">Delete</a>
+
+                    <div id="card-view">
+                        <div class="row">
+                            @foreach ($tasklistColumns as $column)
+                                <div class="col-lg-4">
+                                    <div class="card rounded-4">
+                                        <div class="card-body">
+                                            <div
+                                                class="dropdown float-end {{ Auth::user()->role_id > 3 ? 'd-none' : '' }}">
+                                                <a href="#" class="dropdown-toggle arrow-none"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#updateTasklistColumnModal"
+                                                        wire:click="openEditTasklistColumnModal({{ $column }})">Edit</a>
+                                                    <a class="dropdown-item" href="#"
+                                                        wire:click="deleteTasklistColumn({{ $column->id }})">Delete</a>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <h4 class="card-title mb-4">{{ $column->name }}</h4>
-                                        <div class="task-list" data-column-id="{{ $column->id }}"
-                                            x-data="{ dropzone: null }" x-init="dropzone = new Sortable($el, {
-                                                group: 'task',
-                                                animation: 150,
-                                                onEnd: function(evt) {
-                                                    let columnId = evt.to.dataset.columnId;
-                                                    let taskOrder = Array.from(evt.to.children).map(el => el.dataset.taskId);
-                                                    $wire.updateTaskOrder(columnId, taskOrder);
-                                                }
-                                            })">
-                                            @forelse ($column->tasks as $task)
-                                                <div class="card task-box mb-3 rounded-4 shadow-lg"
-                                                    data-task-id="{{ $task->id }}"
-                                                    style="cursor: grab; height: 13rem;">
-                                                    <div class="card-body">
-                                                        <div
-                                                            class="dropdown float-end {{ Auth::user()->role_id > 3 ? 'd-none' : '' }}">
-                                                            <a href="#" class="dropdown-toggle arrow-none"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
-                                                            </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a class="dropdown-item" href="#"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#updateModal"
-                                                                    wire:click="openEditTaskModal({{ $task }})">Edit</a>
-                                                                <a class="dropdown-item" href="#"
-                                                                    wire:click="deleteTask({{ $task->id }})">Delete</a>
-                                                            </div>
-                                                        </div>
-                                                        <div class="float-end ml-2">
-                                                            <span class="badge rounded-pill font-size-12"
-                                                                style="background-color: {{ isset($task->user->role->color) ? $task->user->role->color : 'tomato' }};">{{ $task->user->role->name }}</span>
-                                                            <span class="badge rounded-pill font-size-12"
-                                                                style="background-color: tomato; opacity: 100%">{{ $task->user->division->divisi }}</span>
-                                                        </div>
-                                                        <div>
-                                                            <h5 class="font-size-15" style="cursor: pointer"
-                                                                data-bs-toggle="modal" data-bs-target="#subTaskModal"
-                                                                wire:click="openSubTaskModal({{ $task }})">
-                                                                {{ Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '') }}
-                                                            </h5>
-                                                            <small>Divisi:
-                                                                {{ $task->user->division->divisi ?? '-' }}</small><br>
-                                                            <small class="text-muted mb-2">
-                                                                {{ \Carbon\Carbon::parse($task->started_at)->format('d M Y') }}<span
-                                                                    class="mx-1">-</span>{{ $task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A' }}
-                                                            </small>
-                                                            @foreach ($detil->where('id_tasks', $task->id) as $detail)
-                                                                <div class="progress mt-2" style="height: 15px;">
-                                                                    <div class="progress-bar" role="progressbar"
-                                                                        style="width: {{ $detail->jlh_score }}%; background-color: {{ $detail->warna_status }}"
-                                                                        aria-valuenow="{{ $detail->jlh_score }}"
-                                                                        aria-valuemin="0" aria-valuemax="100">
-                                                                        {{ $detail->jlh_score }}%
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-
-                                                        <div class="position-absolute bottom-0 start-0 end-0 p-3">
-                                                            @if ($task->url)
-                                                                <a href="{{ $task->url }}" target="_blank"
-                                                                    class="float-start d-flex align-items-center text-decoration-none">
-                                                                    <i class="bi bi-link-45deg fs-4 me-1"></i>
-                                                                    <span>lampiran</span>
+                                            <h4 class="card-title mb-4">{{ $column->name }}</h4>
+                                            <div class="task-list" data-column-id="{{ $column->id }}"
+                                                x-data="{ dropzone: null }" x-init="dropzone = new Sortable($el, {
+                                                    group: 'task',
+                                                    animation: 150,
+                                                    onEnd: function(evt) {
+                                                        let columnId = evt.to.dataset.columnId;
+                                                        let taskOrder = Array.from(evt.to.children).map(el => el.dataset.taskId);
+                                                        $wire.updateTaskOrder(columnId, taskOrder);
+                                                    }
+                                                })">
+                                                @forelse ($column->tasks as $task)
+                                                    <div class="card task-box mb-3 rounded-4 shadow-lg"
+                                                        data-task-id="{{ $task->id }}"
+                                                        style="cursor: grab; height: 13rem;">
+                                                        <div class="card-body">
+                                                            <div
+                                                                class="dropdown float-end {{ Auth::user()->role_id > 3 ? 'd-none' : '' }}">
+                                                                <a href="#" class="dropdown-toggle arrow-none"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i
+                                                                        class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
                                                                 </a>
-                                                            @endif
-                                                            <div class="text-end">
-                                                                <h5 class="font-size-15 mb-1">
-                                                                    Rp
-                                                                    {{ number_format($this->getSubtotal($task->id), 0, ',', '.') }}
+                                                                <div class="dropdown-menu dropdown-menu-end">
+                                                                    <a class="dropdown-item" href="#"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#updateModal"
+                                                                        wire:click="openEditTaskModal({{ $task }})">Edit</a>
+                                                                    <a class="dropdown-item" href="#"
+                                                                        wire:click="deleteTask({{ $task->id }})">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="float-end ml-2">
+                                                                <span class="badge rounded-pill font-size-12"
+                                                                    style="background-color: {{ isset($task->user->role->color) ? $task->user->role->color : 'tomato' }};">{{ $task->user->role->name }}</span>
+                                                                <span class="badge rounded-pill font-size-12"
+                                                                    style="background-color: tomato; opacity: 100%">{{ $task->user->division->divisi }}</span>
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="font-size-15" style="cursor: pointer"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#subTaskModal"
+                                                                    wire:click="openSubTaskModal({{ $task }})">
+                                                                    {{ Str::limit($task->name, 14) . (strlen($task->name) > 14 ? '...' : '') }}
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Biaya (RAPP)</p>
+                                                                <small>Divisi:
+                                                                    {{ $task->user->division->divisi ?? '-' }}</small><br>
+                                                                <small class="text-muted mb-2">
+                                                                    {{ \Carbon\Carbon::parse($task->started_at)->format('d M Y') }}<span
+                                                                        class="mx-1">-</span>{{ $task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A' }}
+                                                                </small>
+                                                                @foreach ($detil->where('id_tasks', $task->id) as $detail)
+                                                                    <div class="progress mt-2" style="height: 15px;">
+                                                                        <div class="progress-bar" role="progressbar"
+                                                                            style="width: {{ $detail->jlh_score }}%; background-color: {{ $detail->warna_status }}"
+                                                                            aria-valuenow="{{ $detail->jlh_score }}"
+                                                                            aria-valuemin="0" aria-valuemax="100">
+                                                                            {{ $detail->jlh_score }}%
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+
+                                                            <div class="position-absolute bottom-0 start-0 end-0 p-3">
+                                                                @if ($task->url)
+                                                                    <a href="{{ $task->url }}" target="_blank"
+                                                                        class="float-start d-flex align-items-center text-decoration-none">
+                                                                        <i class="bi bi-link-45deg fs-4 me-1"></i>
+                                                                        <span>lampiran</span>
+                                                                    </a>
+                                                                @endif
+                                                                <div class="text-end">
+                                                                    <h5 class="font-size-15 mb-1">
+                                                                        Rp
+                                                                        {{ number_format($this->getSubtotal($task->id), 0, ',', '.') }}
+                                                                    </h5>
+                                                                    <p class="mb-0 text-muted">Biaya (RAPP)</p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            @empty
-                                                <p class="text-muted">Tidak ada task saat ini.</p>
-                                            @endforelse
-                                        </div>
-
-                                        @if ($loop->index == 0)
-                                            <div
-                                                class="text-center d-grid {{ Auth::user()->role_id === 7 ? 'd-none' : '' }}">
-                                                <a href="javascript: void(0);"
-                                                    class="btn btn-primary waves-effect waves-light addtask-btn"
-                                                    wire:click="openTaskModal({{ $column->id }})">
-                                                    <i class="mdi mdi-plus me-1"></i> Add New
-                                                </a>
+                                                @empty
+                                                    <p class="text-muted">Tidak ada task saat ini.</p>
+                                                @endforelse
                                             </div>
-                                        @endif
+
+                                            @if ($loop->index == 0)
+                                                <div
+                                                    class="text-center d-grid {{ Auth::user()->role_id === 7 ? 'd-none' : '' }}">
+                                                    <a href="javascript: void(0);"
+                                                        class="btn btn-primary waves-effect waves-light addtask-btn"
+                                                        wire:click="openTaskModal({{ $column->id }})">
+                                                        <i class="mdi mdi-plus me-1"></i> Add New
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div id="calendar-view" class="d-none">
+                        <div wire:ignore id='calendar-tasklist'></div>
                     </div>
                 </div>
             </div>
@@ -799,7 +814,8 @@
                             <select id="statusa" class="form-select" wire:model='subTaskStatus'>
                                 <option value="" disabled>Pilih Status</option>
                                 @foreach ($statusSubtask as $status)
-                                    <option class="text-capitalize" value="{{ $status->id }}">{{ $status->name }}
+                                    <option class="text-capitalize" value="{{ $status->id }}">
+                                        {{ $status->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -829,4 +845,225 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalJadwal" wire:ignore.self tabindex="-1" role="dialog"
+        aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">
+                        Ubah Jadwal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form wire:submit="updateDetailJadwal">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Acara: <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="name" id="name" wire:model='namaAcaraTask'
+                                class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Tanggal Acara: <span
+                                    class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" name="start" id="date" class="form-control"
+                                        wire:model='tanggalMulaiTask'>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="date" name="end" id="date" class="form-control"
+                                        wire:model='tanggalSelesaiTask'>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="finished" class="form-label">Tandai sebagai selesai?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='statusJadwalTask' type="checkbox"
+                                    id="finished" data-on-value="6" data-off-value="1" />
+                                <label class="form-check-label ms-1" for="finished">Tidak/Ya</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {{-- <button type="button" class="btn btn-danger">
+                            Hapus
+                        </button> --}}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CALENDARNYA
+        document.addEventListener('livewire:initialized', function() {
+            const jadwal = @json($events);
+            var calendarEl = document.getElementById('calendar-tasklist');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: localStorage.getItem('calendarView') || 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                locale: 'id',
+                buttonText: {
+                    today: 'Hari ini',
+                    month: 'Bulan',
+                    week: 'Minggu',
+                    day: 'Hari',
+                    list: 'List'
+                },
+                monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                    'September', 'Oktober', 'November', 'Desember'
+                ],
+                monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt',
+                    'Nov', 'Des'
+                ],
+                dayNames: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+                dayNamesShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                nextDayThreshold: '00:00',
+                events: jadwal,
+                editable: {{ Auth::user()->role_id <= 2 ? 'true' : 'false' }},
+                eventResizableFromStart: {{ Auth::user()->role_id <= 2 ? 'true' : 'false' }},
+                selectable: {{ Auth::user()->role_id <= 2 ? 'true' : 'false' }},
+                eventResize: function(data) {
+                    console.log('Event berhasil Diubah');
+                    @this.call('updateJadwal', data.event.id, data.event.start, data.event.end)
+                        .then(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Jadwal berhasil diperbarui',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Gagal memperbarui jadwal',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        });
+                },
+                eventDrop: function(data) {
+                    console.log('Event berhasil Dipindahkan');
+                    @this.call('updateJadwal', data.event.id, data.event.start, data.event.end)
+                        .then(() => {
+                            location.reload();
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Jadwal berhasil diperbarui',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Gagal memperbarui jadwal',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        });
+                },
+                eventClick: function(data) {
+                    @this.call('detailJadwal', data.event.id)
+                        .then(() => {
+                            $('#modalJadwal').modal('show');
+                        });
+                },
+                eventMouseEnter: function(info) {
+                    if (!{{ Auth::user()->role_id <= 2 ? 'true' : 'false' }}) {
+                        info.el.style.cursor = 'pointer';
+                    }
+                },
+                datesSet: function(info) {
+                    localStorage.setItem('calendarView', info.view.type);
+                    localStorage.setItem('calendarDate', calendar.getDate().toISOString());
+                },
+                businessHours: [{
+                    daysOfWeek: [1, 2, 3, 4, 5],
+                    startTime: '08:00',
+                    endTime: '17:00',
+                }]
+            });
+
+            const savedDate = localStorage.getItem('calendarDate');
+            if (savedDate) {
+                calendar.gotoDate(new Date(savedDate));
+            }
+
+            calendar.render();
+
+            @this.on('refreshCalendar', function() {
+                console.log('Refresh Calendar event received');
+                const currentView = localStorage.getItem('tasklistView') || 'card';
+
+                calendar.removeAllEvents();
+                calendar.addEventSource(@json($events));
+
+                if (currentView === 'calendar') {
+                    switchToCalendar();
+                } else {
+                    switchToCard();
+                }
+            });
+
+        })
+
+        window.addEventListener('close-modal', event => {
+            $('#modalJadwal').modal('hide');
+        })
+
+
+
+
+        // TABNYA
+        function switchToCard() {
+            localStorage.setItem('tasklistView', 'card');
+            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-card').classList.add('btn-secondary');
+            document.getElementById('btn-calendar').classList.remove('btn-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
+
+            document.getElementById('card-view').classList.remove('d-none');
+            document.getElementById('calendar-view').classList.add('d-none');
+        }
+
+        function switchToCalendar() {
+            localStorage.setItem('tasklistView', 'calendar');
+            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-secondary');
+            document.getElementById('btn-card').classList.remove('btn-secondary');
+            document.getElementById('btn-card').classList.add('btn-outline-secondary');
+
+            document.getElementById('calendar-view').classList.remove('d-none');
+            document.getElementById('card-view').classList.add('d-none');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewPreference = localStorage.getItem('tasklistView') || 'card';
+            if (viewPreference === 'calendar') {
+                switchToCalendar();
+            } else {
+                switchToCard();
+            }
+        });
+    </script>
 </div>

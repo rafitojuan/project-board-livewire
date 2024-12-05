@@ -20,57 +20,180 @@
         </div>
     </div>
 
+    <!-- Modal Body -->
+    <div class="modal fade" id="modalJadwal" wire:ignore.self tabindex="-1" role="dialog"
+        aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">
+                        Ubah Jadwal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form wire:submit="updateDetailJadwal">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Acara: <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="name" id="name" wire:model='namaAcara'
+                                class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Tanggal Acara: <span
+                                    class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" name="start" id="date" class="form-control"
+                                        wire:model='tanggalMulai'>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="date" name="end" id="date" class="form-control"
+                                        wire:model='tanggalSelesai'>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="finished" class="form-label">Tandai sebagai selesai?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='statusJadwal' type="checkbox" id="finished"
+                                    data-on-value="6" data-off-value="1" />
+                                <label class="form-check-label ms-1" for="finished">Tidak/Ya</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script>
-        // FUNCTION CALENDAR CUYY
-        document.addEventListener('livewire:initialized', function() {
-            const jadwal = <?php echo json_encode($events, 15, 512) ?>;
-            console.log(jadwal);
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: localStorage.getItem('calendarView') || 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-                },
-                locale: 'id',
-                buttonText: {
-                    today: 'Hari ini',
-                    month: 'Bulan',
-                    week: 'Minggu',
-                    day: 'Hari',
-                    list: 'List'
-                },
-                monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
-                    'September', 'Oktober', 'November', 'Desember'
-                ],
-                monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt',
-                    'Nov', 'Des'
-                ],
-                dayNames: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
-                dayNamesShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
-                events: jadwal,
-                editable: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
-                selectable: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
-                eventMouseEnter: function(info) {
-                    if (!<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
-                        info.el.style.cursor = 'pointer';
-                    }
-                },
-                datesSet: function(info) {
-                    localStorage.setItem('calendarView', info.view.type);
-                    localStorage.setItem('calendarDate', calendar.getDate().toISOString());
+<script>
+    // FUNCTION CALENDAR CUYY
+    document.addEventListener('livewire:initialized', function() {
+        const jadwal = <?php echo json_encode($events, 15, 512) ?>;
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: localStorage.getItem('calendarView') || 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            locale: 'id',
+            buttonText: {
+                today: 'Hari ini',
+                month: 'Bulan',
+                week: 'Minggu',
+                day: 'Hari',
+                list: 'List'
+            },
+            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                'September', 'Oktober', 'November', 'Desember'
+            ],
+            monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt',
+                'Nov', 'Des'
+            ],
+            dayNames: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+            dayNamesShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+            events: jadwal,
+            editable: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
+            eventResizableFromStart: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
+            selectable: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
+            eventResize: function(data) {
+                console.log('Event berhasil Diubah');
+                window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('updateJadwal', data.event.id, data.event.start, data.event.end)
+                    .then(() => {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Jadwal berhasil diperbarui',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Gagal memperbarui jadwal',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    });
+            },
+            eventDrop: function(data) {
+                console.log('Event berhasil Dipindahkan');
+                window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('updateJadwal', data.event.id, data.event.start, data.event.end)
+                    .then(() => {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Jadwal berhasil diperbarui',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Gagal memperbarui jadwal',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    });
+            },
+            eventClick: function(data) {
+                window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
+                    .then(() => {
+                        $('#modalJadwal').modal('show');
+                    });
+            },
+            eventMouseEnter: function(info) {
+                if (!<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
+                    info.el.style.cursor = 'pointer';
                 }
-            });
+            },
+            datesSet: function(info) {
+                localStorage.setItem('calendarView', info.view.type);
+                localStorage.setItem('calendarDate', calendar.getDate().toISOString());
+            },
+            businessHours: [{
+                daysOfWeek: [1, 2, 3, 4, 5],
+                startTime: '08:00',
+                endTime: '18:00',
+            }]
+        });
 
-            const savedDate = localStorage.getItem('calendarDate');
-            if (savedDate) {
-                calendar.gotoDate(new Date(savedDate));
-            }
+        const savedDate = localStorage.getItem('calendarDate');
+        if (savedDate) {
+            calendar.gotoDate(new Date(savedDate));
+        }
 
-            calendar.render();
-        })
-    </script>
+        calendar.render();
+
+        window.Livewire.find('<?php echo e($_instance->getId()); ?>').on('refreshCalendar', function() {
+            console.log('Refresh Calendar event received');
+            calendar.removeAllEvents();
+            calendar.addEventSource(<?php echo json_encode($events, 15, 512) ?>);
+        });
+    })
+
+    window.addEventListener('close-modal', event => {
+        $('#modalJadwal').modal('hide');
+    })
+</script>
 </div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/tugas-calendar.blade.php ENDPATH**/ ?>

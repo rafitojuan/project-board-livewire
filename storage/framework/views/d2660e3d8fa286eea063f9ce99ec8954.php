@@ -1,4 +1,4 @@
-<?php foreach ((['component', 'tableName','primaryKey','isTailwind','isBootstrap']) as $__key => $__value) {
+<?php foreach (([ 'tableName','primaryKey','isTailwind','isBootstrap']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>

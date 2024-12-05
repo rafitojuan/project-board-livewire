@@ -1,4 +1,4 @@
-<?php foreach ((['component', 'rowIndex', 'rowID','isTailwind','isBootstrap']) as $__key => $__value) {
+<?php foreach (([ 'rowIndex', 'rowID','isTailwind','isBootstrap']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -31,6 +31,7 @@ foreach ($attributes->all() as $__key => $__value) {
 }
 
 unset($__defined_vars); ?>
+
 
 <!--[if BLOCK]><![endif]--><?php if($isTailwind): ?>
     <td x-cloak <?php echo e($attributes

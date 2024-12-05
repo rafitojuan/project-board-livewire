@@ -1,4 +1,4 @@
-<?php foreach ((['component', 'tableName','isTailwind','isBootstrap']) as $__key => $__value) {
+<?php foreach (([ 'tableName','isTailwind','isBootstrap']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -26,7 +26,7 @@
                 ->class(['min-w-full divide-y divide-gray-200 dark:divide-none' => $customAttributes['table']['default'] ?? true])
                 ->except(['default','default-styling','default-colors'])); ?>
 
-            
+
         >
             <thead wire:key="<?php echo e($tableName); ?>-thead"
                 <?php echo e($attributes->merge($customAttributes['thead'])

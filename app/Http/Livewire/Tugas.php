@@ -12,7 +12,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Title('Glide | Tugas')]
+#[Title('EPI | Tugas')]
 class Tugas extends Component
 {
     use WithPagination, LivewireAlert;

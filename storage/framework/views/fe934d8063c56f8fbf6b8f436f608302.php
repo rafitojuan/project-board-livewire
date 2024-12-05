@@ -1,4 +1,4 @@
-<?php foreach ((['component', 'row', 'rowIndex', 'tableName', 'primaryKey','isTailwind','isBootstrap']) as $__key => $__value) {
+<?php foreach (([ 'row', 'rowIndex', 'tableName', 'primaryKey','isTailwind','isBootstrap']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -38,7 +38,7 @@ unset($__defined_vars); ?>
 
 <td wire:key="<?php echo e($tableName . '-table-td-'.$row->{$primaryKey}.'-'.$column->getSlug()); ?>"
     <?php if($column->isClickable()): ?>
-        <?php if($this->getTableRowUrlTarget($row) === "navigate"): ?> wire:navigate href="<?php echo e($this->getTableRowUrl($row)); ?>"
+        <?php if($this->getTableRowUrlTarget($row) === 'navigate'): ?> wire:navigate href="<?php echo e($this->getTableRowUrl($row)); ?>"
         <?php else: ?> onclick="window.open('<?php echo e($this->getTableRowUrl($row)); ?>', '<?php echo e($this->getTableRowUrlTarget($row) ?? '_self'); ?>')"
         <?php endif; ?>
     <?php endif; ?>

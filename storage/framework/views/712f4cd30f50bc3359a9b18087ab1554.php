@@ -1,5 +1,3 @@
-
-
 <div>
     <div class="dropdown d-inline-block">
         <button wire:poll.5s='fetchNotif' wire:click="toggleDropdown" type="button"

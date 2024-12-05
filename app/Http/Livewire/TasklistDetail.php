@@ -10,6 +10,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Notifications\ApproveNotification;
 use App\Notifications\TugasNotification;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +66,12 @@ class TasklistDetail extends Component
     public $taskSubtotals = [];
     public $userList;
     public $subtaskSAP;
+    public $idJadwalTask;
+    public $namaAcaraTask;
+    public $tanggalMulaiTask;
+    public $tanggalSelesaiTask;
+    public $statusJadwalTask;
+
 
     protected $listeners = [
         'refreshTasklistColumns' => '$refresh',
@@ -535,8 +542,81 @@ class TasklistDetail extends Component
         return $total;
     }
 
+    public function updateJadwal($id, $jadwal_awal, $jadwal_akhir)
+    {
+        $jadwal_awal = Carbon::parse($jadwal_awal);
+        $jadwal_akhir = Carbon::parse($jadwal_akhir);
+        $task = Task::find($id);
+        $task->started_at = $jadwal_awal;
+        $task->end_at = $jadwal_akhir;
+        $task->save();
+    }
+
+    public function detailJadwal($id)
+    {
+        $task = Task::find($id);
+        $this->idJadwalTask = $task->id;
+        $this->namaAcaraTask = $task->name;
+        $this->tanggalMulaiTask = $task->started_at;
+        $this->tanggalSelesaiTask = $task->end_at;
+        $this->statusJadwalTask = $task->status_id;
+    }
+
+    public function updateDetailJadwal()
+    {
+        $id = $this->idJadwalTask;
+        $task = Task::find($id);
+        $task->name = $this->namaAcaraTask;
+        $task->started_at = $this->tanggalMulaiTask;
+        $task->end_at = $this->tanggalSelesaiTask;
+        $task->status_id = $this->statusJadwalTask;
+        $task->save();
+        $this->dispatch('close-modal', ['modal-name' => 'modalJadwal']);
+        $this->reset(['namaAcaraTask', 'tanggalMulaiTask', 'tanggalSelesaiTask', 'statusJadwalTask']);
+        $this->alert('success', 'Jadwal berhasil diperbarui');
+
+        $this->dispatch('refreshCalendar');
+        $this->render();
+
+        return redirect(request()->header('Referer'));
+    }
+
     public function render()
     {
+        $events = [];
+        $tasklist = DB::table('v_tasks_rekap')
+            ->where('tasklist_id', $this->tasklist->id)
+            ->orderBy('id_tasks')
+            ->lazy();
+        $colors = ['#87A2FF', '#2A629A', '#FFD7C4', '#FFF4B5', '#A5B68D', '#A594F9', '#FFF078', '#FF885B', '#4B0082', '#32CD32'];
+
+        $start = Carbon::createFromDate(1900, 1, 1);
+        $end = Carbon::createFromDate(2100, 12, 31);
+
+        while ($start <= $end) {
+            if ($start->isDayOfWeek(Carbon::SATURDAY) || $start->isDayOfWeek(Carbon::SUNDAY)) {
+                $events[] = [
+                    'start' => $start->format('Y-m-d'),
+                    'end' => $start->format('Y-m-d'),
+                    'display' => 'background',
+                    'backgroundColor' => '#ff0000',
+                ];
+            }
+            $start->addDay();
+        }
+
+        foreach ($tasklist as $tasklist) {
+            $tgl_mulai = Carbon::parse($tasklist->tgl_mulai_tasks);
+            $tgl_selesai = Carbon::parse($tasklist->tgl_akhir_tasks);
+
+            $events[] = [
+                'id' => $tasklist->id_tasks,
+                'title' => $tasklist->nama_tasks,
+                'start' => $tgl_mulai,
+                'end' => $tgl_selesai,
+            ];
+        }
+
         $tasks = DB::table('v_tasks_rekap')
             ->get();
         $statuses = Status::all();
@@ -544,6 +624,7 @@ class TasklistDetail extends Component
         return view('livewire.tasklist-detail', compact('statusSubtask', 'statuses'), [
             'detil' => $tasks,
             'userList' => $this->userList,
+            'events' => $events,
         ]);
     }
 }

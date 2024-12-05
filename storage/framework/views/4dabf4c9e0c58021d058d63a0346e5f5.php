@@ -80,7 +80,6 @@
                             saveStatus() {
                                 this.isLoading = true;
                                 this.isEditing = false;
-                        
                                 $wire.saveTasklistStatus()
                                     .then(color => {
                                         this.statusColor = color;
@@ -176,132 +175,148 @@
         <div class="col-9">
             <div class="card rounded-4">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="card-title">Kegiatan</h5>
-                        <button class="btn btn-primary btn-sm <?php echo e($tasklist->role_id != 2 ? 'd-none' : ''); ?>"
-                            data-bs-toggle="modal" data-bs-target="#addColumnModal">Add Column</button>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" id="btn-card" onclick="switchToCard()"><i
+                                    class="bx bx-notepad"></i></button>
+                            <button class="btn btn-outline-secondary" id="btn-calendar" onclick="switchToCalendar()"><i
+                                    class="bx bx-calendar"></i></button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm <?php echo e($tasklist->role_id != 2 ? 'd-none' : ''); ?>"
+                                data-bs-toggle="modal" data-bs-target="#addColumnModal">Add Column</button>
+                        </div>
                     </div>
-                    <div class="row">
-                        <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $tasklistColumns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <div class="col-lg-4">
-                                <div class="card rounded-4">
-                                    <div class="card-body">
-                                        <div
-                                            class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
-                                            <a href="#" class="dropdown-toggle arrow-none"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                    data-bs-target="#updateTasklistColumnModal"
-                                                    wire:click="openEditTasklistColumnModal(<?php echo e($column); ?>)">Edit</a>
-                                                <a class="dropdown-item" href="#"
-                                                    wire:click="deleteTasklistColumn(<?php echo e($column->id); ?>)">Delete</a>
+
+                    <div id="card-view">
+                        <div class="row">
+                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $tasklistColumns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <div class="col-lg-4">
+                                    <div class="card rounded-4">
+                                        <div class="card-body">
+                                            <div
+                                                class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
+                                                <a href="#" class="dropdown-toggle arrow-none"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#updateTasklistColumnModal"
+                                                        wire:click="openEditTasklistColumnModal(<?php echo e($column); ?>)">Edit</a>
+                                                    <a class="dropdown-item" href="#"
+                                                        wire:click="deleteTasklistColumn(<?php echo e($column->id); ?>)">Delete</a>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <h4 class="card-title mb-4"><?php echo e($column->name); ?></h4>
-                                        <div class="task-list" data-column-id="<?php echo e($column->id); ?>"
-                                            x-data="{ dropzone: null }" x-init="dropzone = new Sortable($el, {
-                                                group: 'task',
-                                                animation: 150,
-                                                onEnd: function(evt) {
-                                                    let columnId = evt.to.dataset.columnId;
-                                                    let taskOrder = Array.from(evt.to.children).map(el => el.dataset.taskId);
-                                                    $wire.updateTaskOrder(columnId, taskOrder);
-                                                }
-                                            })">
-                                            <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                                <div class="card task-box mb-3 rounded-4 shadow-lg"
-                                                    data-task-id="<?php echo e($task->id); ?>"
-                                                    style="cursor: grab; height: 13rem;">
-                                                    <div class="card-body">
-                                                        <div
-                                                            class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
-                                                            <a href="#" class="dropdown-toggle arrow-none"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                <i class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
-                                                            </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a class="dropdown-item" href="#"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#updateModal"
-                                                                    wire:click="openEditTaskModal(<?php echo e($task); ?>)">Edit</a>
-                                                                <a class="dropdown-item" href="#"
-                                                                    wire:click="deleteTask(<?php echo e($task->id); ?>)">Delete</a>
-                                                            </div>
-                                                        </div>
-                                                        <div class="float-end ml-2">
-                                                            <span class="badge rounded-pill font-size-12"
-                                                                style="background-color: <?php echo e(isset($task->user->role->color) ? $task->user->role->color : 'tomato'); ?>;"><?php echo e($task->user->role->name); ?></span>
-                                                            <span class="badge rounded-pill font-size-12"
-                                                                style="background-color: tomato; opacity: 100%"><?php echo e($task->user->division->divisi); ?></span>
-                                                        </div>
-                                                        <div>
-                                                            <h5 class="font-size-15" style="cursor: pointer"
-                                                                data-bs-toggle="modal" data-bs-target="#subTaskModal"
-                                                                wire:click="openSubTaskModal(<?php echo e($task); ?>)">
-                                                                <?php echo e(Str::limit($task->name, 60) . (strlen($task->name) > 60 ? '...' : '')); ?>
-
-                                                            </h5>
-                                                            <small>Divisi:
-                                                                <?php echo e($task->user->division->divisi ?? '-'); ?></small><br>
-                                                            <small class="text-muted mb-2">
-                                                                <?php echo e(\Carbon\Carbon::parse($task->started_at)->format('d M Y')); ?><span
-                                                                    class="mx-1">-</span><?php echo e($task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A'); ?>
-
-                                                            </small>
-                                                            <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $detil->where('id_tasks', $task->id); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                <div class="progress mt-2" style="height: 15px;">
-                                                                    <div class="progress-bar" role="progressbar"
-                                                                        style="width: <?php echo e($detail->jlh_score); ?>%; background-color: <?php echo e($detail->warna_status); ?>"
-                                                                        aria-valuenow="<?php echo e($detail->jlh_score); ?>"
-                                                                        aria-valuemin="0" aria-valuemax="100">
-                                                                        <?php echo e($detail->jlh_score); ?>%
-                                                                    </div>
-                                                                </div>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
-                                                        </div>
-
-                                                        <div class="position-absolute bottom-0 start-0 end-0 p-3">
-                                                            <!--[if BLOCK]><![endif]--><?php if($task->url): ?>
-                                                                <a href="<?php echo e($task->url); ?>" target="_blank"
-                                                                    class="float-start d-flex align-items-center text-decoration-none">
-                                                                    <i class="bi bi-link-45deg fs-4 me-1"></i>
-                                                                    <span>lampiran</span>
+                                            <h4 class="card-title mb-4"><?php echo e($column->name); ?></h4>
+                                            <div class="task-list" data-column-id="<?php echo e($column->id); ?>"
+                                                x-data="{ dropzone: null }" x-init="dropzone = new Sortable($el, {
+                                                    group: 'task',
+                                                    animation: 150,
+                                                    onEnd: function(evt) {
+                                                        let columnId = evt.to.dataset.columnId;
+                                                        let taskOrder = Array.from(evt.to.children).map(el => el.dataset.taskId);
+                                                        $wire.updateTaskOrder(columnId, taskOrder);
+                                                    }
+                                                })">
+                                                <!--[if BLOCK]><![endif]--><?php $__empty_1 = true; $__currentLoopData = $column->tasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                    <div class="card task-box mb-3 rounded-4 shadow-lg"
+                                                        data-task-id="<?php echo e($task->id); ?>"
+                                                        style="cursor: grab; height: 13rem;">
+                                                        <div class="card-body">
+                                                            <div
+                                                                class="dropdown float-end <?php echo e(Auth::user()->role_id > 3 ? 'd-none' : ''); ?>">
+                                                                <a href="#" class="dropdown-toggle arrow-none"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i
+                                                                        class="mdi mdi-dots-vertical m-0 text-muted h5"></i>
                                                                 </a>
-                                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                                                            <div class="text-end">
-                                                                <h5 class="font-size-15 mb-1">
-                                                                    Rp
-                                                                    <?php echo e(number_format($this->getSubtotal($task->id), 0, ',', '.')); ?>
+                                                                <div class="dropdown-menu dropdown-menu-end">
+                                                                    <a class="dropdown-item" href="#"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#updateModal"
+                                                                        wire:click="openEditTaskModal(<?php echo e($task); ?>)">Edit</a>
+                                                                    <a class="dropdown-item" href="#"
+                                                                        wire:click="deleteTask(<?php echo e($task->id); ?>)">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="float-end ml-2">
+                                                                <span class="badge rounded-pill font-size-12"
+                                                                    style="background-color: <?php echo e(isset($task->user->role->color) ? $task->user->role->color : 'tomato'); ?>;"><?php echo e($task->user->role->name); ?></span>
+                                                                <span class="badge rounded-pill font-size-12"
+                                                                    style="background-color: tomato; opacity: 100%"><?php echo e($task->user->division->divisi); ?></span>
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="font-size-15" style="cursor: pointer"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#subTaskModal"
+                                                                    wire:click="openSubTaskModal(<?php echo e($task); ?>)">
+                                                                    <?php echo e(Str::limit($task->name, 14) . (strlen($task->name) > 14 ? '...' : '')); ?>
 
                                                                 </h5>
-                                                                <p class="mb-0 text-muted">Biaya (RAPP)</p>
+                                                                <small>Divisi:
+                                                                    <?php echo e($task->user->division->divisi ?? '-'); ?></small><br>
+                                                                <small class="text-muted mb-2">
+                                                                    <?php echo e(\Carbon\Carbon::parse($task->started_at)->format('d M Y')); ?><span
+                                                                        class="mx-1">-</span><?php echo e($task->end_at ? \Carbon\Carbon::parse($task->end_at)->format('d M Y') : 'N/A'); ?>
+
+                                                                </small>
+                                                                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $detil->where('id_tasks', $task->id); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                    <div class="progress mt-2" style="height: 15px;">
+                                                                        <div class="progress-bar" role="progressbar"
+                                                                            style="width: <?php echo e($detail->jlh_score); ?>%; background-color: <?php echo e($detail->warna_status); ?>"
+                                                                            aria-valuenow="<?php echo e($detail->jlh_score); ?>"
+                                                                            aria-valuemin="0" aria-valuemax="100">
+                                                                            <?php echo e($detail->jlh_score); ?>%
+                                                                        </div>
+                                                                    </div>
+                                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                                                            </div>
+
+                                                            <div class="position-absolute bottom-0 start-0 end-0 p-3">
+                                                                <!--[if BLOCK]><![endif]--><?php if($task->url): ?>
+                                                                    <a href="<?php echo e($task->url); ?>" target="_blank"
+                                                                        class="float-start d-flex align-items-center text-decoration-none">
+                                                                        <i class="bi bi-link-45deg fs-4 me-1"></i>
+                                                                        <span>lampiran</span>
+                                                                    </a>
+                                                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                                                <div class="text-end">
+                                                                    <h5 class="font-size-15 mb-1">
+                                                                        Rp
+                                                                        <?php echo e(number_format($this->getSubtotal($task->id), 0, ',', '.')); ?>
+
+                                                                    </h5>
+                                                                    <p class="mb-0 text-muted">Biaya (RAPP)</p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                    <p class="text-muted">Tidak ada task saat ini.</p>
+                                                <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                            </div>
+
+                                            <!--[if BLOCK]><![endif]--><?php if($loop->index == 0): ?>
+                                                <div
+                                                    class="text-center d-grid <?php echo e(Auth::user()->role_id === 7 ? 'd-none' : ''); ?>">
+                                                    <a href="javascript: void(0);"
+                                                        class="btn btn-primary waves-effect waves-light addtask-btn"
+                                                        wire:click="openTaskModal(<?php echo e($column->id); ?>)">
+                                                        <i class="mdi mdi-plus me-1"></i> Add New
+                                                    </a>
                                                 </div>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                                <p class="text-muted">Tidak ada task saat ini.</p>
                                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                         </div>
-
-                                        <!--[if BLOCK]><![endif]--><?php if($loop->index == 0): ?>
-                                            <div
-                                                class="text-center d-grid <?php echo e(Auth::user()->role_id === 7 ? 'd-none' : ''); ?>">
-                                                <a href="javascript: void(0);"
-                                                    class="btn btn-primary waves-effect waves-light addtask-btn"
-                                                    wire:click="openTaskModal(<?php echo e($column->id); ?>)">
-                                                    <i class="mdi mdi-plus me-1"></i> Add New
-                                                </a>
-                                            </div>
-                                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                     </div>
                                 </div>
-                            </div>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                        </div>
+                    </div>
+
+                    <div id="calendar-view" class="d-none">
+                        <div wire:ignore id='calendar-tasklist'></div>
                     </div>
                 </div>
             </div>
@@ -1077,7 +1092,8 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             <select id="statusa" class="form-select" wire:model='subTaskStatus'>
                                 <option value="" disabled>Pilih Status</option>
                                 <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $statusSubtask; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option class="text-capitalize" value="<?php echo e($status->id); ?>"><?php echo e($status->name); ?>
+                                    <option class="text-capitalize" value="<?php echo e($status->id); ?>">
+                                        <?php echo e($status->name); ?>
 
                                     </option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
@@ -1115,5 +1131,224 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
         </div>
     </div>
 
+    <div class="modal fade" id="modalJadwal" wire:ignore.self tabindex="-1" role="dialog"
+        aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">
+                        Ubah Jadwal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form wire:submit="updateDetailJadwal">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nama Acara: <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="name" id="name" wire:model='namaAcaraTask'
+                                class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Tanggal Acara: <span
+                                    class="text-danger">*</span></label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" name="start" id="date" class="form-control"
+                                        wire:model='tanggalMulaiTask'>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="date" name="end" id="date" class="form-control"
+                                        wire:model='tanggalSelesaiTask'>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="finished" class="form-label">Tandai sebagai selesai?</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='statusJadwalTask' type="checkbox"
+                                    id="finished" data-on-value="6" data-off-value="1" />
+                                <label class="form-check-label ms-1" for="finished">Tidak/Ya</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CALENDARNYA
+        document.addEventListener('livewire:initialized', function() {
+            const jadwal = <?php echo json_encode($events, 15, 512) ?>;
+            var calendarEl = document.getElementById('calendar-tasklist');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: localStorage.getItem('calendarView') || 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                locale: 'id',
+                buttonText: {
+                    today: 'Hari ini',
+                    month: 'Bulan',
+                    week: 'Minggu',
+                    day: 'Hari',
+                    list: 'List'
+                },
+                monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                    'September', 'Oktober', 'November', 'Desember'
+                ],
+                monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt',
+                    'Nov', 'Des'
+                ],
+                dayNames: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+                dayNamesShort: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                nextDayThreshold: '00:00',
+                events: jadwal,
+                editable: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
+                eventResizableFromStart: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
+                selectable: <?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>,
+                eventResize: function(data) {
+                    console.log('Event berhasil Diubah');
+                    window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('updateJadwal', data.event.id, data.event.start, data.event.end)
+                        .then(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Jadwal berhasil diperbarui',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Gagal memperbarui jadwal',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        });
+                },
+                eventDrop: function(data) {
+                    console.log('Event berhasil Dipindahkan');
+                    window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('updateJadwal', data.event.id, data.event.start, data.event.end)
+                        .then(() => {
+                            location.reload();
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Jadwal berhasil diperbarui',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Gagal memperbarui jadwal',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        });
+                },
+                eventClick: function(data) {
+                    window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
+                        .then(() => {
+                            $('#modalJadwal').modal('show');
+                        });
+                },
+                eventMouseEnter: function(info) {
+                    if (!<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
+                        info.el.style.cursor = 'pointer';
+                    }
+                },
+                datesSet: function(info) {
+                    localStorage.setItem('calendarView', info.view.type);
+                    localStorage.setItem('calendarDate', calendar.getDate().toISOString());
+                },
+                businessHours: [{
+                    daysOfWeek: [1, 2, 3, 4, 5],
+                    startTime: '08:00',
+                    endTime: '17:00',
+                }]
+            });
+
+            const savedDate = localStorage.getItem('calendarDate');
+            if (savedDate) {
+                calendar.gotoDate(new Date(savedDate));
+            }
+
+            calendar.render();
+
+            window.Livewire.find('<?php echo e($_instance->getId()); ?>').on('refreshCalendar', function() {
+                console.log('Refresh Calendar event received');
+                const currentView = localStorage.getItem('tasklistView') || 'card';
+
+                calendar.removeAllEvents();
+                calendar.addEventSource(<?php echo json_encode($events, 15, 512) ?>);
+
+                if (currentView === 'calendar') {
+                    switchToCalendar();
+                } else {
+                    switchToCard();
+                }
+            });
+
+        })
+
+        window.addEventListener('close-modal', event => {
+            $('#modalJadwal').modal('hide');
+        })
+
+
+
+
+        // TABNYA
+        function switchToCard() {
+            localStorage.setItem('tasklistView', 'card');
+            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-card').classList.add('btn-secondary');
+            document.getElementById('btn-calendar').classList.remove('btn-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
+
+            document.getElementById('card-view').classList.remove('d-none');
+            document.getElementById('calendar-view').classList.add('d-none');
+        }
+
+        function switchToCalendar() {
+            localStorage.setItem('tasklistView', 'calendar');
+            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-secondary');
+            document.getElementById('btn-card').classList.remove('btn-secondary');
+            document.getElementById('btn-card').classList.add('btn-outline-secondary');
+
+            document.getElementById('calendar-view').classList.remove('d-none');
+            document.getElementById('card-view').classList.add('d-none');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewPreference = localStorage.getItem('tasklistView') || 'card';
+            if (viewPreference === 'calendar') {
+                switchToCalendar();
+            } else {
+                switchToCard();
+            }
+        });
+    </script>
 </div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/tasklist-detail.blade.php ENDPATH**/ ?>

@@ -1,4 +1,4 @@
-<?php foreach ((['component', 'tableName','isTailwind','isBootstrap']) as $__key => $__value) {
+<?php foreach (([ 'tableName','isTailwind','isBootstrap']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -33,7 +33,7 @@ foreach ($attributes->all() as $__key => $__value) {
 unset($__defined_vars); ?>
 <?php ($toolBarAttributes = $this->getToolBarAttributesBag()); ?>
 
-<div 
+<div
     <?php echo e($toolBarAttributes->merge()
         ->class(['md:flex md:justify-between mb-4 px-4 md:p-0' => $isTailwind && ($toolBarAttributes['default-styling'] ?? true)])
         ->class(['d-md-flex justify-content-between mb-3' => $isBootstrap && ($toolBarAttributes['default-styling'] ?? true)])
@@ -77,7 +77,7 @@ unset($__defined_vars); ?>
 <?php endif; ?>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-        <!--[if BLOCK]><![endif]--><?php if($this->searchIsEnabled() && $this->searchVisibilityIsEnabled()): ?>
+        <!--[if BLOCK]><![endif]--><?php if($this->searchIsEnabled && $this->searchVisibilityIsEnabled): ?>
             <?php if (isset($component)) { $__componentOriginala0818fea5a9943294909fb32c8167a66 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginala0818fea5a9943294909fb32c8167a66 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'livewire-tables::components.tools.toolbar.items.search-field','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -123,7 +123,7 @@ unset($__defined_vars); ?>
 <?php endif; ?>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
-        <!--[if BLOCK]><![endif]--><?php if($this->hasActions && $this->showActionsInToolbar && $this->getActionsPosition == 'left'): ?>
+        <!--[if BLOCK]><![endif]--><?php if($this->hasActions && $this->showActionsInToolbar && $this->getActionsPosition === 'left'): ?>
             <?php if (isset($component)) { $__componentOriginal59c796603a9fe3a5632766e1b08f5eca = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal59c796603a9fe3a5632766e1b08f5eca = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'livewire-tables::components.includes.actions','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -143,7 +143,7 @@ unset($__defined_vars); ?>
 <?php if (isset($__componentOriginal59c796603a9fe3a5632766e1b08f5eca)): ?>
 <?php $component = $__componentOriginal59c796603a9fe3a5632766e1b08f5eca; ?>
 <?php unset($__componentOriginal59c796603a9fe3a5632766e1b08f5eca); ?>
-<?php endif; ?>    
+<?php endif; ?>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
         <!--[if BLOCK]><![endif]--><?php if($this->hasConfigurableAreaFor('toolbar-left-end')): ?>
@@ -164,7 +164,7 @@ unset($__defined_vars); ?>
     >
         <?php echo $__env->renderWhen($this->hasConfigurableAreaFor('toolbar-right-start'), $this->getConfigurableAreaFor('toolbar-right-start'), $this->getParametersForConfigurableArea('toolbar-right-start'), \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path'])); ?>
 
-        <!--[if BLOCK]><![endif]--><?php if($this->hasActions && $this->showActionsInToolbar && $this->getActionsPosition == 'right'): ?>
+        <!--[if BLOCK]><![endif]--><?php if($this->hasActions && $this->showActionsInToolbar && $this->getActionsPosition === 'right'): ?>
             <?php if (isset($component)) { $__componentOriginal59c796603a9fe3a5632766e1b08f5eca = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal59c796603a9fe3a5632766e1b08f5eca = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'livewire-tables::components.includes.actions','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -184,7 +184,7 @@ unset($__defined_vars); ?>
 <?php if (isset($__componentOriginal59c796603a9fe3a5632766e1b08f5eca)): ?>
 <?php $component = $__componentOriginal59c796603a9fe3a5632766e1b08f5eca; ?>
 <?php unset($__componentOriginal59c796603a9fe3a5632766e1b08f5eca); ?>
-<?php endif; ?>    
+<?php endif; ?>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
 
         <!--[if BLOCK]><![endif]--><?php if($this->showBulkActionsDropdownAlpine() && $this->shouldAlwaysHideBulkActionsDropdownOption != true): ?>
@@ -286,5 +286,4 @@ unset($__defined_vars); ?>
 <?php unset($__componentOriginal23ad44e4fef8ad273d667870094af139); ?>
 <?php endif; ?>
 <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-
 <?php /**PATH C:\laragon\www\epi-dasbor\vendor\rappasoft\laravel-livewire-tables\src/../resources/views/components/tools/toolbar.blade.php ENDPATH**/ ?>

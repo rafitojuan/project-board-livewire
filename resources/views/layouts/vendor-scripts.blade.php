@@ -5,6 +5,7 @@
 <script data-navigate-once src="{{ URL::asset('build/libs/simplebar/simplebar.min.js') }}"></script>
 <script data-navigate-once src="{{ URL::asset('build/libs/fullcalendar/index.global.min.js') }}"></script>
 <script src="{{ URL::asset('build/libs/node-waves/waves.min.js') }}"></script>
+<script></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 <script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/datatables.min.js"></script>
 <script>

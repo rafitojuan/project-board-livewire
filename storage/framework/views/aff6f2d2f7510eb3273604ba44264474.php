@@ -1,4 +1,4 @@
-<?php foreach ((['component', 'tableName','isTailwind','isBootstrap','isBootstrap4','isBootstrap5']) as $__key => $__value) {
+<?php foreach (([ 'tableName','isTailwind','isBootstrap','isBootstrap4','isBootstrap5']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -36,7 +36,9 @@
                         <?php endif; ?>
             aria-haspopup="true" aria-expanded="false">
 
-            <?php echo app('translator')->get('livewire-tables::Bulk Actions'); ?>
+            <?php echo e(__($this->getLocalisationPath.'Bulk Actions')); ?>
+
+
             <!--[if BLOCK]><![endif]--><?php if($this->isTailwind): ?>
                 <?php if (isset($component)) { $__componentOriginal643fe1b47aec0b76658e1a0200b34b2c = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal643fe1b47aec0b76658e1a0200b34b2c = $attributes; } ?>

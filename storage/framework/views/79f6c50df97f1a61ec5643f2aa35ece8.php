@@ -31,7 +31,7 @@
                     </div>
                     <div class="ml-3">
                         <h3 class="text-sm font-medium text-red-800 dark:text-white">
-                            <?php echo app('translator')->get('livewire-tables::You are not connected to the internet.'); ?>
+                            <?php echo e(__($this->getLocalisationPath.'You are not connected to the internet')); ?>.
                         </h3>
                     </div>
                 </div>
@@ -60,7 +60,8 @@
 <?php $component = $__componentOriginal643fe1b47aec0b76658e1a0200b34b2c; ?>
 <?php unset($__componentOriginal643fe1b47aec0b76658e1a0200b34b2c); ?>
 <?php endif; ?>
-                <span class="d-inline-block ml-2"><?php echo app('translator')->get('livewire-tables::You are not connected to the internet.'); ?></span>
+                <span class="d-inline-block ml-2"><?php echo e(__($this->getLocalisationPath.'You are not connected to the internet')); ?>.
+                </span>
             </div>
         </div>
     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->

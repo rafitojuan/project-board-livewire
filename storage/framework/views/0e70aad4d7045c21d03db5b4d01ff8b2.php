@@ -1,4 +1,4 @@
-<?php foreach ((['component','isTailwind','isBootstrap','isBootstrap4','isBootstrap5']) as $__key => $__value) {
+<?php foreach ((['isTailwind','isBootstrap','isBootstrap4','isBootstrap5']) as $__key => $__value) {
     $__consumeVariable = is_string($__key) ? $__key : $__value;
     $$__consumeVariable = is_string($__key) ? $__env->getConsumableComponentData($__key, $__value) : $__env->getConsumableComponentData($__value);
 } ?>
@@ -17,30 +17,32 @@
                     <!--[if BLOCK]><![endif]--><?php if($this->paginationIsEnabled() && $this->isPaginationMethod('standard') && $this->getRows->lastPage() > 1): ?>
                         <p class="paged-pagination-results text-sm text-gray-700 leading-5 dark:text-white">
                             <!--[if BLOCK]><![endif]--><?php if($this->showPaginationDetails()): ?>
-                                <span><?php echo app('translator')->get('livewire-tables::Showing'); ?></span>
+                                <span><?php echo e(__($this->getLocalisationPath.'Showing')); ?></span>
                                 <span class="font-medium"><?php echo e($this->getRows->firstItem()); ?></span>
-                                <span><?php echo app('translator')->get('livewire-tables::to'); ?></span>
+                                <span><?php echo e(__($this->getLocalisationPath.'to')); ?></span>
                                 <span class="font-medium"><?php echo e($this->getRows->lastItem()); ?></span>
-                                <span><?php echo app('translator')->get('livewire-tables::of'); ?></span>
+                                <span><?php echo e(__($this->getLocalisationPath.'of')); ?></span>
                                 <span class="font-medium"><span x-text="paginationTotalItemCount"></span></span>
-                                <span><?php echo app('translator')->get('livewire-tables::results'); ?></span>
+                                <span><?php echo e(__($this->getLocalisationPath.'results')); ?></span>
                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </p>
                     <?php elseif($this->paginationIsEnabled() && $this->isPaginationMethod('simple')): ?>
                         <p class="paged-pagination-results text-sm text-gray-700 leading-5 dark:text-white">
                             <!--[if BLOCK]><![endif]--><?php if($this->showPaginationDetails()): ?>
-                                <span><?php echo app('translator')->get('livewire-tables::Showing'); ?></span>
+                                <span><?php echo e(__($this->getLocalisationPath.'Showing')); ?></span>
                                 <span class="font-medium"><?php echo e($this->getRows->firstItem()); ?></span>
-                                <span><?php echo app('translator')->get('livewire-tables::to'); ?></span>
+                                <span><?php echo e(__($this->getLocalisationPath.'to')); ?></span>
                                 <span class="font-medium"><?php echo e($this->getRows->lastItem()); ?></span>
                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         </p>
                     <?php elseif($this->paginationIsEnabled() && $this->isPaginationMethod('cursor')): ?>
                     <?php else: ?>
                         <p class="total-pagination-results text-sm text-gray-700 leading-5 dark:text-white">
-                            <?php echo app('translator')->get('livewire-tables::Showing'); ?>
+                            <?php echo e(__($this->getLocalisationPath.'Showing')); ?>
+
                             <span class="font-medium"><?php echo e($this->getRows->count()); ?></span>
-                            <?php echo app('translator')->get('livewire-tables::results'); ?>
+                            <?php echo e(__($this->getLocalisationPath.'results')); ?>
+
                         </p>
                     <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                 </div>
@@ -64,13 +66,13 @@
 
                     <div class="col-12 col-md-6 text-center text-md-right text-muted">
                         <!--[if BLOCK]><![endif]--><?php if($this->showPaginationDetails()): ?>
-                            <span><?php echo app('translator')->get('livewire-tables::Showing'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'Showing')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->firstItem() : 0); ?></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::to'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'to')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->lastItem() : 0); ?></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::of'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'of')); ?></span>
                             <strong><span x-text="paginationTotalItemCount"></span></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::results'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'results')); ?></span>
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
                 </div>
@@ -83,9 +85,9 @@
 
                     <div class="col-12 col-md-6 text-center text-md-right text-muted">
                         <!--[if BLOCK]><![endif]--><?php if($this->showPaginationDetails()): ?>
-                            <span><?php echo app('translator')->get('livewire-tables::Showing'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'Showing')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->firstItem() : 0); ?></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::to'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'to')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->lastItem() : 0); ?></strong>
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
@@ -100,9 +102,11 @@
             <?php else: ?>
                 <div class="row mt-3">
                     <div class="col-12 text-muted">
-                        <?php echo app('translator')->get('livewire-tables::Showing'); ?>
+                        <?php echo e(__($this->getLocalisationPath.'Showing')); ?>
+
                         <strong><?php echo e($this->getRows->count()); ?></strong>
-                        <?php echo app('translator')->get('livewire-tables::results'); ?>
+                        <?php echo e(__($this->getLocalisationPath.'results')); ?>
+
                     </div>
                 </div>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
@@ -119,13 +123,13 @@
                     </div>
                     <div class="col-12 col-md-6 text-center text-md-end text-muted">
                         <!--[if BLOCK]><![endif]--><?php if($this->showPaginationDetails()): ?>
-                            <span><?php echo app('translator')->get('livewire-tables::Showing'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'Showing')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->firstItem() : 0); ?></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::to'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'to')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->lastItem() : 0); ?></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::of'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'of')); ?></span>
                             <strong><span x-text="paginationTotalItemCount"></span></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::results'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'results')); ?></span>
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
                 </div>
@@ -137,9 +141,9 @@
                     </div>
                     <div class="col-12 col-md-6 text-center text-md-end text-muted">
                         <!--[if BLOCK]><![endif]--><?php if($this->showPaginationDetails()): ?>
-                            <span><?php echo app('translator')->get('livewire-tables::Showing'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'Showing')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->firstItem() : 0); ?></strong>
-                            <span><?php echo app('translator')->get('livewire-tables::to'); ?></span>
+                            <span><?php echo e(__($this->getLocalisationPath.'to')); ?></span>
                             <strong><?php echo e($this->getRows->count() ? $this->getRows->lastItem() : 0); ?></strong>
                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                     </div>
@@ -154,9 +158,11 @@
             <?php else: ?>
                 <div class="row mt-3">
                     <div class="col-12 text-muted">
-                        <?php echo app('translator')->get('livewire-tables::Showing'); ?>
+                        <?php echo e(__($this->getLocalisationPath.'Showing')); ?>
+
                         <strong><?php echo e($this->getRows->count()); ?></strong>
-                        <?php echo app('translator')->get('livewire-tables::results'); ?>
+                        <?php echo e(__($this->getLocalisationPath.'results')); ?>
+
                     </div>
                 </div>
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
