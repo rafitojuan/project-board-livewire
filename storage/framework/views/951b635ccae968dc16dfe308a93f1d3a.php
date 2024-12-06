@@ -30,22 +30,6 @@
                 <div class="container-fluid">
                     <?php echo e($slot); ?>
 
-                    <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split('tugas-modal', []);
-
-$__html = app('livewire')->mount($__name, $__params, 'lw-791045687-0', $__slots ?? [], get_defined_vars());
-
-echo $__html;
-
-unset($__html);
-unset($__name);
-unset($__params);
-unset($__split);
-if (isset($__slots)) unset($__slots);
-?>
                 </div>
                 <!-- container-fluid -->
             </div>

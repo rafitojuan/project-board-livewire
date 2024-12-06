@@ -1,7 +1,7 @@
 <div>
 
     <div class="mb-3">
-        <a href="<?php echo e(url()->previous()); ?>" class="btn btn-outline-secondary btn-sm">
+        <a href="<?php echo e(route('kanban.index')); ?>" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
@@ -316,7 +316,7 @@
                     </div>
 
                     <div id="calendar-view" class="d-none">
-                        <div wire:ignore id='calendar-tasklist'></div>
+                        <div class="d-block" wire:ignore id='calendar-tasklist'></div>
                     </div>
                 </div>
             </div>
@@ -736,7 +736,7 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
-                            <label for="rab" class="form-label">RAB</label>
+                            <label for="rab" class="form-label">Rencana Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input id="rab" type="number" class="form-control"
@@ -1147,29 +1147,100 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             <label for="name" class="form-label">Nama Acara: <span
                                     class="text-danger">*</span></label>
                             <input type="text" name="name" id="name" wire:model='namaAcaraTask'
-                                class="form-control">
+                                class="form-control <?php $__errorArgs = ['namaAcaraTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['namaAcaraTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="date" class="form-label">Tanggal Acara: <span
                                     class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="date" name="start" id="date" class="form-control"
+                                    <input type="date" name="start" id="date"
+                                        class="form-control <?php $__errorArgs = ['tanggalMulaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                         wire:model='tanggalMulaiTask'>
+                                    <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['tanggalMulaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <small class="text-danger"><?php echo e($message); ?></small>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="date" name="end" id="date" class="form-control"
+                                    <input type="date" name="end" id="date"
+                                        class="form-control <?php $__errorArgs = ['tanggalSelesaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                         wire:model='tanggalSelesaiTask'>
+                                    <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['tanggalSelesaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <small class="text-danger"><?php echo e($message); ?></small>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="finished" class="form-label">Tandai sebagai selesai?</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='statusJadwalTask' type="checkbox"
-                                    id="finished" data-on-value="6" data-off-value="1" />
+                                <input class="form-check-input <?php $__errorArgs = ['statusJadwalTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='statusJadwalTask' type="checkbox" id="finished" data-on-value="6"
+                                    data-off-value="1" />
                                 <label class="form-check-label ms-1" for="finished">Tidak/Ya</label>
                             </div>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['statusJadwalTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -1185,8 +1256,32 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
     </div>
 
     <script>
-        // CALENDARNYA
-        document.addEventListener('livewire:initialized', function() {
+        window.addEventListener('close-modal', event => {
+            $('#modalJadwal').modal('hide');
+        })
+
+        // TABNYA
+        function switchToCard() {
+            localStorage.setItem('tasklistView', 'card');
+            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-card').classList.add('btn-secondary');
+            document.getElementById('btn-calendar').classList.remove('btn-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
+
+            document.getElementById('card-view').classList.remove('d-none');
+            document.getElementById('calendar-view').classList.add('d-none');
+        }
+
+        function switchToCalendar() {
+            localStorage.setItem('tasklistView', 'calendar');
+            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-secondary');
+            document.getElementById('btn-card').classList.remove('btn-secondary');
+            document.getElementById('btn-card').classList.add('btn-outline-secondary');
+
+            document.getElementById('calendar-view').classList.remove('d-none');
+            document.getElementById('card-view').classList.add('d-none');
+
             const jadwal = <?php echo json_encode($events, 15, 512) ?>;
             var calendarEl = document.getElementById('calendar-tasklist');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -1295,6 +1390,7 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
 
             calendar.render();
 
+
             window.Livewire.find('<?php echo e($_instance->getId()); ?>').on('refreshCalendar', function() {
                 console.log('Refresh Calendar event received');
                 const currentView = localStorage.getItem('tasklistView') || 'card';
@@ -1308,37 +1404,6 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                     switchToCard();
                 }
             });
-
-        })
-
-        window.addEventListener('close-modal', event => {
-            $('#modalJadwal').modal('hide');
-        })
-
-
-
-
-        // TABNYA
-        function switchToCard() {
-            localStorage.setItem('tasklistView', 'card');
-            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
-            document.getElementById('btn-card').classList.add('btn-secondary');
-            document.getElementById('btn-calendar').classList.remove('btn-secondary');
-            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
-
-            document.getElementById('card-view').classList.remove('d-none');
-            document.getElementById('calendar-view').classList.add('d-none');
-        }
-
-        function switchToCalendar() {
-            localStorage.setItem('tasklistView', 'calendar');
-            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
-            document.getElementById('btn-calendar').classList.add('btn-secondary');
-            document.getElementById('btn-card').classList.remove('btn-secondary');
-            document.getElementById('btn-card').classList.add('btn-outline-secondary');
-
-            document.getElementById('calendar-view').classList.remove('d-none');
-            document.getElementById('card-view').classList.add('d-none');
         }
 
         document.addEventListener('DOMContentLoaded', function() {

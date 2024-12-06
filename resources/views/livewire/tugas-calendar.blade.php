@@ -37,19 +37,28 @@
                             <label for="name" class="form-label">Nama Acara: <span
                                     class="text-danger">*</span></label>
                             <input type="text" name="name" id="name" wire:model='namaAcara'
-                                class="form-control">
+                                class="form-control @error('namaAcara') is-invalid @enderror">
+                            @error('namaAcara')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="date" class="form-label">Tanggal Acara: <span
                                     class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="date" name="start" id="date" class="form-control"
+                                    <input type="date" name="start" id="date" class="form-control @error('tanggalMulai') is-invalid @enderror"
                                         wire:model='tanggalMulai'>
+                                    @error('tanggalMulai')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="date" name="end" id="date" class="form-control"
+                                    <input type="date" name="end" id="date" class="form-control @error('tanggalSelesai') is-invalid @enderror"
                                         wire:model='tanggalSelesai'>
+                                    @error('tanggalSelesai')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -71,8 +80,7 @@
                         </button>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
-                </form>
-            </div>
+                </form>            </div>
         </div>
     </div>
 </div>

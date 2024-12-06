@@ -331,6 +331,7 @@ class TasklistDetail extends Component
             'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
             'subtaskUrl.url' => 'URL harus valid.',
             'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
+            'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah tanggal projek.',
             'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
@@ -564,6 +565,18 @@ class TasklistDetail extends Component
 
     public function updateDetailJadwal()
     {
+        $this->validate([
+            'namaAcaraTask' => 'required',
+            'tanggalMulaiTask' => ['required', 'date', 'after_or_equal:' . $this->tasklist->started_at, 'before_or_equal:' . $this->tasklist->end_at],
+            'tanggalSelesaiTask' => ['date', 'before_or_equal:' . $this->tasklist->end_at, 'after_or_equal:' . $this->tasklist->started_at],
+            'statusJadwalTask' => 'required',
+        ], [
+            'tanggalMulaiTask.after_or_equal' => 'Tanggal mulai tidak boleh lebih awal dari tanggal mulai projek.',
+            'tanggalMulaiTask.before_or_equal' => 'tanggal melewati batasan projek.',
+            'tanggalSelesaiTask.before_or_equal' => 'Tanggal melewati batasan projek.',
+            'tanggalSelesaiTask.after_or_equal' => 'Tanggal tidak boleh lebih awal dari tanggal mulai projek.',
+        ]);
+
         $id = $this->idJadwalTask;
         $task = Task::find($id);
         $task->name = $this->namaAcaraTask;
@@ -576,7 +589,6 @@ class TasklistDetail extends Component
         $this->alert('success', 'Jadwal berhasil diperbarui');
 
         $this->dispatch('refreshCalendar');
-        $this->render();
 
         return redirect(request()->header('Referer'));
     }
@@ -586,8 +598,7 @@ class TasklistDetail extends Component
         $events = [];
         $tasklist = DB::table('v_tasks_rekap')
             ->where('tasklist_id', $this->tasklist->id)
-            ->orderBy('id_tasks')
-            ->lazy();
+            ->get();
         $colors = ['#87A2FF', '#2A629A', '#FFD7C4', '#FFF4B5', '#A5B68D', '#A594F9', '#FFF078', '#FF885B', '#4B0082', '#32CD32'];
 
         $start = Carbon::createFromDate(1900, 1, 1);

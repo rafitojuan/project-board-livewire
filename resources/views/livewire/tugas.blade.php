@@ -28,20 +28,22 @@
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
                                                                         @click="
-                                                                            if (lastClicked === {{ $tugas->id_tugas }}) {
-                                                                                isOpen = false;
-                                                                                lastClicked = null;
-                                                                                $refs.detailTugas.classList.remove('fade-left');
-                                                                                $refs.detailTugas.style.display = 'none';
-                                                                            } else {
-                                                                                $dispatch('close-others');
-                                                                                isOpen = true;
-                                                                                lastClicked = {{ $tugas->id_tugas }};
-                                                                                $refs.detailTugas.classList.add('fade-left');
-                                                                                $refs.detailTugas.style.display = 'block';
-                                                                                $wire.showTugasUser({{ $tugas->id_tugas }})
-                                                                            }
-                                                                        ">
+                                                                        if (lastClicked === {{ $tugas->id_tugas }}) {
+                                                                            isOpen = false;
+                                                                            lastClicked = null;
+                                                                            $refs.detailTugas.classList.remove('fade-left');
+                                                                            $refs.detailTugas.classList.remove('d-block');
+                                                                            $refs.detailTugas.classList.add('d-none');
+                                                                        } else {
+                                                                            $dispatch('close-others');
+                                                                            isOpen = true;
+                                                                            lastClicked = {{ $tugas->id_tugas }};
+                                                                            $refs.detailTugas.classList.add('fade-left');
+                                                                            $refs.detailTugas.classList.remove('d-none');
+                                                                            $refs.detailTugas.classList.add('d-block');
+                                                                            $wire.showTugasUser({{ $tugas->id_tugas }})
+                                                                        }
+                                                                    ">
                                                                         <i class="fas"
                                                                             :class="{
                                                                                 'fa-eye': !isOpen,
@@ -51,24 +53,25 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                            @endif
+                                                    @endif
                                                             @if ($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id)
                                                                 <li>
                                                                     {{ $tugas->nama_tugas }}
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
-                                                                        @click="
-                                                                                if (lastClicked === {{ $tugas->id_tugas }}) {
+                                                                        @click=" if (lastClicked === {{ $tugas->id_tugas }}) {
                                                                                     isOpen = false;
                                                                                     lastClicked = null;
                                                                                     $refs.detailTugas.classList.remove('fade-left');
-                                                                                    $refs.detailTugas.style.display = 'none';
+                                                                                    $refs.detailTugas.classList.remove('d-block');
+                                                                                    $refs.detailTugas.classList.add('d-none');
                                                                                 } else {
                                                                                     $dispatch('close-others');
                                                                                     isOpen = true;
                                                                                     lastClicked = {{ $tugas->id_tugas }};
                                                                                     $refs.detailTugas.classList.add('fade-left');
-                                                                                    $refs.detailTugas.style.display = 'block';
+                                                                                    $refs.detailTugas.classList.remove('d-none');
+                                                                                    $refs.detailTugas.classList.add('d-block');
                                                                                     $wire.showTugasUser({{ $tugas->id_tugas }})
                                                                                 }
                                                                             ">
@@ -95,6 +98,9 @@
                     </div>
                 </div>
             </div>
+
+
+
             <div class="col-md-9">
                 <div class="row">
                     <div class="row">
@@ -159,9 +165,9 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="card rounded-4 shadow-sm" x-ref="detailTugas" id="detail-tugas" style="display: none;">
+
+                <div class="card rounded-4 shadow-sm d-none" x-ref="detailTugas" id="detail-tugas">
                     <style>
                         .fade-left {
                             animation: fadeLeft 0.5s ease-in-out;

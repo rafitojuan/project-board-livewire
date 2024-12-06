@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Subtask;
+use App\Models\Task;
 use Carbon\Carbon;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Title;
@@ -18,6 +19,7 @@ class TugasCalendar extends Component
     public $tanggalSelesai;
     public $statusJadwal;
     public $idJadwal;
+    public $idTask;
     protected $userId;
 
     public function mount()
@@ -39,6 +41,7 @@ class TugasCalendar extends Component
     {
         $subtask = Subtask::find($id);
         $this->idJadwal = $subtask->id;
+        $this->idTask = $subtask->task_id;
         $this->namaAcara = $subtask->name;
         $this->tanggalMulai = $subtask->started_at;
         $this->tanggalSelesai = $subtask->end_at;
@@ -47,6 +50,18 @@ class TugasCalendar extends Component
 
     public function updateDetailJadwal()
     {
+        $this->validate([
+            'namaAcara' => 'required',
+            'tanggalMulai' => ['required', 'date', 'after_or_equal:' . Task::find($this->idTask)->started_at, 'before_or_equal:' . Task::find($this->idTask)->end_at],
+            'tanggalSelesai' => ['date', 'before_or_equal:' . Task::find($this->idTask)->end_at, 'after_or_equal:' . Task::find($this->idTask)->started_at],
+            'statusJadwal' => 'required',
+        ], [
+            'tanggalMulai.after_or_equal' => 'Tanggal mulai tidak boleh lebih awal dari tanggal mulai projek.',
+            'tanggalMulai.before_or_equal' => 'tanggal melewati batasan projek.',
+            'tanggalSelesai.before_or_equal' => 'Tanggal melewati batasan projek.',
+            'tanggalSelesai.after_or_equal' => 'Tanggal tidak boleh lebih awal dari tanggal mulai projek.',
+        ]);
+
         $id = $this->idJadwal;
         $subtask = Subtask::find($id);
         $subtask->name = $this->namaAcara;
