@@ -28,7 +28,6 @@
             <div class="page-content">
                 <div class="container-fluid">
                     {{ $slot }}
-                    <livewire:tugas-modal />
                 </div>
                 <!-- container-fluid -->
             </div>

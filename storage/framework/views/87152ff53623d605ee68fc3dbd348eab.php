@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title'); ?>
     <?php echo app('translator')->get('translation.Login'); ?>
 <?php $__env->stopSection(); ?>

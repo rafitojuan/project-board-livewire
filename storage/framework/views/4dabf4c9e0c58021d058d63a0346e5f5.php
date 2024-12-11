@@ -1,7 +1,7 @@
 <div>
 
     <div class="mb-3">
-        <a href="<?php echo e(url()->previous()); ?>" class="btn btn-outline-secondary btn-sm">
+        <a href="<?php echo e(route('kanban.index')); ?>" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
@@ -155,7 +155,7 @@
                             <td><strong>Rp<?php echo e(number_format($tasklist->value, 0)); ?></strong></td>
                         </tr>
                         <tr>
-                            <td>Biaya (RAPP)</td>
+                            <td>Realisasi Biaya</td>
                             <td><strong
                                     class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>">Rp<?php echo e(number_format($this->getTotalBiaya(), 0, ',', '.')); ?></strong>
                             </td>
@@ -316,7 +316,7 @@
                     </div>
 
                     <div id="calendar-view" class="d-none">
-                        <div wire:ignore id='calendar-tasklist'></div>
+                        <div class="d-block" wire:ignore id='calendar-tasklist'></div>
                     </div>
                 </div>
             </div>
@@ -736,11 +736,27 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
-                            <label for="rab" class="form-label">RAB</label>
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rab" class="form-label">Rencana Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input id="rab" type="number" class="form-control"
-                                    placeholder="Masukkan nominal" x-data="{ subtaskRAB: '' }"
+                                <input id="rab" type="number"
+                                    class="form-control <?php $__errorArgs = ['subtaskRAB'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    placeholder="Masukkan rencana" x-data="{ subtaskRAB: '' }"
                                     x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
                                     x-on:keydown="if(subtaskRAB.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
                                     wire:model="subtaskRAB" x-model="subtaskRAB" maxlength="13">
@@ -755,13 +771,36 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        <div class="mb-3" x-data="{ subtaskValue: '' }"
+                            x-show="$wire.subtaskRAB > 0 && !$wire.subtaskSAP">
+                            <label for="biaya" class="form-label">Realisasi Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input id="biaya" type="number"
+                                    class="form-control <?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    placeholder="Masukkan realisasi biaya"
+                                    x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                    x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="13">
                             </div>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
@@ -961,8 +1000,17 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
                         <div x-data="{ subtaskRAB: <?php if ((object) ('subtaskRAB') instanceof \Livewire\WireDirective) : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAB'->value()); ?>')<?php echo e('subtaskRAB'->hasModifier('live') ? '.live' : ''); ?><?php else : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAB'); ?>')<?php endif; ?>.defer }" class="mb-3">
-                            <label for="rab" class="form-label">RAB</label> <small class="text-danger">*</small>
+                            <label for="rab" class="form-label">Rencana Biaya</label> <small
+                                class="text-danger">*</small>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="number"
@@ -991,14 +1039,48 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        <!--[if BLOCK]><![endif]--><?php if($subtaskValue && Auth::user()->role_id <= 2): ?>
+                            <div class='mb-3' x-data="{
+                                subtaskValue: <?php echo e($subtaskValue ?? 'null'); ?>,
+                                init() {
+                                    this.subtaskValue = <?php echo e($subtaskValue ?? 'null'); ?>;
+                                    $watch('subtaskValue', value => {
+                                        window.Livewire.find('<?php echo e($_instance->getId()); ?>').set('subtaskValue', value)
+                                    })
+                                }
+                            }">
+                                <label for="biaya" class="form-label">Realisasi Biaya</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input id="biaya" type="number"
+                                        class="form-control <?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                        placeholder="Masukkan realisasi biaya"
+                                        x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                        x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                        x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                        wire:model="subtaskValue" x-model="subtaskValue" maxlength="13"
+                                        value="<?php echo e($subtaskValue); ?>">
+                                </div>
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                                <small>Realisasi biaya (existing): <?php echo e($subtaskValue); ?></small>
                             </div>
-                        </div>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         <!--[if BLOCK]><![endif]--><?php if($subtaskSAP && Auth::user()->role_id <= 2): ?>
                             <div class='mb-3' x-data="{
                                 subtaskRAP: <?php echo e($subtaskRAP ?? 'null'); ?>,
@@ -1042,7 +1124,8 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 <template x-if="parseInt(subtaskRAP) >= <?php echo e($subtaskRAB); ?>">
-                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB (RAB:
+                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB
+                                        (RAB:
                                         <?php echo e($subtaskRAB); ?>)</small>
                                 </template>
                             </div>
@@ -1147,29 +1230,100 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                             <label for="name" class="form-label">Nama Acara: <span
                                     class="text-danger">*</span></label>
                             <input type="text" name="name" id="name" wire:model='namaAcaraTask'
-                                class="form-control">
+                                class="form-control <?php $__errorArgs = ['namaAcaraTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['namaAcaraTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="date" class="form-label">Tanggal Acara: <span
                                     class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="date" name="start" id="date" class="form-control"
+                                    <input type="date" name="start" id="date"
+                                        class="form-control <?php $__errorArgs = ['tanggalMulaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                         wire:model='tanggalMulaiTask'>
+                                    <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['tanggalMulaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <small class="text-danger"><?php echo e($message); ?></small>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="date" name="end" id="date" class="form-control"
+                                    <input type="date" name="end" id="date"
+                                        class="form-control <?php $__errorArgs = ['tanggalSelesaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                         wire:model='tanggalSelesaiTask'>
+                                    <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['tanggalSelesaiTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <small class="text-danger"><?php echo e($message); ?></small>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="finished" class="form-label">Tandai sebagai selesai?</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='statusJadwalTask' type="checkbox"
-                                    id="finished" data-on-value="6" data-off-value="1" />
+                                <input class="form-check-input <?php $__errorArgs = ['statusJadwalTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    wire:model='statusJadwalTask' type="checkbox" id="finished" data-on-value="6"
+                                    data-off-value="1" />
                                 <label class="form-check-label ms-1" for="finished">Tidak/Ya</label>
                             </div>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['statusJadwalTask'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -1185,8 +1339,32 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
     </div>
 
     <script>
-        // CALENDARNYA
-        document.addEventListener('livewire:initialized', function() {
+        window.addEventListener('close-modal', event => {
+            $('#modalJadwal').modal('hide');
+        })
+
+        // TABNYA
+        function switchToCard() {
+            localStorage.setItem('tasklistView', 'card');
+            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-card').classList.add('btn-secondary');
+            document.getElementById('btn-calendar').classList.remove('btn-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
+
+            document.getElementById('card-view').classList.remove('d-none');
+            document.getElementById('calendar-view').classList.add('d-none');
+        }
+
+        function switchToCalendar() {
+            localStorage.setItem('tasklistView', 'calendar');
+            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-secondary');
+            document.getElementById('btn-card').classList.remove('btn-secondary');
+            document.getElementById('btn-card').classList.add('btn-outline-secondary');
+
+            document.getElementById('calendar-view').classList.remove('d-none');
+            document.getElementById('card-view').classList.add('d-none');
+
             const jadwal = <?php echo json_encode($events, 15, 512) ?>;
             var calendarEl = document.getElementById('calendar-tasklist');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -1267,14 +1445,16 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         });
                 },
                 eventClick: function(data) {
-                    window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
-                        .then(() => {
-                            $('#modalJadwal').modal('show');
-                        });
+                    if (<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
+                        window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
+                            .then(() => {
+                                $('#modalJadwal').modal('show');
+                            });
+                    }
                 },
                 eventMouseEnter: function(info) {
                     if (!<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
-                        info.el.style.cursor = 'pointer';
+                        info.el.style.cursor = 'not-allowed';
                     }
                 },
                 datesSet: function(info) {
@@ -1295,6 +1475,7 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
 
             calendar.render();
 
+
             window.Livewire.find('<?php echo e($_instance->getId()); ?>').on('refreshCalendar', function() {
                 console.log('Refresh Calendar event received');
                 const currentView = localStorage.getItem('tasklistView') || 'card';
@@ -1308,37 +1489,6 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                     switchToCard();
                 }
             });
-
-        })
-
-        window.addEventListener('close-modal', event => {
-            $('#modalJadwal').modal('hide');
-        })
-
-
-
-
-        // TABNYA
-        function switchToCard() {
-            localStorage.setItem('tasklistView', 'card');
-            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
-            document.getElementById('btn-card').classList.add('btn-secondary');
-            document.getElementById('btn-calendar').classList.remove('btn-secondary');
-            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
-
-            document.getElementById('card-view').classList.remove('d-none');
-            document.getElementById('calendar-view').classList.add('d-none');
-        }
-
-        function switchToCalendar() {
-            localStorage.setItem('tasklistView', 'calendar');
-            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
-            document.getElementById('btn-calendar').classList.add('btn-secondary');
-            document.getElementById('btn-card').classList.remove('btn-secondary');
-            document.getElementById('btn-card').classList.add('btn-outline-secondary');
-
-            document.getElementById('calendar-view').classList.remove('d-none');
-            document.getElementById('card-view').classList.add('d-none');
         }
 
         document.addEventListener('DOMContentLoaded', function() {

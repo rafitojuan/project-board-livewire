@@ -316,6 +316,7 @@ class TasklistDetail extends Component
             'subtaskName' => 'required|min:3',
             'subtaskJob' => 'required',
             'subtaskRAB' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
+            'subtaskValue' => ['numeric', 'lte:' . $this->subtaskRAB],
             'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskEnd' => ['date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskKeterangan' => 'nullable|min:3',
@@ -324,13 +325,15 @@ class TasklistDetail extends Component
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
             'subtaskJob.required' => 'Pelaksana harus diisi.',
-            'subtaskRAB.numeric' => 'RAB harus berupa angka.',
-            'subtaskRAB.lte' => 'RAB tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
+            'subtaskRAB.numeric' => 'Harus berupa angka.',
+            'subtaskRAB.lte' => 'Tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
+            'subtaskValue.lte' => 'Melebihi rencana biaya',
             'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
             'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
             'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
             'subtaskUrl.url' => 'URL harus valid.',
             'subTaskKeterangan.min' => 'Keterangan subtask minimal 3 karakter.',
+            'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah tanggal projek.',
             'subTaskStarted.after_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
@@ -341,6 +344,7 @@ class TasklistDetail extends Component
             'pelaksana' => $this->subtaskJob,
             'sap' => $this->subtaskSAP ?? false,
             'rab' => $this->subtaskRAB,
+            'biaya' => $this->subtaskValue,
             'started_at' => $this->subTaskStarted,
             'end_at' => $this->subTaskEnd,
             'task_id' => $this->kode,
@@ -421,6 +425,7 @@ class TasklistDetail extends Component
             'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
             'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
+            'subtaskValue' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
         ], [
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
@@ -436,6 +441,8 @@ class TasklistDetail extends Component
             'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
+            'subtaskValue.numeric' => 'Nilai subtask harus berupa angka.',
+            'subtaskValue.lte' => 'Nilai subtask tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
         ]);
 
         Subtask::where('id', $this->subtaskId)->update([
@@ -526,9 +533,19 @@ class TasklistDetail extends Component
         }
     }
 
-    public function getSubtotal($taskId)
+    public function getBiaya($taskId)
+    {
+        return Subtask::where('task_id', $taskId)->sum('biaya');
+    }
+
+    public function getRapp($taskId)
     {
         return Subtask::where('task_id', $taskId)->sum('rapp');
+    }
+
+    public function getSubtotal($taskId)
+    {
+        return $this->getBiaya($taskId) + $this->getRapp($taskId);
     }
 
     public function getTotalBiaya()
@@ -564,6 +581,18 @@ class TasklistDetail extends Component
 
     public function updateDetailJadwal()
     {
+        $this->validate([
+            'namaAcaraTask' => 'required',
+            'tanggalMulaiTask' => ['required', 'date', 'after_or_equal:' . $this->tasklist->started_at, 'before_or_equal:' . $this->tasklist->end_at],
+            'tanggalSelesaiTask' => ['date', 'before_or_equal:' . $this->tasklist->end_at, 'after_or_equal:' . $this->tasklist->started_at],
+            'statusJadwalTask' => 'required',
+        ], [
+            'tanggalMulaiTask.after_or_equal' => 'Tanggal mulai tidak boleh lebih awal dari tanggal mulai projek.',
+            'tanggalMulaiTask.before_or_equal' => 'tanggal melewati batasan projek.',
+            'tanggalSelesaiTask.before_or_equal' => 'Tanggal melewati batasan projek.',
+            'tanggalSelesaiTask.after_or_equal' => 'Tanggal tidak boleh lebih awal dari tanggal mulai projek.',
+        ]);
+
         $id = $this->idJadwalTask;
         $task = Task::find($id);
         $task->name = $this->namaAcaraTask;
@@ -576,7 +605,6 @@ class TasklistDetail extends Component
         $this->alert('success', 'Jadwal berhasil diperbarui');
 
         $this->dispatch('refreshCalendar');
-        $this->render();
 
         return redirect(request()->header('Referer'));
     }
@@ -586,8 +614,7 @@ class TasklistDetail extends Component
         $events = [];
         $tasklist = DB::table('v_tasks_rekap')
             ->where('tasklist_id', $this->tasklist->id)
-            ->orderBy('id_tasks')
-            ->lazy();
+            ->get();
         $colors = ['#87A2FF', '#2A629A', '#FFD7C4', '#FFF4B5', '#A5B68D', '#A594F9', '#FFF078', '#FF885B', '#4B0082', '#32CD32'];
 
         $start = Carbon::createFromDate(1900, 1, 1);

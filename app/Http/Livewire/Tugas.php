@@ -10,12 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 #[Title('EPI | Tugas')]
 class Tugas extends Component
 {
-    use WithPagination, LivewireAlert;
+    use LivewireAlert;
     public $idTugas;
     public $tugasUser;
     public $dashboardUser;

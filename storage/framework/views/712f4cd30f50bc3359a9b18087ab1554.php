@@ -1,5 +1,5 @@
 <div>
-    <div class="dropdown d-inline-block">
+    <div class="dropdown d-inline-block position-relative">
         <button wire:poll.5s='fetchNotif' wire:click="toggleDropdown" type="button"
             class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="<?php echo e($isDropdownOpen ? 'true' : 'false'); ?>"
@@ -10,7 +10,8 @@
             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         </button>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 <?php echo e($isDropdownOpen ? 'show' : ''); ?>"
-            aria-labelledby="page-header-notifications-dropdown" onclick="event.stopPropagation()">
+            aria-labelledby="page-header-notifications-dropdown" onclick="event.stopPropagation()"
+            style="position: absolute; right: 0;">
             <div class="p-3">
                 <div class="row align-items-center">
                     <div class="col">
@@ -46,8 +47,10 @@
             </div>
             <div class="p-2 border-top d-grid">
                 <a class="btn btn-sm btn-link font-size-14 text-center" href="<?php echo e(route('tugas.index')); ?>">
-                    <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more"> Lihat
-                        selengkapnya</span>
+                    <i class="mdi mdi-arrow-right-circle me-1"></i>
+                    <span key="t-view-more">
+                        Lihat selengkapnya
+                    </span>
                 </a>
             </div>
         </div>

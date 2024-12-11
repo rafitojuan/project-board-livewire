@@ -112,7 +112,7 @@ class SubtasksTable extends DataTableComponent
                 ->sortable()->outputFormat('d F y')->emptyValue('N/A'),
             Column::make("RAB", "rab")
                 ->format(function ($value) {
-                    return 'Rp' . number_format($value, 0, ',', '.');
+                    return $value == 0 ? '-' : 'Rp' . number_format($value, 0, ',', '.');
                 })
                 ->sortable()->searchable()->footer(function ($rows) {
                     $subtotal = $rows->sum('rab');
@@ -120,7 +120,7 @@ class SubtasksTable extends DataTableComponent
                 }),
             Column::make("RAP", "rap")
                 ->format(function ($value) {
-                    return 'Rp' . number_format($value, 0, ',', '.');
+                    return $value == 0 ? '-' : 'Rp' . number_format($value, 0, ',', '.');
                 })
                 ->sortable()->searchable()->footer(function ($rows) {
                     $subtotal = $rows->sum('rap');
@@ -128,7 +128,7 @@ class SubtasksTable extends DataTableComponent
                 }),
             Column::make("RAPP", "rapp")
                 ->format(function ($value) {
-                    return 'Rp' . number_format($value, 0, ',', '.');
+                    return $value == 0 ? '-' : 'Rp' . number_format($value, 0, ',', '.');
                 })
                 ->sortable()->searchable()->footer(function ($rows) {
                     $subtotal = $rows->sum('rapp');
@@ -136,12 +136,12 @@ class SubtasksTable extends DataTableComponent
                 }),
             Column::make("Biaya", "biaya")
                 ->format(function ($value) {
-                    return 'Rp' . number_format($value, 0, ',', '.');
+                    return $value == 0 ? '-' : 'Rp' . number_format($value, 0, ',', '.');
                 })
                 ->sortable()->searchable()->footer(function ($rows) {
                     $subtotal = $rows->sum('biaya');
                     return 'Subtotal: Rp' . number_format($subtotal, 0, ',', '.');
-                })->hideIf(true),
+                }),
             Column::make("Status", "status.name")->view('components.status-badge')->searchable(),
             Column::make("Status", "status.color")->hideIf(true),
             Column::make('Action', 'id')->view('components.action-buttons')->searchable(),
@@ -184,7 +184,6 @@ class SubtasksTable extends DataTableComponent
             'subtaskSAP' => $this->subtaskSAP,
         ]);
     }
-
 
     public function delete($row)
     {

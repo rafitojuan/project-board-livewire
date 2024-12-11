@@ -1,7 +1,7 @@
 <div>
 
     <div class="mb-3">
-        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ route('kanban.index') }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
@@ -152,7 +152,7 @@
                             <td><strong>Rp{{ number_format($tasklist->value, 0) }}</strong></td>
                         </tr>
                         <tr>
-                            <td>Biaya (RAPP)</td>
+                            <td>Realisasi Biaya</td>
                             <td><strong
                                     class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">Rp{{ number_format($this->getTotalBiaya(), 0, ',', '.') }}</strong>
                             </td>
@@ -309,7 +309,7 @@
                     </div>
 
                     <div id="calendar-view" class="d-none">
-                        <div wire:ignore id='calendar-tasklist'></div>
+                        <div class="d-block" wire:ignore id='calendar-tasklist'></div>
                     </div>
                 </div>
             </div>
@@ -598,11 +598,20 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="rab" class="form-label">RAB</label>
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rab" class="form-label">Rencana Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input id="rab" type="number" class="form-control"
-                                    placeholder="Masukkan nominal" x-data="{ subtaskRAB: '' }"
+                                <input id="rab" type="number"
+                                    class="form-control @error('subtaskRAB') is-invalid @enderror"
+                                    placeholder="Masukkan rencana" x-data="{ subtaskRAB: '' }"
                                     x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
                                     x-on:keydown="if(subtaskRAB.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
                                     wire:model="subtaskRAB" x-model="subtaskRAB" maxlength="13">
@@ -610,13 +619,22 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        <div class="mb-3" x-data="{ subtaskValue: '' }"
+                            x-show="$wire.subtaskRAB > 0 && !$wire.subtaskSAP">
+                            <label for="biaya" class="form-label">Realisasi Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input id="biaya" type="number"
+                                    class="form-control @error('subtaskValue') is-invalid @enderror"
+                                    placeholder="Masukkan realisasi biaya"
+                                    x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                    x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="13">
                             </div>
+                            @error('subtaskValue')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
@@ -725,8 +743,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
                         <div x-data="{ subtaskRAB: @entangle('subtaskRAB').defer }" class="mb-3">
-                            <label for="rab" class="form-label">RAB</label> <small class="text-danger">*</small>
+                            <label for="rab" class="form-label">Rencana Biaya</label> <small
+                                class="text-danger">*</small>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="number"
@@ -741,14 +768,34 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        @if ($subtaskValue && Auth::user()->role_id <= 2)
+                            <div class='mb-3' x-data="{
+                                subtaskValue: {{ $subtaskValue ?? 'null' }},
+                                init() {
+                                    this.subtaskValue = {{ $subtaskValue ?? 'null' }};
+                                    $watch('subtaskValue', value => {
+                                        @this.set('subtaskValue', value)
+                                    })
+                                }
+                            }">
+                                <label for="biaya" class="form-label">Realisasi Biaya</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input id="biaya" type="number"
+                                        class="form-control @error('subtaskValue') is-invalid @enderror"
+                                        placeholder="Masukkan realisasi biaya"
+                                        x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                        x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                        x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                        wire:model="subtaskValue" x-model="subtaskValue" maxlength="13"
+                                        value="{{ $subtaskValue }}">
+                                </div>
+                                @error('subtaskValue')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                                <small>Realisasi biaya (existing): {{ $subtaskValue }}</small>
                             </div>
-                        </div>
+                        @endif
                         @if ($subtaskSAP && Auth::user()->role_id <= 2)
                             <div class='mb-3' x-data="{
                                 subtaskRAP: {{ $subtaskRAP ?? 'null' }},
@@ -778,7 +825,8 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                                 <template x-if="parseInt(subtaskRAP) >= {{ $subtaskRAB }}">
-                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB (RAB:
+                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB
+                                        (RAB:
                                         {{ $subtaskRAB }})</small>
                                 </template>
                             </div>
@@ -861,29 +909,44 @@
                             <label for="name" class="form-label">Nama Acara: <span
                                     class="text-danger">*</span></label>
                             <input type="text" name="name" id="name" wire:model='namaAcaraTask'
-                                class="form-control">
+                                class="form-control @error('namaAcaraTask') is-invalid @enderror">
+                            @error('namaAcaraTask')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="date" class="form-label">Tanggal Acara: <span
                                     class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="date" name="start" id="date" class="form-control"
+                                    <input type="date" name="start" id="date"
+                                        class="form-control @error('tanggalMulaiTask') is-invalid @enderror"
                                         wire:model='tanggalMulaiTask'>
+                                    @error('tanggalMulaiTask')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="date" name="end" id="date" class="form-control"
+                                    <input type="date" name="end" id="date"
+                                        class="form-control @error('tanggalSelesaiTask') is-invalid @enderror"
                                         wire:model='tanggalSelesaiTask'>
+                                    @error('tanggalSelesaiTask')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="finished" class="form-label">Tandai sebagai selesai?</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='statusJadwalTask' type="checkbox"
-                                    id="finished" data-on-value="6" data-off-value="1" />
+                                <input class="form-check-input @error('statusJadwalTask') is-invalid @enderror"
+                                    wire:model='statusJadwalTask' type="checkbox" id="finished" data-on-value="6"
+                                    data-off-value="1" />
                                 <label class="form-check-label ms-1" for="finished">Tidak/Ya</label>
                             </div>
+                            @error('statusJadwalTask')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -901,8 +964,32 @@
     </div>
 
     <script>
-        // CALENDARNYA
-        document.addEventListener('livewire:initialized', function() {
+        window.addEventListener('close-modal', event => {
+            $('#modalJadwal').modal('hide');
+        })
+
+        // TABNYA
+        function switchToCard() {
+            localStorage.setItem('tasklistView', 'card');
+            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-card').classList.add('btn-secondary');
+            document.getElementById('btn-calendar').classList.remove('btn-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
+
+            document.getElementById('card-view').classList.remove('d-none');
+            document.getElementById('calendar-view').classList.add('d-none');
+        }
+
+        function switchToCalendar() {
+            localStorage.setItem('tasklistView', 'calendar');
+            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
+            document.getElementById('btn-calendar').classList.add('btn-secondary');
+            document.getElementById('btn-card').classList.remove('btn-secondary');
+            document.getElementById('btn-card').classList.add('btn-outline-secondary');
+
+            document.getElementById('calendar-view').classList.remove('d-none');
+            document.getElementById('card-view').classList.add('d-none');
+
             const jadwal = @json($events);
             var calendarEl = document.getElementById('calendar-tasklist');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -983,14 +1070,16 @@
                         });
                 },
                 eventClick: function(data) {
-                    @this.call('detailJadwal', data.event.id)
-                        .then(() => {
-                            $('#modalJadwal').modal('show');
-                        });
+                    if ({{ Auth::user()->role_id <= 2 ? 'true' : 'false' }}) {
+                        @this.call('detailJadwal', data.event.id)
+                            .then(() => {
+                                $('#modalJadwal').modal('show');
+                            });
+                    }
                 },
                 eventMouseEnter: function(info) {
                     if (!{{ Auth::user()->role_id <= 2 ? 'true' : 'false' }}) {
-                        info.el.style.cursor = 'pointer';
+                        info.el.style.cursor = 'not-allowed';
                     }
                 },
                 datesSet: function(info) {
@@ -1011,6 +1100,7 @@
 
             calendar.render();
 
+
             @this.on('refreshCalendar', function() {
                 console.log('Refresh Calendar event received');
                 const currentView = localStorage.getItem('tasklistView') || 'card';
@@ -1024,37 +1114,6 @@
                     switchToCard();
                 }
             });
-
-        })
-
-        window.addEventListener('close-modal', event => {
-            $('#modalJadwal').modal('hide');
-        })
-
-
-
-
-        // TABNYA
-        function switchToCard() {
-            localStorage.setItem('tasklistView', 'card');
-            document.getElementById('btn-card').classList.remove('btn-outline-secondary');
-            document.getElementById('btn-card').classList.add('btn-secondary');
-            document.getElementById('btn-calendar').classList.remove('btn-secondary');
-            document.getElementById('btn-calendar').classList.add('btn-outline-secondary');
-
-            document.getElementById('card-view').classList.remove('d-none');
-            document.getElementById('calendar-view').classList.add('d-none');
-        }
-
-        function switchToCalendar() {
-            localStorage.setItem('tasklistView', 'calendar');
-            document.getElementById('btn-calendar').classList.remove('btn-outline-secondary');
-            document.getElementById('btn-calendar').classList.add('btn-secondary');
-            document.getElementById('btn-card').classList.remove('btn-secondary');
-            document.getElementById('btn-card').classList.add('btn-outline-secondary');
-
-            document.getElementById('calendar-view').classList.remove('d-none');
-            document.getElementById('card-view').classList.add('d-none');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
