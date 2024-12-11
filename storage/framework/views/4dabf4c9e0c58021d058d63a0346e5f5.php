@@ -155,7 +155,7 @@
                             <td><strong>Rp<?php echo e(number_format($tasklist->value, 0)); ?></strong></td>
                         </tr>
                         <tr>
-                            <td>Biaya (RAPP)</td>
+                            <td>Realisasi Biaya</td>
                             <td><strong
                                     class="<?php echo e($this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark')); ?>">Rp<?php echo e(number_format($this->getTotalBiaya(), 0, ',', '.')); ?></strong>
                             </td>
@@ -736,11 +736,27 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label for="rab" class="form-label">Rencana Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input id="rab" type="number" class="form-control"
-                                    placeholder="Masukkan nominal" x-data="{ subtaskRAB: '' }"
+                                <input id="rab" type="number"
+                                    class="form-control <?php $__errorArgs = ['subtaskRAB'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    placeholder="Masukkan rencana" x-data="{ subtaskRAB: '' }"
                                     x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
                                     x-on:keydown="if(subtaskRAB.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
                                     wire:model="subtaskRAB" x-model="subtaskRAB" maxlength="13">
@@ -755,13 +771,36 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        <div class="mb-3" x-data="{ subtaskValue: '' }"
+                            x-show="$wire.subtaskRAB > 0 && !$wire.subtaskSAP">
+                            <label for="biaya" class="form-label">Realisasi Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input id="biaya" type="number"
+                                    class="form-control <?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                    placeholder="Masukkan realisasi biaya"
+                                    x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                    x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="13">
                             </div>
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <small class="text-danger"><?php echo e($message); ?></small>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
@@ -961,8 +1000,17 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
                         <div x-data="{ subtaskRAB: <?php if ((object) ('subtaskRAB') instanceof \Livewire\WireDirective) : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAB'->value()); ?>')<?php echo e('subtaskRAB'->hasModifier('live') ? '.live' : ''); ?><?php else : ?>window.Livewire.find('<?php echo e($__livewire->getId()); ?>').entangle('<?php echo e('subtaskRAB'); ?>')<?php endif; ?>.defer }" class="mb-3">
-                            <label for="rab" class="form-label">RAB</label> <small class="text-danger">*</small>
+                            <label for="rab" class="form-label">Rencana Biaya</label> <small
+                                class="text-danger">*</small>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="number"
@@ -991,14 +1039,48 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        <!--[if BLOCK]><![endif]--><?php if($subtaskValue && Auth::user()->role_id <= 2): ?>
+                            <div class='mb-3' x-data="{
+                                subtaskValue: <?php echo e($subtaskValue ?? 'null'); ?>,
+                                init() {
+                                    this.subtaskValue = <?php echo e($subtaskValue ?? 'null'); ?>;
+                                    $watch('subtaskValue', value => {
+                                        window.Livewire.find('<?php echo e($_instance->getId()); ?>').set('subtaskValue', value)
+                                    })
+                                }
+                            }">
+                                <label for="biaya" class="form-label">Realisasi Biaya</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input id="biaya" type="number"
+                                        class="form-control <?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                        placeholder="Masukkan realisasi biaya"
+                                        x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                        x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                        x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                        wire:model="subtaskValue" x-model="subtaskValue" maxlength="13"
+                                        value="<?php echo e($subtaskValue); ?>">
+                                </div>
+                                <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['subtaskValue'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
+                                <small>Realisasi biaya (existing): <?php echo e($subtaskValue); ?></small>
                             </div>
-                        </div>
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                         <!--[if BLOCK]><![endif]--><?php if($subtaskSAP && Auth::user()->role_id <= 2): ?>
                             <div class='mb-3' x-data="{
                                 subtaskRAP: <?php echo e($subtaskRAP ?? 'null'); ?>,
@@ -1042,7 +1124,8 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 <template x-if="parseInt(subtaskRAP) >= <?php echo e($subtaskRAB); ?>">
-                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB (RAB:
+                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB
+                                        (RAB:
                                         <?php echo e($subtaskRAB); ?>)</small>
                                 </template>
                             </div>
@@ -1362,14 +1445,16 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         });
                 },
                 eventClick: function(data) {
-                    window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
-                        .then(() => {
-                            $('#modalJadwal').modal('show');
-                        });
+                    if (<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
+                        window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
+                            .then(() => {
+                                $('#modalJadwal').modal('show');
+                            });
+                    }
                 },
                 eventMouseEnter: function(info) {
                     if (!<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
-                        info.el.style.cursor = 'pointer';
+                        info.el.style.cursor = 'not-allowed';
                     }
                 },
                 datesSet: function(info) {

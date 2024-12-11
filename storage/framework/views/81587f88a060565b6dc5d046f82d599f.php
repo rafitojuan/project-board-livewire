@@ -18,7 +18,7 @@
                                     <!--[if BLOCK]><![endif]--><?php $__currentLoopData = json_decode($tugas->kegiatan_list); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kegiatan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <!--[if BLOCK]><![endif]--><?php if($kegiatan->subtasks): ?>
                                             <div class="card-text mt-1">
-                                                <span class="fw-bold">- <?php echo e($kegiatan->nama_kegiatan); ?> :</span>
+                                                <span class="fw-bold">• <?php echo e($kegiatan->nama_kegiatan); ?> :</span>
                                                 <!--[if BLOCK]><![endif]--><?php if($kegiatan->subtasks): ?>
                                                     <ul>
                                                         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $kegiatan->subtasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tugas): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -28,20 +28,18 @@
 
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
-                                                                        @click="
-                                                                        if (lastClicked === <?php echo e($tugas->id_tugas); ?>) {
+                                                                        @click=" if (lastClicked === <?php echo e($tugas->id_tugas); ?>) {
+                                                                            console.log('nutup');
                                                                             isOpen = false;
                                                                             lastClicked = null;
-                                                                            $refs.detailTugas.classList.remove('fade-left');
-                                                                            $refs.detailTugas.classList.remove('d-block');
                                                                             $refs.detailTugas.classList.add('d-none');
                                                                         } else {
+                                                                            console.log('buka');
                                                                             $dispatch('close-others');
                                                                             isOpen = true;
                                                                             lastClicked = <?php echo e($tugas->id_tugas); ?>;
-                                                                            $refs.detailTugas.classList.add('fade-left');
                                                                             $refs.detailTugas.classList.remove('d-none');
-                                                                            $refs.detailTugas.classList.add('d-block');
+                                                                            $refs.detailTugas.classList.add('fade-left');
                                                                             $wire.showTugasUser(<?php echo e($tugas->id_tugas); ?>)
                                                                         }
                                                                     ">
@@ -54,27 +52,28 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                                                            <?php elseif($tugas->rap == null && $loop->first): ?>
+                                                                <li>Belum ada tugas.</li>
+                                                            <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                                             <!--[if BLOCK]><![endif]--><?php if($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id): ?>
                                                                 <li>
                                                                     <?php echo e($tugas->nama_tugas); ?>
 
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
-                                                                        @click=" if (lastClicked === <?php echo e($tugas->id_tugas); ?>) {
+                                                                        @click=" if (lastClicked == <?php echo e($tugas->id_tugas); ?>) {
+                                                                                    console.log('nutup');
                                                                                     isOpen = false;
                                                                                     lastClicked = null;
-                                                                                    $refs.detailTugas.classList.remove('fade-left');
-                                                                                    $refs.detailTugas.classList.remove('d-block');
                                                                                     $refs.detailTugas.classList.add('d-none');
                                                                                 } else {
+                                                                                    console.log('buka');
                                                                                     $dispatch('close-others');
                                                                                     isOpen = true;
                                                                                     lastClicked = <?php echo e($tugas->id_tugas); ?>;
-                                                                                    $refs.detailTugas.classList.add('fade-left');
                                                                                     $refs.detailTugas.classList.remove('d-none');
-                                                                                    $refs.detailTugas.classList.add('d-block');
-                                                                                    $wire.showTugasUser(<?php echo e($tugas->id_tugas); ?>)
+                                                                                    $refs.detailTugas.classList.add('fade-left');
+                                                                                    $wire.showTugasUser(<?php echo e($tugas->id_tugas); ?>);
                                                                                 }
                                                                             ">
                                                                         <i class="fas"
@@ -86,11 +85,12 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
+                                                            <?php elseif(empty($tugas->nama_tugas)): ?>
+                                                                <li>Belum ada tugas.</li>
                                                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                                                     </ul>
                                                 <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                                                
                                             </div>
                                         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
@@ -100,8 +100,6 @@
                     </div>
                 </div>
             </div>
-
-
 
             <div class="col-md-9">
                 <div class="row">
@@ -114,7 +112,6 @@
                                             <p class="text-muted fw-medium">Potential</p>
                                             <h4 class="mb-0"><?php echo e($userData->jlh_tasklists_potential_user); ?></h4>
                                         </div>
-
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
                                                 <span class="avatar-title">
@@ -169,10 +166,10 @@
                     </div>
                 </div>
 
-                <div class="card rounded-4 shadow-sm d-none" x-ref="detailTugas" id="detail-tugas">
+                <div class="card rounded-4 shadow-sm" x-ref="detailTugas" id="detail-tugas">
                     <style>
                         .fade-left {
-                            animation: fadeLeft 0.5s ease-in-out;
+                            animation: fadeLeft 0.5s ease-in;
                         }
 
                         @keyframes fadeLeft {
@@ -193,7 +190,7 @@
                         <form wire:submit.prevent="updateTugas">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
-                                <input type="text" wire:model='namaTugas'
+                                <input type="text" x-ref='namaTugas' wire:model='namaTugas'
                                     class="form-control rounded-3 <?php $__errorArgs = ['namaTugas'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -402,5 +399,8 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
     </div>
+
+    <?php $__env->startSection('script'); ?>
+    <?php $__env->stopSection(); ?>
 </div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/tugas.blade.php ENDPATH**/ ?>

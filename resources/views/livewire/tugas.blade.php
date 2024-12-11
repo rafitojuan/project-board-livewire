@@ -18,7 +18,7 @@
                                     @foreach (json_decode($tugas->kegiatan_list) as $kegiatan)
                                         @if ($kegiatan->subtasks)
                                             <div class="card-text mt-1">
-                                                <span class="fw-bold">- {{ $kegiatan->nama_kegiatan }} :</span>
+                                                <span class="fw-bold">• {{ $kegiatan->nama_kegiatan }} :</span>
                                                 @if ($kegiatan->subtasks)
                                                     <ul>
                                                         @foreach ($kegiatan->subtasks as $tugas)
@@ -27,20 +27,18 @@
                                                                     {{ $tugas->nama_tugas }}
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
-                                                                        @click="
-                                                                        if (lastClicked === {{ $tugas->id_tugas }}) {
+                                                                        @click=" if (lastClicked === {{ $tugas->id_tugas }}) {
+                                                                            console.log('nutup');
                                                                             isOpen = false;
                                                                             lastClicked = null;
-                                                                            $refs.detailTugas.classList.remove('fade-left');
-                                                                            $refs.detailTugas.classList.remove('d-block');
                                                                             $refs.detailTugas.classList.add('d-none');
                                                                         } else {
+                                                                            console.log('buka');
                                                                             $dispatch('close-others');
                                                                             isOpen = true;
                                                                             lastClicked = {{ $tugas->id_tugas }};
-                                                                            $refs.detailTugas.classList.add('fade-left');
                                                                             $refs.detailTugas.classList.remove('d-none');
-                                                                            $refs.detailTugas.classList.add('d-block');
+                                                                            $refs.detailTugas.classList.add('fade-left');
                                                                             $wire.showTugasUser({{ $tugas->id_tugas }})
                                                                         }
                                                                     ">
@@ -53,26 +51,27 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                    @endif
+                                                            @elseif ($tugas->rap == null && $loop->first)
+                                                                <li>Belum ada tugas.</li>
+                                                            @endif
                                                             @if ($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id)
                                                                 <li>
                                                                     {{ $tugas->nama_tugas }}
                                                                     <span class="ms-2" style="cursor: pointer"
                                                                         x-data="{ isOpen: false, lastClicked: null }"
-                                                                        @click=" if (lastClicked === {{ $tugas->id_tugas }}) {
+                                                                        @click=" if (lastClicked == {{ $tugas->id_tugas }}) {
+                                                                                    console.log('nutup');
                                                                                     isOpen = false;
                                                                                     lastClicked = null;
-                                                                                    $refs.detailTugas.classList.remove('fade-left');
-                                                                                    $refs.detailTugas.classList.remove('d-block');
                                                                                     $refs.detailTugas.classList.add('d-none');
                                                                                 } else {
+                                                                                    console.log('buka');
                                                                                     $dispatch('close-others');
                                                                                     isOpen = true;
                                                                                     lastClicked = {{ $tugas->id_tugas }};
-                                                                                    $refs.detailTugas.classList.add('fade-left');
                                                                                     $refs.detailTugas.classList.remove('d-none');
-                                                                                    $refs.detailTugas.classList.add('d-block');
-                                                                                    $wire.showTugasUser({{ $tugas->id_tugas }})
+                                                                                    $refs.detailTugas.classList.add('fade-left');
+                                                                                    $wire.showTugasUser({{ $tugas->id_tugas }});
                                                                                 }
                                                                             ">
                                                                         <i class="fas"
@@ -84,11 +83,12 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
+                                                            @elseif (empty($tugas->nama_tugas))
+                                                                <li>Belum ada tugas.</li>
                                                             @endif
                                                         @endforeach
                                                     </ul>
                                                 @endif
-                                                {{-- <hr class="my-2 border-2 border-secondary"> --}}
                                             </div>
                                         @endif
                                     @endforeach
@@ -98,8 +98,6 @@
                     </div>
                 </div>
             </div>
-
-
 
             <div class="col-md-9">
                 <div class="row">
@@ -112,7 +110,6 @@
                                             <p class="text-muted fw-medium">Potential</p>
                                             <h4 class="mb-0">{{ $userData->jlh_tasklists_potential_user }}</h4>
                                         </div>
-
                                         <div class="flex-shrink-0 align-self-center">
                                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
                                                 <span class="avatar-title">
@@ -167,10 +164,10 @@
                     </div>
                 </div>
 
-                <div class="card rounded-4 shadow-sm d-none" x-ref="detailTugas" id="detail-tugas">
+                <div class="card rounded-4 shadow-sm" x-ref="detailTugas" id="detail-tugas">
                     <style>
                         .fade-left {
-                            animation: fadeLeft 0.5s ease-in-out;
+                            animation: fadeLeft 0.5s ease-in;
                         }
 
                         @keyframes fadeLeft {
@@ -191,7 +188,7 @@
                         <form wire:submit.prevent="updateTugas">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
-                                <input type="text" wire:model='namaTugas'
+                                <input type="text" x-ref='namaTugas' wire:model='namaTugas'
                                     class="form-control rounded-3 @error('namaTugas') is-invalid @enderror"
                                     id="name">
                                 @error('namaTugas')
@@ -288,4 +285,7 @@
             </div>
         @endif
     </div>
+
+    @section('script')
+    @endsection
 </div>

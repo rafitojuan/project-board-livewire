@@ -152,7 +152,7 @@
                             <td><strong>Rp{{ number_format($tasklist->value, 0) }}</strong></td>
                         </tr>
                         <tr>
-                            <td>Biaya (RAPP)</td>
+                            <td>Realisasi Biaya</td>
                             <td><strong
                                     class="{{ $this->getTotalBiaya() > $tasklist->value ? 'text-danger' : ($this->getTotalBiaya() < $tasklist->value ? 'text-success' : 'text-dark') }}">Rp{{ number_format($this->getTotalBiaya(), 0, ',', '.') }}</strong>
                             </td>
@@ -598,11 +598,20 @@
                             @enderror
                         </div>
                         <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <label for="rab" class="form-label">Rencana Biaya</label>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
-                                <input id="rab" type="number" class="form-control"
-                                    placeholder="Masukkan nominal" x-data="{ subtaskRAB: '' }"
+                                <input id="rab" type="number"
+                                    class="form-control @error('subtaskRAB') is-invalid @enderror"
+                                    placeholder="Masukkan rencana" x-data="{ subtaskRAB: '' }"
                                     x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
                                     x-on:keydown="if(subtaskRAB.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
                                     wire:model="subtaskRAB" x-model="subtaskRAB" maxlength="13">
@@ -610,13 +619,22 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        <div class="mb-3" x-data="{ subtaskValue: '' }"
+                            x-show="$wire.subtaskRAB > 0 && !$wire.subtaskSAP">
+                            <label for="biaya" class="form-label">Realisasi Biaya</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input id="biaya" type="number"
+                                    class="form-control @error('subtaskValue') is-invalid @enderror"
+                                    placeholder="Masukkan realisasi biaya"
+                                    x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                    x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                    x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                    wire:model="subtaskValue" x-model="subtaskValue" maxlength="13">
                             </div>
+                            @error('subtaskValue')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
@@ -725,8 +743,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="sap" class="form-label">Administrasi SAP </label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
+                                    id="sap" role="switch" />
+                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                            </div>
+                        </div>
                         <div x-data="{ subtaskRAB: @entangle('subtaskRAB').defer }" class="mb-3">
-                            <label for="rab" class="form-label">RAB</label> <small class="text-danger">*</small>
+                            <label for="rab" class="form-label">Rencana Biaya</label> <small
+                                class="text-danger">*</small>
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input type="number"
@@ -741,14 +768,34 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="sap" class="form-label">Administrasi SAP </label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" wire:model='subtaskSAP' type="checkbox"
-                                    id="sap" role="switch" />
-                                <label class="form-check-label" for="sap">Tidak/Ya</label>
+                        @if ($subtaskValue && Auth::user()->role_id <= 2)
+                            <div class='mb-3' x-data="{
+                                subtaskValue: {{ $subtaskValue ?? 'null' }},
+                                init() {
+                                    this.subtaskValue = {{ $subtaskValue ?? 'null' }};
+                                    $watch('subtaskValue', value => {
+                                        @this.set('subtaskValue', value)
+                                    })
+                                }
+                            }">
+                                <label for="biaya" class="form-label">Realisasi Biaya</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input id="biaya" type="number"
+                                        class="form-control @error('subtaskValue') is-invalid @enderror"
+                                        placeholder="Masukkan realisasi biaya"
+                                        x-on:keypress="if (!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                        x-on:keydown="if(subtaskValue.length >= 13 && !['Backspace', 'Delete', 'Space'].includes($event.key)) $event.preventDefault()"
+                                        x-on:input="if(parseFloat($event.target.value) > parseFloat($wire.subtaskRAB)) $event.target.value = $wire.subtaskRAB"
+                                        wire:model="subtaskValue" x-model="subtaskValue" maxlength="13"
+                                        value="{{ $subtaskValue }}">
+                                </div>
+                                @error('subtaskValue')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                                <small>Realisasi biaya (existing): {{ $subtaskValue }}</small>
                             </div>
-                        </div>
+                        @endif
                         @if ($subtaskSAP && Auth::user()->role_id <= 2)
                             <div class='mb-3' x-data="{
                                 subtaskRAP: {{ $subtaskRAP ?? 'null' }},
@@ -778,7 +825,8 @@
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                                 <template x-if="parseInt(subtaskRAP) >= {{ $subtaskRAB }}">
-                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB (RAB:
+                                    <small class="text-danger">RAP tidak bisa sama dengan atau melewati RAB
+                                        (RAB:
                                         {{ $subtaskRAB }})</small>
                                 </template>
                             </div>
@@ -1022,14 +1070,16 @@
                         });
                 },
                 eventClick: function(data) {
-                    @this.call('detailJadwal', data.event.id)
-                        .then(() => {
-                            $('#modalJadwal').modal('show');
-                        });
+                    if ({{ Auth::user()->role_id <= 2 ? 'true' : 'false' }}) {
+                        @this.call('detailJadwal', data.event.id)
+                            .then(() => {
+                                $('#modalJadwal').modal('show');
+                            });
+                    }
                 },
                 eventMouseEnter: function(info) {
                     if (!{{ Auth::user()->role_id <= 2 ? 'true' : 'false' }}) {
-                        info.el.style.cursor = 'pointer';
+                        info.el.style.cursor = 'not-allowed';
                     }
                 },
                 datesSet: function(info) {

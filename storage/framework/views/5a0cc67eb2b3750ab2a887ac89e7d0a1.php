@@ -61,7 +61,8 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                     class="text-danger">*</span></label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="date" name="start" id="date" class="form-control <?php $__errorArgs = ['tanggalMulai'];
+                                    <input type="date" name="start" id="date"
+                                        class="form-control <?php $__errorArgs = ['tanggalMulai'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -82,7 +83,8 @@ endif;
 unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="date" name="end" id="date" class="form-control <?php $__errorArgs = ['tanggalSelesai'];
+                                    <input type="date" name="end" id="date"
+                                        class="form-control <?php $__errorArgs = ['tanggalSelesai'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -120,7 +122,8 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </button>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
-                </form>            </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -206,10 +209,12 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                     });
             },
             eventClick: function(data) {
-                window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
-                    .then(() => {
-                        $('#modalJadwal').modal('show');
-                    });
+                if (<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {
+                    window.Livewire.find('<?php echo e($_instance->getId()); ?>').call('detailJadwal', data.event.id)
+                        .then(() => {
+                            $('#modalJadwal').modal('show');
+                        });
+                }
             },
             eventMouseEnter: function(info) {
                 if (!<?php echo e(Auth::user()->role_id <= 2 ? 'true' : 'false'); ?>) {

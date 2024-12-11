@@ -316,6 +316,7 @@ class TasklistDetail extends Component
             'subtaskName' => 'required|min:3',
             'subtaskJob' => 'required',
             'subtaskRAB' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
+            'subtaskValue' => ['numeric', 'lte:' . $this->subtaskRAB],
             'subTaskStarted' => ['required', 'date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskEnd' => ['date', 'after_or_equal:' . Task::find($this->kode)->started_at, 'before_or_equal:' . Task::find($this->kode)->end_at],
             'subTaskKeterangan' => 'nullable|min:3',
@@ -324,8 +325,9 @@ class TasklistDetail extends Component
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
             'subtaskJob.required' => 'Pelaksana harus diisi.',
-            'subtaskRAB.numeric' => 'RAB harus berupa angka.',
-            'subtaskRAB.lte' => 'RAB tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
+            'subtaskRAB.numeric' => 'Harus berupa angka.',
+            'subtaskRAB.lte' => 'Tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
+            'subtaskValue.lte' => 'Melebihi rencana biaya',
             'subTaskStarted.required' => 'Tanggal mulai harus diisi.',
             'subTaskStarted.date' => 'Tanggal mulai harus berupa tanggal.',
             'subTaskEnd.date' => 'Tanggal selesai harus berupa tanggal.',
@@ -342,6 +344,7 @@ class TasklistDetail extends Component
             'pelaksana' => $this->subtaskJob,
             'sap' => $this->subtaskSAP ?? false,
             'rab' => $this->subtaskRAB,
+            'biaya' => $this->subtaskValue,
             'started_at' => $this->subTaskStarted,
             'end_at' => $this->subTaskEnd,
             'task_id' => $this->kode,
@@ -422,6 +425,7 @@ class TasklistDetail extends Component
             'subTaskEnd' => ['date', 'before_or_equal:' . Task::find($this->kode)->end_at, 'after_or_equal:' . Task::find($this->kode)->started_at],
             'subTaskKeterangan' => 'nullable|min:3',
             'subtaskUrl' => 'nullable|url',
+            'subtaskValue' => ['numeric', 'lte:' . $this->getSelisihBiaya()['rawValue']],
         ], [
             'subtaskName.required' => 'Nama harus diisi.',
             'subtaskName.min' => 'Nama detail pekerjaan minimal 3 karakter.',
@@ -437,6 +441,8 @@ class TasklistDetail extends Component
             'subTaskStarted.before_or_equal' => 'Tanggal mulai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai pekerjaan.',
             'subTaskEnd.before_or_equal' => 'Tanggal selesai harus sebelum atau sama dengan tanggal akhir pekerjaan.',
+            'subtaskValue.numeric' => 'Nilai subtask harus berupa angka.',
+            'subtaskValue.lte' => 'Nilai subtask tidak boleh lebih besar dari Nilai Project (tersedia: Rp.' . $this->getSelisihBiaya()['value'] . ').',
         ]);
 
         Subtask::where('id', $this->subtaskId)->update([
@@ -527,9 +533,19 @@ class TasklistDetail extends Component
         }
     }
 
-    public function getSubtotal($taskId)
+    public function getBiaya($taskId)
+    {
+        return Subtask::where('task_id', $taskId)->sum('biaya');
+    }
+
+    public function getRapp($taskId)
     {
         return Subtask::where('task_id', $taskId)->sum('rapp');
+    }
+
+    public function getSubtotal($taskId)
+    {
+        return $this->getBiaya($taskId) + $this->getRapp($taskId);
     }
 
     public function getTotalBiaya()
