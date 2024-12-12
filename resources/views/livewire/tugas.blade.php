@@ -51,8 +51,6 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                            @elseif ($tugas->rap == null && $loop->first)
-                                                                <li>Belum ada tugas.</li>
                                                             @endif
                                                             @if ($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id)
                                                                 <li>
@@ -83,8 +81,6 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                            @elseif (empty($tugas->nama_tugas))
-                                                                <li>Belum ada tugas.</li>
                                                             @endif
                                                         @endforeach
                                                     </ul>

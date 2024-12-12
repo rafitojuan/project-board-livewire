@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Division::class);
     }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function teamAccess()
+    {
+        return $this->hasMany(TeamAccess::class);
+    }
 }

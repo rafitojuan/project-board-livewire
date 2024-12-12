@@ -52,8 +52,6 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                            <?php elseif($tugas->rap == null && $loop->first): ?>
-                                                                <li>Belum ada tugas.</li>
                                                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                                             <!--[if BLOCK]><![endif]--><?php if($tugas->nama_tugas && $tugas->pelaksana_id == Auth::user()->id): ?>
                                                                 <li>
@@ -85,8 +83,6 @@
                                                                         </i>
                                                                     </span>
                                                                 </li>
-                                                            <?php elseif(empty($tugas->nama_tugas)): ?>
-                                                                <li>Belum ada tugas.</li>
                                                             <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
                                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                                                     </ul>
