@@ -1,4 +1,20 @@
 <div>
+    <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('add-column', []);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-1183979899-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
     <div class="row">
         <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $columns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $column): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="col-lg-4">
@@ -153,6 +169,12 @@
             </div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
     </div>
+
+    <p>
+        <span class="fw-bold">Keterangan:</span> <br>
+        <span class="text-danger align-baseline" style="font-size: 24px;">●</span> = Projek yang melewati waktu
+        akhir<br>
+    </p>
 
 
     <!-- Update Tasklist Modal -->

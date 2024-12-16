@@ -19,18 +19,25 @@
                 <li class="menu-title" key="t-menu">Menu Projek</li>
 
                 <li>
-                    <a href="{{ route('kanban.index') }}" class="waves-effect">
-                        <i class="bx bx-chalkboard"></i>
-                        <span key="t-dashboards">{{--  @lang('translation.Dashboards') --}} Projek</span>
+                    <a href="{{ route('tim.index') }}" class="waves-effect">
+                        <i class='bx bx-sitemap'></i>
+                        <span key="t-dashboards">Tim</span>
                     </a>
                 </li>
 
-                <li>
+                {{-- <li>
+                    <a href="{{ route('kanban.index') }}" class="waves-effect">
+                        <i class="bx bx-chalkboard"></i>
+                        <span key="t-dashboards">Projek</span>
+                    </a>
+                </li> --}}
+
+                {{-- <li>
                     <a href="{{ route('tugas.index') }}" class="waves-effect">
                         <i class="bx bx-task"></i>
                         <span key="t-dashboards">Tugas</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="{{ route('kalendar.index') }}" class="waves-effect">

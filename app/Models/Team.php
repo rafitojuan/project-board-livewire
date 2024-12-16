@@ -31,4 +31,9 @@ class Team extends Model
             $query->where('user_id', $userId);
         });
     }
+
+    public function tasklists()
+    {
+        return $this->hasMany(Tasklist::class);
+    }
 }

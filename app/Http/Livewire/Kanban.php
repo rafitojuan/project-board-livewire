@@ -9,6 +9,7 @@ use App\Models\TasklistColumn;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -49,16 +50,18 @@ class Kanban extends Component
         'deleteTasklistColumnConfirmed' => 'deleteTasklistColumnConfirmed',
     ];
 
-    public function mount()
+    public function mount($id)
     {
-        $this->loadColumns();
+        $id = Crypt::decryptString($id);
+        $this->loadColumns($id);
     }
 
-    public function loadColumns()
+    public function loadColumns($id)
     {
-        $this->columns = Column::with(['tasklists' => function ($query) {
-            $query->orderBy('order');
+        $this->columns = Column::with(['tasklists' => function ($query) use ($id) {
+            $query->where('team_id', $id)->orderBy('order');
         }])->orderBy('id')->get();
+        // dd($this->columns);
     }
 
     // public function updateTasklistOrder($columnId, $tasklistOrder)
@@ -74,7 +77,7 @@ class Kanban extends Component
     //     $this->loadColumns();
     // }
 
-    public function updateTasklistOrder(int $columnId, array $tasklistOrder): void
+    public function updateTasklistOrder(int $columnId, array $tasklistOrder, $id): void
     {
         try {
             $tasklistOrder = array_values(array_filter($tasklistOrder, function ($id) {
@@ -118,7 +121,7 @@ class Kanban extends Component
                 }
             });
 
-            $this->loadColumns();
+            $this->loadColumns($id);
         } catch (\Exception $e) {
             Log::error("Error in updateTasklistOrder: " . $e->getMessage(), [
                 'columnId' => $columnId,
@@ -158,10 +161,10 @@ class Kanban extends Component
         $this->contractSignDate = $tasklist['contract_sign'];
     }
 
-    public function closeEditTasklistModal()
+    public function closeEditTasklistModal($id)
     {
         $this->reset();
-        $this->loadColumns();
+        $this->loadColumns($id);
     }
 
     public function openAddTaskModal($tasklistColumnId)
@@ -170,7 +173,7 @@ class Kanban extends Component
         $this->dispatch('open-modal', ['modalName' => 'add-task-modal']);
     }
 
-    public function updateTasklistColumn()
+    public function updateTasklistColumn($id)
     {
         $this->validate([
             'tasklistColumnName' => 'required|min:3',
@@ -178,7 +181,7 @@ class Kanban extends Component
 
         Column::where('id', $this->editingColumn)->update(['name' => $this->tasklistColumnName]);
         $this->reset();
-        $this->loadColumns();
+        $this->loadColumns($id);
         $this->dispatch('close-updateColumnModal', ['modalName' => 'updateColumnModal']);
         $this->alert('success', 'Kolom berhasil diperbarui!');
     }
@@ -202,15 +205,15 @@ class Kanban extends Component
         ]);
     }
 
-    public function deleteTasklistColumnConfirmed()
+    public function deleteTasklistColumnConfirmed($id)
     {
         Column::where('id', $this->tasklistColumnId)->delete();
         $this->reset();
-        $this->loadColumns();
+        $this->loadColumns($id);
         $this->alert('success', 'Kolom berhasil dihapus!');
     }
 
-    public function addTasklist()
+    public function addTasklist($id)
     {
         $this->validate([
             'newTasklistName' => 'required|min:3',
@@ -268,12 +271,12 @@ class Kanban extends Component
         }
 
         $this->reset(['newTasklistName', 'newTasklistCompany', 'location', 'newTasklistValue', 'editingColumn', 'newTasklistStartDate', 'newTasklistEndDate', 'newTasklistUrl', 'newTasklistContract', 'tasklistPengadaan']);
-        $this->loadColumns();
+        $this->loadColumns($id);
         $this->dispatch('close-modal', ['modalName' => 'bs-example-modal-lg']);
         $this->alert('success', 'Tasklist berhasil ditambahkan!');
     }
 
-    public function updateTasklist()
+    public function updateTasklist($id)
     {
         $this->validate([
             'newTasklistName' => 'required|min:3',
@@ -322,7 +325,7 @@ class Kanban extends Component
 
         $tasklist->update($data);
         $this->reset();
-        $this->loadColumns();
+        $this->loadColumns($id);
         $this->dispatch('close-updateModal', ['modalName' => 'updateModal']);
         $this->alert('success', 'Tasklist berhasil diperbarui!');
     }
@@ -345,7 +348,7 @@ class Kanban extends Component
         ]);
     }
 
-    public function hapusTasklist()
+    public function hapusTasklist($id)
     {
         $tasklist = Tasklist::where('id', $this->tasklistId)->first();
 
@@ -358,7 +361,7 @@ class Kanban extends Component
             ->log("Project {$tasklist->name} dihapus");
 
         $tasklist->delete();
-        $this->loadColumns();
+        $this->loadColumns($id);
         $this->alert('success', 'Tasklist berhasil dihapus!');
     }
     public function addTask()

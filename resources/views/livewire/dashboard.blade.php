@@ -78,7 +78,7 @@
                         </div>
                     @endforeach
                     <div class="text-end">
-                        <a href="{{ route('kanban.index') }}" class="btn btn-primary waves-effect waves-light btn-sm">
+                        <a href="{{ route('tugas.index') }}" class="btn btn-primary waves-effect waves-light btn-sm">
                             Lihat Projek
                             <i class="mdi mdi-arrow-right ms-1"></i>
                         </a>

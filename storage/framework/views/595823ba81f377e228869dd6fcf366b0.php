@@ -74,7 +74,7 @@
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
                     <div class="text-end">
-                        <a href="<?php echo e(route('kanban.index')); ?>" class="btn btn-primary waves-effect waves-light btn-sm">
+                        <a href="<?php echo e(route('tugas.index')); ?>" class="btn btn-primary waves-effect waves-light btn-sm">
                             Lihat Projek
                             <i class="mdi mdi-arrow-right ms-1"></i>
                         </a>

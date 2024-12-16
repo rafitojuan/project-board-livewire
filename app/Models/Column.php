@@ -12,4 +12,9 @@ class Column extends Model
     {
         return $this->hasMany(Tasklist::class)->orderBy('id');
     }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
 }

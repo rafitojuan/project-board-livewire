@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title'); ?>
     Log Aktivitas
 <?php $__env->stopSection(); ?>

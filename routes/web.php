@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\RegistAuthController;
 use App\Http\Livewire\Dashboard;
+use App\Http\Livewire\Kanban;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Kanban\Index;
 use App\Http\Livewire\TasklistDetail;
+use App\Http\Livewire\Tim;
+use App\Http\Livewire\TimDetail;
 use App\Http\Livewire\Tugas;
 use App\Http\Livewire\TugasCalendar;
 use App\Http\Livewire\User;
@@ -31,7 +34,9 @@ Route::middleware(['guest'])->group(function () {
 // Route::resource('/kanban', KanbanController::class);
 Route::middleware(['auth'])->group(function () {
     // Project
-    Route::get('/project', Index::class)->name('kanban.index');
+    // Route::get('/project', Index::class)->name('kanban.index');
+    // Route::get('/team/{id}/project', Index::class)->name('kanban.index');
+    Route::get('/team/{id}/project', Kanban::class)->name('kanban.index');
 
     // Tasklist
     Route::get('/tasklist/{encryptedId}', TasklistDetail::class)->name('tasklist.detail');
@@ -44,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/log/{tasklist}', [App\Http\Livewire\Kanban::class, 'log'])->name('livewire.log');
 
     // Dashboard
-    Route::get('/dashboard', Dashboard::class);
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/', Dashboard::class)->name('root');
 
     // Tugas
@@ -53,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     // Kalendar
     Route::get('/kalendar', TugasCalendar::class)->name('kalendar.index');
 
+    // Tim
+    Route::get('/team', Tim::class)->name('tim.index');
+    Route::get('/team/{id}', TimDetail::class)->name('tim.detail');
 
 
 

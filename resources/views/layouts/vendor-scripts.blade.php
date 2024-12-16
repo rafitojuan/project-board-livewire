@@ -15,6 +15,9 @@
 
     window.addEventListener('close-modal', event => {
         $('.bs-example-modal-lg').modal('hide');
+        $('#modalTambahTim').modal('hide');
+        $('#modalEditTim').modal('hide');
+        $('#modalUbahWarnaTim').modal('hide');
     })
 
     window.addEventListener('column-modal', event => {

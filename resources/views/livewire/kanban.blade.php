@@ -1,4 +1,5 @@
 <div>
+    <livewire:add-column />
     <div class="row">
         @foreach ($columns as $column)
             <div class="col-lg-4">
@@ -150,6 +151,12 @@
             </div>
         @endforeach
     </div>
+
+    <p>
+        <span class="fw-bold">Keterangan:</span> <br>
+        <span class="text-danger align-baseline" style="font-size: 24px;">●</span> = Projek yang melewati waktu
+        akhir<br>
+    </p>
 
 
     <!-- Update Tasklist Modal -->

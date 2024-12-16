@@ -19,18 +19,15 @@
                 <li class="menu-title" key="t-menu">Menu Projek</li>
 
                 <li>
-                    <a href="<?php echo e(route('kanban.index')); ?>" class="waves-effect">
-                        <i class="bx bx-chalkboard"></i>
-                        <span key="t-dashboards"> Projek</span>
+                    <a href="<?php echo e(route('tim.index')); ?>" class="waves-effect">
+                        <i class='bx bx-sitemap'></i>
+                        <span key="t-dashboards">Tim</span>
                     </a>
                 </li>
 
-                <li>
-                    <a href="<?php echo e(route('tugas.index')); ?>" class="waves-effect">
-                        <i class="bx bx-task"></i>
-                        <span key="t-dashboards">Tugas</span>
-                    </a>
-                </li>
+                
+
+                
 
                 <li>
                     <a href="<?php echo e(route('kalendar.index')); ?>" class="waves-effect">

@@ -15,7 +15,7 @@ class Tasklist extends Model
 
     protected $table = 'tasklists';
 
-    protected $fillable = ['column_id', 'name', 'work_id', 'order', 'adendum_value', 'company', 'location', 'value', 'status_id', 'started_at', 'end_at', 'url', 'contract_number', 'pengadaan', 'conract_sign', 'adendum', 'color', 'user_id'];
+    protected $guarded = ['id'];
 
     protected static $recordEvents = ['created', 'updated', 'deleted'];
 
@@ -32,21 +32,6 @@ class Tasklist extends Model
             })
             ->useLogName('Tasklist');
     }
-
-    // public function getCreatedAtAttribute($value)
-    // {
-    //     return Carbon::parse($value)->timezone('Asia/Jakarta');
-    // }
-
-    // public function getUpdatedAtAttribute($value)
-    // {
-    //     return Carbon::parse($value)->timezone('Asia/Jakarta');
-    // }
-
-    // public function getDeletedAtAttribute($value)
-    // {
-    //     return Carbon::parse($value)->timezone('Asia/Jakarta');
-    // }
 
     public function column()
     {
@@ -66,5 +51,10 @@ class Tasklist extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
     }
 }
