@@ -1,5 +1,5 @@
 <div>
-    <livewire:add-column />
+    <livewire:add-column id='{{ $team->id }}' />
     <div class="row">
         @foreach ($columns as $column)
             <div class="col-lg-4">

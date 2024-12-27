@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Column;
+use App\Models\Team;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
@@ -10,6 +11,18 @@ class AddColumn extends Component
 {
     use LivewireAlert;
     public $columnName;
+    public $teamId;
+
+    public function mount($id)
+    {
+        $this->fetchTeamData($id);
+    }
+
+    public function fetchTeamData($id)
+    {
+        $this->teamId = Team::where('id', $id)->first();
+        return $this->teamId;
+    }
 
     public function addColumn()
     {
@@ -35,6 +48,8 @@ class AddColumn extends Component
     }
     public function render()
     {
-        return view('livewire.add-column');
+        return view('livewire.add-column', [
+            'team' => $this->teamId,
+        ]);
     }
 }

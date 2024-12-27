@@ -3,7 +3,7 @@
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('add-column', []);
+[$__name, $__params] = $__split('add-column', ['id' => ''.e($team->id).'']);
 
 $__html = app('livewire')->mount($__name, $__params, 'lw-1183979899-0', $__slots ?? [], get_defined_vars());
 

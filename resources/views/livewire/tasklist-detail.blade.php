@@ -1,7 +1,7 @@
 <div>
 
     <div class="mb-3">
-        <a href="{{ route('kanban.index') }}" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
@@ -28,9 +28,9 @@
                 <div class="card-header rounded-top-4" style="background-color: white; border-bottom: 1px solid #dee2e6;">
                     <nav aria-label="breadcrumb" style="margin-bottom: -0.9rem; margin-left: -0.4rem;">
                         <ol class="breadcrumb" style="font-size: 0.8rem;">
-                            <li class="breadcrumb-item"><a href="{{ route('kanban.index') }}"
+                            <li class="breadcrumb-item"><a href="{{ url()->previous() }}"
                                     style="color:#007bff;">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('kanban.index') }}"
+                            <li class="breadcrumb-item"><a href="{{ url()->previous() }}"
                                     style="color:#007bff;">Project</a></li>
                             <li class="breadcrumb-item active" aria-current="page">#{{ $tasklist->id }}</li>
                         </ol>

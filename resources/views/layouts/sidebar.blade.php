@@ -39,12 +39,12 @@
                     </a>
                 </li> --}}
 
-                <li>
+                {{-- <li>
                     <a href="{{ route('kalendar.index') }}" class="waves-effect">
                         <i class="bx bx-calendar"></i>
                         <span>Kalendarku</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="{{ route('logs') }}" class="waves-effect">

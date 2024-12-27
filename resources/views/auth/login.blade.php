@@ -1,7 +1,7 @@
 @extends('layouts.master-without-nav')
 
 @section('title')
-    @lang('translation.Login')
+    Login
 @endsection
 
 @section('css')
@@ -149,7 +149,7 @@
                                         <p class="mb-0">©
                                             <script>
                                                 document.write(new Date().getFullYear())
-                                            </script> kanbanan. Dibuat dengan <i
+                                            </script> Glide. Dibuat dengan <i
                                                 class="mdi mdi-heart text-danger"></i> oleh
                                             Tim IT EPI
                                         </p>

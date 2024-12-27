@@ -1,4 +1,13 @@
 <div>
+    <div>
+        <h4 class="mb-3">
+            <i class="bx bx-chevron-left" style="transition: transform 0.3s ease; cursor: pointer;"
+                onclick="window.location.href='<?php echo e(url()->previous()); ?>'"
+                onmouseover="this.style.transform='translateX(-5px)'" onmouseout="this.style.transform='translateX(0)'">
+            </i>
+            Tugas Individual
+        </h4>
+    </div>
     <div class="row">
         <!--[if BLOCK]><![endif]--><?php if($tugasUser->isEmpty()): ?>
             <div class="d-flex justify-content-center align-items-center" style="height: 65vh;">

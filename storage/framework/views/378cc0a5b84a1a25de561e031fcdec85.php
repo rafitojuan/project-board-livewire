@@ -95,7 +95,7 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between">
                                             <h4 class="card-text"><?php echo e($team['nama_tim']); ?></h4>
-                                            <div class="dropdown">
+                                            <div class="dropdown" onclick="event.stopPropagation()">
                                                 <button class="btn btn-link p-0 rounded" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false"
                                                     style="background-color: white; width: 30px; height: 30px;">
@@ -146,11 +146,11 @@
                             onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'"></i>
                     </div>
                 </div>
-                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teamDivision; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $team): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php if(empty($search) ||
-                            str_contains(strtolower($team['nama_tim']), strtolower($search)) ||
-                            str_contains(strtolower($team['deskripsi']), strtolower($search))): ?>
-                        <div class="row mt-1">
+                <div class="row mt-1">
+                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teamDivision; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $team): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <!--[if BLOCK]><![endif]--><?php if(empty($search) ||
+                                str_contains(strtolower($team['nama_tim']), strtolower($search)) ||
+                                str_contains(strtolower($team['deskripsi']), strtolower($search))): ?>
                             <div class="col-md-3">
                                 <div class="card rounded-4 shadow-sm kartuTim"
                                     style="height: 13rem; transition: transform 0.3s, box-shadow 0.3s;"
@@ -160,7 +160,7 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between">
                                             <h4 class="card-text"><?php echo e($team['nama_tim']); ?></h4>
-                                            <div class="dropdown">
+                                            <div class="dropdown" onclick="event.stopPropagation()">
                                                 <button class="btn btn-link p-0 rounded" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false"
                                                     style="background-color: white; width: 30px; height: 30px;">
@@ -193,9 +193,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                </div>
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         
@@ -212,11 +212,11 @@
                             onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'"></i>
                     </div>
                 </div>
-                <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teamProject; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $team): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php if(empty($search) ||
-                            str_contains(strtolower($team['nama_tim']), strtolower($search)) ||
-                            str_contains(strtolower($team['deskripsi']), strtolower($search))): ?>
-                        <div class="row mt-1">
+                <div class="row mt-1">
+                    <!--[if BLOCK]><![endif]--><?php $__currentLoopData = $teamProject; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $team): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <!--[if BLOCK]><![endif]--><?php if(empty($search) ||
+                                str_contains(strtolower($team['nama_tim']), strtolower($search)) ||
+                                str_contains(strtolower($team['deskripsi']), strtolower($search))): ?>
                             <div class="col-md-3">
                                 <div class="card rounded-4 shadow-sm kartuTim"
                                     style="height: 13rem; transition: transform 0.3s, box-shadow 0.3s;"
@@ -226,7 +226,7 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between">
                                             <h4 class="card-text"><?php echo e($team['nama_tim']); ?></h4>
-                                            <div class="dropdown">
+                                            <div class="dropdown" onclick="event.stopPropagation()">
                                                 <button class="btn btn-link p-0 rounded" type="button"
                                                     data-bs-toggle="dropdown" aria-expanded="false"
                                                     style="background-color: white; width: 30px; height: 30px;">
@@ -259,9 +259,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                        <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><!--[if ENDBLOCK]><![endif]-->
+                </div>
             </div>
         <?php endif; ?><!--[if ENDBLOCK]><![endif]-->
         

@@ -7,6 +7,7 @@ use App\Models\Column;
 use App\Models\Tasklist;
 use App\Models\TasklistColumn;
 use App\Models\Task;
+use App\Models\Team;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -32,6 +33,7 @@ class Kanban extends Component
     public $newTasklistStartDate;
     public $newTasklistEndDate;
     public $newTasklistValue;
+
     public $editingColumn;
     public $newTaskName;
     public $editingTasklistColumn;
@@ -42,6 +44,9 @@ class Kanban extends Component
     public $tasklistPengadaan = 'pl';
     public $contractSignDate;
     public $userId;
+
+    public $teamData;
+    public $teamId;
     public $logs;
 
     protected $listeners = [
@@ -50,18 +55,22 @@ class Kanban extends Component
         'deleteTasklistColumnConfirmed' => 'deleteTasklistColumnConfirmed',
     ];
 
-    public function mount($id)
+    public function mount(string $id): void
     {
-        $id = Crypt::decryptString($id);
-        $this->loadColumns($id);
+        $decryptedId = Crypt::decryptString($id);
+        $this->teamData = Team::with(['teamAccess' => function ($query) {
+            $query->select('id', 'team_id', 'user_id', 'role_team');
+        }])->findOrFail($decryptedId);
+        $this->teamId = $decryptedId;
+
+        $this->loadColumns($decryptedId);
     }
 
-    public function loadColumns($id)
+    public function loadColumns(int $id): void
     {
         $this->columns = Column::with(['tasklists' => function ($query) use ($id) {
             $query->where('team_id', $id)->orderBy('order');
         }])->orderBy('id')->get();
-        // dd($this->columns);
     }
 
     // public function updateTasklistOrder($columnId, $tasklistOrder)
@@ -213,7 +222,7 @@ class Kanban extends Component
         $this->alert('success', 'Kolom berhasil dihapus!');
     }
 
-    public function addTasklist($id)
+    public function addTasklist()
     {
         $this->validate([
             'newTasklistName' => 'required|min:3',
@@ -256,10 +265,9 @@ class Kanban extends Component
             'contract_number' => trim($this->newTasklistContract),
             'pengadaan' => trim($this->tasklistPengadaan),
             'color' => Auth::user()->role->color,
-            // 'user_id' => Auth::user()->role->id > 2 ? Auth::user()->id : $this->userId
             'user_id' => Auth::user()->id,
+            'team_id' => $this->teamId,
         ]);
-
 
         $defaultColumns = ['Potential', 'In Progress', 'Completed'];
         foreach ($defaultColumns as $index => $columnName) {
@@ -271,7 +279,7 @@ class Kanban extends Component
         }
 
         $this->reset(['newTasklistName', 'newTasklistCompany', 'location', 'newTasklistValue', 'editingColumn', 'newTasklistStartDate', 'newTasklistEndDate', 'newTasklistUrl', 'newTasklistContract', 'tasklistPengadaan']);
-        $this->loadColumns($id);
+        $this->loadColumns($this->teamId);
         $this->dispatch('close-modal', ['modalName' => 'bs-example-modal-lg']);
         $this->alert('success', 'Tasklist berhasil ditambahkan!');
     }
@@ -329,6 +337,7 @@ class Kanban extends Component
         $this->dispatch('close-updateModal', ['modalName' => 'updateModal']);
         $this->alert('success', 'Tasklist berhasil diperbarui!');
     }
+
     public function deleteTasklist($tasklistId)
     {
         $this->tasklistId = $tasklistId;
@@ -406,7 +415,8 @@ class Kanban extends Component
         $tasklists = DB::table('v_tasklists_rekap')
             ->get();
         return view('livewire.kanban', [
-            'detilTasklist' => $tasklists
+            'detilTasklist' => $tasklists,
+            'team' => $this->teamData,
         ]);
     }
 }

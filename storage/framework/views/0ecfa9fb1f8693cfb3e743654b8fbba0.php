@@ -29,12 +29,7 @@
 
                 
 
-                <li>
-                    <a href="<?php echo e(route('kalendar.index')); ?>" class="waves-effect">
-                        <i class="bx bx-calendar"></i>
-                        <span>Kalendarku</span>
-                    </a>
-                </li>
+                
 
                 <li>
                     <a href="<?php echo e(route('logs')); ?>" class="waves-effect">

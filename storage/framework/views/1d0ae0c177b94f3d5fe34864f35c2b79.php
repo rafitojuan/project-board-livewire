@@ -1,9 +1,17 @@
 <div>
-    <h4 class="mb-3">Project Board</h4>
+    <h4 class="mb-3">
+        <i class="bx bx-chevron-left" style="transition: transform 0.3s ease; cursor: pointer;"
+            onclick="window.location.href='<?php echo e(url()->previous()); ?>'" onmouseover="this.style.transform='translateX(-5px)'"
+            onmouseout="this.style.transform='translateX(0)'">
+        </i>
+        Project Board <?php echo e($team->nama_tim); ?>
+
+    </h4>
+
     <button class="btn btn-primary mb-3 text-end" wire:click="openColumnModal()">+ Add Column</button>
 
-    <div class="modal fade modalColumn" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true"
-        wire:ignore.self>
+    <div class="modal fade modalColumn" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -50,5 +58,6 @@ unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                 </div>
             </div>
         </div>
-    </div></div>
+    </div>
+</div>
 <?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/add-column.blade.php ENDPATH**/ ?>

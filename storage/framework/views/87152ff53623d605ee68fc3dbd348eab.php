@@ -1,7 +1,7 @@
 
 
 <?php $__env->startSection('title'); ?>
-    <?php echo app('translator')->get('translation.Login'); ?>
+    Login
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('css'); ?>
@@ -165,7 +165,7 @@ unset($__errorArgs, $__bag); ?>
                                         <p class="mb-0">©
                                             <script>
                                                 document.write(new Date().getFullYear())
-                                            </script> kanbanan. Dibuat dengan <i
+                                            </script> Glide. Dibuat dengan <i
                                                 class="mdi mdi-heart text-danger"></i> oleh
                                             Tim IT EPI
                                         </p>

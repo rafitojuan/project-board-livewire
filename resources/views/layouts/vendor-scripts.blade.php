@@ -18,6 +18,8 @@
         $('#modalTambahTim').modal('hide');
         $('#modalEditTim').modal('hide');
         $('#modalUbahWarnaTim').modal('hide');
+        $('#modalTambahAnggota').modal('hide');
+        $('#modalAksesTim').modal('hide');
     })
 
     window.addEventListener('column-modal', event => {
