@@ -63,6 +63,7 @@
             <div class="col-md-4">
                 <div class="card text-center rounded-5 " style="transition: all 0.3s ease; cursor:pointer;">
                     <div class="card-body"
+                        onclick="window.location='{{ route('pengumuman.index', ['id' => Crypt::encryptString($team['id'])]) }}'"
                         onmouseover="this.parentElement.style.transform='translate(-5px, -5px)';this.parentElement.style.boxShadow='8px 8px 15px rgba(0,0,0,0.3)'"
                         onmouseout="this.parentElement.style.transform='translate(0)';this.parentElement.style.boxShadow='0 .125rem .25rem rgba(0,0,0,.075)'">
                         <img src="{{ URL::asset('build/images/teams/pengumuman.svg') }}" class="w-75"

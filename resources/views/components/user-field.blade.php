@@ -1,4 +1,4 @@
-<div class="container d-flex">
+<div class="container d-flex float-start">
     <div class="">
         <img src="{{ asset($row->avatar) }}" alt="Profile Photo" class="rounded-circle" style="width: 40px; height: 40px;">
     </div>

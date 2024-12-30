@@ -20,6 +20,7 @@
         $('#modalUbahWarnaTim').modal('hide');
         $('#modalTambahAnggota').modal('hide');
         $('#modalAksesTim').modal('hide');
+        $('#modalTambahUser').modal('hide');
     })
 
     window.addEventListener('column-modal', event => {

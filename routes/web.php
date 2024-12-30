@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\RegistAuthController;
 use App\Http\Livewire\Dashboard;
+use App\Http\Livewire\DetailPengumuman;
 use App\Http\Livewire\Kanban;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Kanban\Index;
+use App\Http\Livewire\Pengumuman;
+use App\Http\Livewire\PengumumanCreate;
 use App\Http\Livewire\TasklistDetail;
 use App\Http\Livewire\Tim;
 use App\Http\Livewire\TimDetail;
@@ -61,6 +64,11 @@ Route::middleware(['auth'])->group(function () {
     // Tim
     Route::get('/team', Tim::class)->name('tim.index');
     Route::get('/team/{id}', TimDetail::class)->name('tim.detail');
+
+    // Pengumuman
+    Route::get('/pengumuman/{id}', Pengumuman::class)->name('pengumuman.index');
+    Route::get('/pengumuman/buat/{id}', PengumumanCreate::class)->name('pengumuman.create');
+    Route::get('/pengumuman/view/{id}', DetailPengumuman::class)->name('pengumuman.view');
 
 
 

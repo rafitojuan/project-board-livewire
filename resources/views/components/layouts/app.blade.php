@@ -10,6 +10,7 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('build/images/logo_project_board.png') }}">
     @include('layouts.head-css')
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
     @livewireStyles
 </head>
 
@@ -42,10 +43,20 @@
     @include('layouts.right-sidebar')
     <!-- /Right-bar -->
 
-    @livewireScripts
     @include('layouts.vendor-scripts')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+    <script>
+        if (typeof $.summernote !== 'undefined') {
+            console.log('Summernote is initialized');
+        }
+    </script>
     <x-livewire-alert::scripts />
+
+    @stack('script')
+
+    
+    @livewireScripts
     <!-- JAVASCRIPT -->
 </body>
 

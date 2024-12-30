@@ -8,11 +8,26 @@
                 <i class="bx bx-plus-circle"></i>
                 <span>Tambah Pengguna</span>
             </button>
-            <livewire:users-table />
+            <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('users-table', []);
+
+$__html = app('livewire')->mount($__name, $__params, 'lw-853190456-0', $__slots ?? [], get_defined_vars());
+
+echo $__html;
+
+unset($__html);
+unset($__name);
+unset($__params);
+unset($__split);
+if (isset($__slots)) unset($__slots);
+?>
         </div>
     </div>
 
-    {{-- MODAL TAMBAH USER --}}
+    
     <div class="modal fade" id="modalTambahUser" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         role="dialog" aria-labelledby="modalTitleId" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal" role="document">
@@ -30,14 +45,29 @@
                             <div class="input-group">
                                 <span class="input-group-text">@</span>
                                 <input type="email" id="akun"
-                                    class="form-control @error('akun') is-invalid @enderror"
+                                    class="form-control <?php $__errorArgs = ['akun'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                     placeholder="contoh@gmail.com" wire:model="akun">
                             </div>
-                            @error('akun')
+                            <!--[if BLOCK]><![endif]--><?php $__errorArgs = ['akun'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                 <div class="invalid-feedback">
-                                    {{ $message }}
+                                    <?php echo e($message); ?>
+
                                 </div>
-                            @enderror
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><!--[if ENDBLOCK]><![endif]-->
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -52,7 +82,7 @@
     </div>
 
 
-    {{-- MODAL EDIT --}}
+    
     <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
@@ -82,3 +112,4 @@
     </div>
 
 </div>
+<?php /**PATH C:\laragon\www\epi-dasbor\resources\views/livewire/user.blade.php ENDPATH**/ ?>

@@ -39,6 +39,14 @@
                 </li>
 
                 
+
+                <li class="menu-title" key="t-menu">Menu Pengguna</li>
+                <li>
+                    <a href="<?php echo e(route('user.index')); ?>" class="waves-effect">
+                        <i class="bx bx-user-plus"></i>
+                        <span>Tambah User</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- Sidebar -->

@@ -63,4 +63,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(TeamAccess::class);
     }
+
+    public function announcement()
+    {
+        return $this->hasMany(Announcement::class, 'post_by');
+    }
 }

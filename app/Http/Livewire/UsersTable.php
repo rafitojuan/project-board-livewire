@@ -63,8 +63,6 @@ class UsersTable extends DataTableComponent
     public function columns(): array
     {
         return [
-            Column::make("No", "id")
-                ->sortable()->searchable(),
             Column::make("avatar", "avatar")
                 ->sortable()->searchable()->hideIf(true),
             Column::make("role", "role.name")
@@ -80,7 +78,7 @@ class UsersTable extends DataTableComponent
                     'height' => '40',
                 ])
                 ->view('components.user-field')->searchable()->hideIf(true),
-            Column::make("Nama", "name")
+            Column::make("Pengguna", "name")
                 ->view('components.user-field')->sortable()->searchable(),
             Column::make('', 'id')->view('components.user-select')->searchable(),
         ];

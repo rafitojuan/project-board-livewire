@@ -63,10 +63,10 @@ class Kanban extends Component
         }])->findOrFail($decryptedId);
         $this->teamId = $decryptedId;
 
-        $this->loadColumns($decryptedId);
+        $this->loadColumns($this->teamId);
     }
 
-    public function loadColumns(int $id): void
+    public function loadColumns($id): void
     {
         $this->columns = Column::with(['tasklists' => function ($query) use ($id) {
             $query->where('team_id', $id)->orderBy('order');
@@ -170,10 +170,10 @@ class Kanban extends Component
         $this->contractSignDate = $tasklist['contract_sign'];
     }
 
-    public function closeEditTasklistModal($id)
+    public function closeEditTasklistModal()
     {
-        $this->reset();
-        $this->loadColumns($id);
+        // $this->reset();
+        $this->loadColumns($this->teamId);
     }
 
     public function openAddTaskModal($tasklistColumnId)
