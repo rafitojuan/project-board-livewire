@@ -17,4 +17,9 @@ class Announcement extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function comment()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

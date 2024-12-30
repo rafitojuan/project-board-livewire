@@ -77,17 +77,17 @@
                     <!-- item-->
                     <a class="dropdown-item" href="javascript:void(0)"><i
                             class="bx bx-user font-size-16 align-middle me-1"></i> <span
-                            key="t-profile">@lang('translation.Profile')</span></a>
-                    <a class="dropdown-item" href="javascript:void(0)"><i
+                            key="t-profile">Profil</span></a>
+                    {{-- <a class="dropdown-item" href="javascript:void(0)"><i
                             class="bx bx-wallet font-size-16 align-middle me-1"></i> <span
-                            key="t-my-wallet">@lang('translation.My_Wallet')</span></a>
+                            key="t-my-wallet">@lang('translation.My_Wallet')</span></a> --}}
                     <a class="dropdown-item d-block" href="javascript:void(0)" data-bs-toggle="modal"
                         data-bs-target=".change-password"><span class="badge bg-success float-end">11</span><i
                             class="bx bx-wrench font-size-16 align-middle me-1"></i> <span
-                            key="t-settings">@lang('translation.Settings')</span></a>
-                    <a class="dropdown-item" href="javascript:void(0)"><i
+                            key="t-settings">Pengaturan</span></a>
+                    {{-- <a class="dropdown-item" href="javascript:void(0)"><i
                             class="bx bx-lock-open font-size-16 align-middle me-1"></i> <span
-                            key="t-lock-screen">@lang('translation.Lock_screen')</span></a>
+                            key="t-lock-screen">@lang('translation.Lock_screen')</span></a> --}}
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item text-danger" href="javascript:void();"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
